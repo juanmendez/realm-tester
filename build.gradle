@@ -25,4 +25,10 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile "org.mockito:mockito-core:2.7.5"
+
+    testCompile "org.powermock:powermock-module-junit4:1.7.0RC2"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.7.0RC2"
+    testCompile "org.powermock:powermock-api-mockito2:1.7.0RC2"
+    testCompile "org.powermock:powermock-classloading-xstream:1.7.0RC2"
+
 }
