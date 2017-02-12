@@ -46,9 +46,13 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-gradlew
-gradlew.bat
-.gradle/
-.idea/
-build/
-gradle/
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/gradle
+/captures
+.externalNativeBuild

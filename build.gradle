@@ -1,34 +1,55 @@
-version '1.0-SNAPSHOT'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+        classpath "io.realm:realm-gradle-plugin:2.3.1"
 
-apply plugin: 'java'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
 
-sourceCompatibility = 1.5
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
 
-repositories {
-    jcenter()
-    mavenCentral()
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'realm-android'
+def AppId = "info.juanmendez.learn.powermock_w_realm"
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+
+    defaultConfig {
+        applicationId "$AppId"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.1"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-}
-version '1.0-SNAPSHOT'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'io.reactivex:rxjava:1.2.5'
 
-apply plugin: 'java'
-
-sourceCompatibility = 1.5
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile "org.mockito:mockito-core:2.7.5"
+    testCompile "org.mockito:mockito-core:1.10.19"
 
-    testCompile "org.powermock:powermock-module-junit4:1.7.0RC2"
-    testCompile "org.powermock:powermock-module-junit4-rule:1.7.0RC2"
-    testCompile "org.powermock:powermock-api-mockito2:1.7.0RC2"
-    testCompile "org.powermock:powermock-classloading-xstream:1.7.0RC2"
-
+    testCompile "org.powermock:powermock-api-mockito:1.6.2"
+    testCompile "org.powermock:powermock-module-junit4:1.6.2"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
+    testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
 }

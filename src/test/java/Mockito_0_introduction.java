@@ -1,16 +1,15 @@
-import com.sun.xml.internal.ws.api.server.AsyncProviderCallback;
-import info.juanmendez.learn.mockito.models.Pet;
 import info.juanmendez.learn.mockito.models.PetImpl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.*;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * Created by musta on 2/7/2017.
