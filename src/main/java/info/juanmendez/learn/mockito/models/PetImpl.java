@@ -33,4 +33,6 @@ public class PetImpl implements Pet {
     public void setType(String type) {
         this.type = type;
     }
+
+    public String updateAnswer( String _a, String _b ){ return ""; };
 }

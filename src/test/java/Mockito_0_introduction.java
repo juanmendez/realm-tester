@@ -1,10 +1,9 @@
 import info.juanmendez.learn.mockito.models.PetImpl;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.List;
 
@@ -101,5 +100,24 @@ public class Mockito_0_introduction {
         verify( pet ).setName( captor.capture() );
 
         assertEquals( "Amelia", captor.getValue() );
+    }
+
+    @Test
+    public void then_Answer(){
+        when( pet.updateAnswer(any(), any())).thenAnswer( answerThem());
+
+        assertEquals("return must be", "answer1 x answer2", pet.updateAnswer( "answer1", "answer2"));
+    }
+
+    private Answer<String> answerThem(){
+        return new Answer<String>() {
+            @Override
+            public String answer(InvocationOnMock invocationOnMock) throws Throwable {
+                String string1 = (String) invocationOnMock.getArguments()[0];
+                String string2 = (String) invocationOnMock.getArguments()[1];
+
+                return string1 + " x " + string2;
+            }
+        };
     }
 }
