@@ -21,7 +21,7 @@ allprojects {
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'realm-android'
-def AppId = "info.juanmendez.learn.powermock_w_realm"
+def AppId = "info.juanmendez.learn.mocking_realm"
 
 android {
     compileSdkVersion 25

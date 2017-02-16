@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/learningMockito.iml" filepath="$PROJECT_DIR$/learningMockito.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mockingRealm.iml" filepath="$PROJECT_DIR$/mockingRealm.iml" />
     </modules>
   </component>
 </project>
