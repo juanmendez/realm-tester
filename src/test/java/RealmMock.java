@@ -127,7 +127,16 @@ public class RealmMock
         }, () ->{
             System.out.println( "this dog made was succesfully saved!");
         }, error -> {
-            System.out.println( "this dog made didn't make it :(");
+        });
+
+        assertEquals( "There are two items found after async transactions", realm.where(Dog.class).findAll().size(), 2 );
+
+        realm.executeTransactionAsync( realm1 -> {
+            throw new  RuntimeException("Making a big deal because there are no more dogs to add" );
+        }, () ->{
+            System.out.println( "this dog made was succesfully saved!");
+        }, error -> {
+            System.err.println( "Transaction.error: " + error.getMessage() );
         });
     }
 }
