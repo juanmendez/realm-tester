@@ -1,4 +1,4 @@
-package info.juanmendez.learn.realms;
+package info.juanmendez.learn.realms.models;
 
 import io.realm.RealmObject;
 
@@ -8,7 +8,7 @@ import java.util.Date;
  * Created by musta on 2/10/2017.
  */
 
-public class RealmDog extends RealmObject{
+public class Dog extends RealmObject{
     private int id;
     private String name;
     private int age;

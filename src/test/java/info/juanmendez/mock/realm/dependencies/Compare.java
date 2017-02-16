@@ -1,0 +1,12 @@
+package info.juanmendez.mock.realm.dependencies;
+
+/**
+ * Created by @juanmendezinfo on 2/15/2017.
+ */
+public class Compare{
+    public static final String less = "less";
+    public static final String lessOrEqual = "lessOrEqual";
+    public static final String equal = "equal";
+    public static final String more = "more";
+    public static final String moreOrEqual = "moreOrEqual";
+}
