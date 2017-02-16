@@ -51,6 +51,28 @@ public class QueryFactory {
             }
         });
 
+
+        when( realmQuery.sum( anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+
+                if( invocation.getArguments().length >= 1 ){
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return queryMap.get(clazz).sum( fieldName );
+                }
+            }
+        });
+
+        when( realmQuery.average(anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+                if( invocation.getArguments().length >= 1 ){
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return queryMap.get(clazz).average(fieldName);
+                }
+            }
+        });
+
         //TODO whens will also be moved over another class
         when( realmQuery.lessThan( any(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyByte()) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
