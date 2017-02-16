@@ -101,20 +101,24 @@ public class RealmMock
 
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
-        dog.setName("Idalgo");
+        dog.setName("Idalgo Mendez");
         dog.setBirthdate( new Date(2011, 6, 10));
 
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
-        dog.setName("Fido");
+        dog.setName("Fido Fernandez");
         dog.setBirthdate( new Date(2016, 6, 10));
 
         RealmResults<Dog> dogs = realm.where(Dog.class).contains("name", "id", Case.INSENSITIVE ).findAll();
-        assertEquals( "dog is found", dogs.size(), 2  );
+        assertEquals( "Two dogs contain 'id' cased-insensitive", dogs.size(), 2  );
 
 
         dogs = realm.where(Dog.class).contains("name", "id" ).findAll();
-        assertEquals( "dog is found", dogs.size(), 1  );
+        assertEquals( "One dog contains 'id' cased sensitive", dogs.size(), 1  );
+
+
+        dogs = realm.where(Dog.class).endsWith("name", "dez", Case.SENSITIVE  ).findAll();
+        assertEquals( "Two dogs end with 'dez' case-sensitive", dogs.size(), 2  );
     }
 
     @Test

@@ -121,12 +121,6 @@ public class QueryFactory {
                 Object value = invocationOnMock.getArguments()[1];
                 Class clazz = value.getClass();
 
-                Case casing = Case.SENSITIVE;
-                if( argsLen >= 3 ){
-                    casing = (Case) invocationOnMock.getArguments()[2];
-                }
-
-
                 RealmList<RealmObject> queriedList = new RealmList<>();
                 RealmList<RealmObject> searchList = new RealmList<>();
                 HashMap<Class, RealmList<RealmObject>> queryMap = RealmStorage.getQueryMap();
@@ -232,25 +226,31 @@ public class QueryFactory {
                                 queriedList.add( realmObject);
                             }
                         }
-                        else if( condition == Compare.contains && clazz == String.class  ){
-                            if( casing == Case.SENSITIVE && ((String)thisValue).contains((String )value)  ){
-                                queriedList.add( realmObject);
-                            }
-                            else
-                            if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).contains(((String )value).toLowerCase()))
-                            {
-                                queriedList.add( realmObject);
-                            }
-                        }
-                        else if( condition == Compare.endsWith ){
+                        else if( clazz == String.class && (condition == Compare.contains || condition == Compare.endsWith)  ){
 
-                            if( casing == Case.SENSITIVE && ((String)thisValue).endsWith((String )value)  ){
-                                queriedList.add( realmObject);
+                            Case casing = Case.SENSITIVE;
+                            if( argsLen >= 3 ){
+                                casing = (Case) invocationOnMock.getArguments()[2];
                             }
-                            else
-                            if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).endsWith(((String )value).toLowerCase()))
-                            {
-                                queriedList.add( realmObject);
+
+                            if( condition == Compare.contains ){
+                                if( casing == Case.SENSITIVE && ((String)thisValue).contains((String )value)  ){
+                                    queriedList.add( realmObject);
+                                }
+                                else
+                                if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).contains(((String )value).toLowerCase())) {
+                                    queriedList.add( realmObject);
+                                }
+                            }
+                            else if( condition == Compare.endsWith ){
+                                if( casing == Case.SENSITIVE && ((String)thisValue).endsWith((String )value)  ){
+                                    queriedList.add( realmObject);
+                                }
+                                else
+                                if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).endsWith(((String )value).toLowerCase()))
+                                {
+                                    queriedList.add( realmObject);
+                                }
                             }
                         }
                     }
