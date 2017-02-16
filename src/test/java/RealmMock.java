@@ -13,9 +13,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.

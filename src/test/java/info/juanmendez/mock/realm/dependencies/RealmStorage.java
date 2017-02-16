@@ -2,8 +2,6 @@ package info.juanmendez.mock.realm.dependencies;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**

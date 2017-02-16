@@ -77,6 +77,31 @@ public class QueryFactory {
             }
         });
 
+
+        when( realmQuery.max(anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+                if( invocation.getArguments().length >= 1 ){
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return queryMap.get(clazz).max(fieldName);
+                }
+                return  null;
+            }
+        });
+
+        when( realmQuery.min(anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+                if( invocation.getArguments().length >= 1 ){
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return queryMap.get(clazz).min(fieldName);
+                }
+                return  null;
+            }
+        });
+
+
+
         //TODO whens will also be moved over another class
         when( realmQuery.lessThan( any(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyByte()) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
