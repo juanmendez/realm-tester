@@ -3,6 +3,7 @@ package info.juanmendez.mock.realm.factories;
 import info.juanmendez.mock.realm.dependencies.RealmMatchers;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import io.realm.Realm;
+import io.realm.RealmAsyncTask;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import org.mockito.Mockito;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -26,6 +28,7 @@ public class RealmFactory {
     public static Realm create(){
         Realm realm = PowerMockito.mock(Realm.class );
         prepare(realm);
+        prepareTransactions(realm);
         return  realm;
     }
 
@@ -52,19 +55,6 @@ public class RealmFactory {
                 return realmObject;
             }
         });
-
-        //call execute() in Realm.Transaction object received.
-        doAnswer( new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-
-                if( invocation.getArguments().length > 0 ){
-                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
-                    transaction.execute( realm );
-                }
-                return null;
-            }
-        }).when( realm ).executeTransaction(any( Realm.Transaction.class ));
 
 
         when( realm.copyToRealm(Mockito.any( RealmObject.class ))).thenAnswer( new Answer<RealmObject>(){
@@ -99,5 +89,133 @@ public class RealmFactory {
                 return QueryFactory.create( clazz );
             }
         });
+    }
+
+    private static void prepareTransactions( Realm realm ){
+
+        //call execute() in Realm.Transaction object received.
+        doAnswer( new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+
+                if( invocation.getArguments().length > 0 ){
+                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                    transaction.execute( realm );
+                }
+                return null;
+            }
+        }).when( realm ).executeTransaction(any( Realm.Transaction.class ));
+
+        doAnswer( new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+
+                if( invocation.getArguments().length > 0 ){
+                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                    transaction.execute( realm );
+                }
+                return null;
+            }
+        }).when( realm ).executeTransactionAsync(any( Realm.Transaction.class ));
+
+
+        when( realm.executeTransactionAsync(any( Realm.Transaction.class ), any( Realm.Transaction.OnSuccess.class ))  ).thenAnswer(
+                new Answer<RealmAsyncTask>() {
+
+
+                    @Override
+                    public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
+
+                        if( invocation.getArguments().length >=1 ){
+                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                            transaction.execute( realm );
+                        }
+
+                        if( invocation.getArguments().length >=2 ){
+                            Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                            onSuccess.onSuccess();
+                        }
+
+                        //this is just to meet requirements
+                        return new RealmAsyncTask() {
+                            @Override
+                            public void cancel() {}
+
+                            @Override
+                            public boolean isCancelled() {return false;}
+                        };
+                    }
+                }
+        );
+
+
+        when( realm.executeTransactionAsync(any( Realm.Transaction.class ), any( Realm.Transaction.OnSuccess.class ), any(Realm.Transaction.OnError.class))  ).thenAnswer(
+                new Answer<RealmAsyncTask>() {
+
+
+                    @Override
+                    public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
+
+                        if( invocation.getArguments().length >=1 ){
+                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+
+                            try{
+                                transaction.execute( realm );
+
+                                if( invocation.getArguments().length >=2 ){
+                                    Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                                    onSuccess.onSuccess();
+                                }
+                            }catch (Throwable error ){
+                                if( invocation.getArguments().length >=3 ){
+                                    Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
+                                    onError.onError(error);
+                                }
+                            }
+                        }
+
+                        //this is just to meet requirements
+                        return new RealmAsyncTask() {
+                            @Override
+                            public void cancel() {}
+
+                            @Override
+                            public boolean isCancelled() {return false;}
+                        };
+                    }
+                }
+        );
+
+
+        when( realm.executeTransactionAsync(any( Realm.Transaction.class ), any(Realm.Transaction.OnError.class))  ).thenAnswer(
+                new Answer<RealmAsyncTask>() {
+
+                    @Override
+                    public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
+
+                        if( invocation.getArguments().length >=1 ){
+                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+
+                            try{
+                                transaction.execute( realm );
+                            }catch (Throwable error ){
+                                if( invocation.getArguments().length >=2 ){
+                                    Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
+                                    onError.onError(error);
+                                }
+                            }
+                        }
+
+                        //this is just to meet requirements
+                        return new RealmAsyncTask() {
+                            @Override
+                            public void cancel() {}
+
+                            @Override
+                            public boolean isCancelled() {return false;}
+                        };
+                    }
+                }
+        );
     }
 }

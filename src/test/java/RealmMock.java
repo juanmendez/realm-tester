@@ -106,4 +106,28 @@ public class RealmMock
 
         assertEquals( "Synchronous added first item", realm.where(Dog.class).findFirst().getName(), "Max" );
     }
+
+    @Test
+    public void testAsyncTransactionOnSuccessAndError(){
+
+        realm.executeTransactionAsync( realm1 -> {
+            Dog dog = realm.createObject(Dog.class);
+            dog.setAge(1);
+            dog.setName("Max");
+            dog.setBirthdate( new Date(2011, 6, 10));
+        }, () ->{
+            System.out.println( "this dog made was succesfully saved!");
+        });
+
+        realm.executeTransactionAsync( realm1 -> {
+            Dog dog = realm.createObject(Dog.class);
+            dog.setAge(1);
+            dog.setName("Max");
+            dog.setBirthdate( new Date(2011, 6, 10));
+        }, () ->{
+            System.out.println( "this dog made was succesfully saved!");
+        }, error -> {
+            System.out.println( "this dog made didn't make it :(");
+        });
+    }
 }
