@@ -7,7 +7,6 @@ import io.realm.log.RealmLog;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -16,7 +15,6 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
@@ -92,8 +90,8 @@ public class RealmMock
         assertNotNull( "dog is found", dogs  );
 
         //iteration is working
-        for( Dog iDog: dogs ){
-            System.out.println( "dog: " + iDog.getName() );
+        for( Dog _dog: dogs ){
+            System.out.println( "dog: " + _dog.getName() );
         }
     }
 }
