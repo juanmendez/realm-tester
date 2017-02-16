@@ -43,6 +43,14 @@ public class QueryFactory {
             return realResults.get(0);
         });
 
+        when( realmQuery.count() ).thenAnswer(new Answer<Long>() {
+            @Override
+            public Long answer(InvocationOnMock invocation) throws Throwable {
+
+                return ((Number)queryMap.get(clazz).size()).longValue();
+            }
+        });
+
         //TODO whens will also be moved over another class
         when( realmQuery.lessThan( any(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyByte()) ).thenAnswer( createComparison( realmQuery, Compare.less ) );

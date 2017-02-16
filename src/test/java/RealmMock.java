@@ -122,6 +122,22 @@ public class RealmMock
     }
 
     @Test
+    public void checkCount(){
+        Dog dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Idalgo Mendez");
+        dog.setBirthdate( new Date(2011, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Fido Fernandez");
+        dog.setBirthdate( new Date(2016, 6, 10));
+
+        long numOfDogs = realm.where(Dog.class).endsWith("name", "dez", Case.SENSITIVE  ).count();
+        assertEquals( "Two dogs end with 'dez' case-sensitive", numOfDogs, 2  );
+    }
+
+    @Test
     public void testSynchronousTransaction(){
         realm.executeTransaction(realm1 -> {
             Dog dog = realm.createObject(Dog.class);
