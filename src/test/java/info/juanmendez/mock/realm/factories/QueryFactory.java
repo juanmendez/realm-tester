@@ -60,6 +60,8 @@ public class QueryFactory {
                     String fieldName = (String) invocation.getArguments()[0];
                     return queryMap.get(clazz).sum( fieldName );
                 }
+
+                return  null;
             }
         });
 
@@ -70,6 +72,8 @@ public class QueryFactory {
                     String fieldName = (String) invocation.getArguments()[0];
                     return queryMap.get(clazz).average(fieldName);
                 }
+
+                return  null;
             }
         });
 
