@@ -94,4 +94,16 @@ public class RealmMock
             System.out.println( "dog: " + _dog.getName() );
         }
     }
+
+    @Test
+    public void testSynchronousTransaction(){
+        realm.executeTransaction(realm1 -> {
+            Dog dog = realm.createObject(Dog.class);
+            dog.setAge(1);
+            dog.setName("Max");
+            dog.setBirthdate( new Date(2011, 6, 10));
+        });
+
+        assertEquals( "Synchronous added first item", realm.where(Dog.class).findFirst().getName(), "Max" );
+    }
 }
