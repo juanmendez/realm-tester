@@ -97,6 +97,27 @@ public class RealmMock
     }
 
     @Test
+    public void testCaseSensitivity(){
+
+        Dog dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Idalgo");
+        dog.setBirthdate( new Date(2011, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Fido");
+        dog.setBirthdate( new Date(2016, 6, 10));
+
+        RealmResults<Dog> dogs = realm.where(Dog.class).contains("name", "id", Case.INSENSITIVE ).findAll();
+        assertEquals( "dog is found", dogs.size(), 2  );
+
+
+        dogs = realm.where(Dog.class).contains("name", "id" ).findAll();
+        assertEquals( "dog is found", dogs.size(), 1  );
+    }
+
+    @Test
     public void testSynchronousTransaction(){
         realm.executeTransaction(realm1 -> {
             Dog dog = realm.createObject(Dog.class);

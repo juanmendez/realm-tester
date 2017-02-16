@@ -2,6 +2,7 @@ package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.Compare;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
+import io.realm.Case;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
@@ -81,6 +82,11 @@ public class QueryFactory {
         when( realmQuery.equalTo( anyString(), anyBoolean() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
 
+        when( realmQuery.contains( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.contains ) );
+        when( realmQuery.contains( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.contains ) );
+        when( realmQuery.endsWith( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.endsWith ) );
+        when( realmQuery.endsWith( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.endsWith ) );
+
         return realmQuery;
     }
 
@@ -99,12 +105,27 @@ public class QueryFactory {
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                String type = (String) invocationOnMock.getArguments()[0];
+                int argsLen = invocationOnMock.getArguments().length;
+                String type = "";
+
+                if( argsLen >= 1 ){
+                    type = (String) invocationOnMock.getArguments()[0];
+
+                    if( type.isEmpty() )
+                        return realmQuery;
+                }
+                else if( argsLen < 2 ){
+                    return realmQuery;
+                }
+
                 Object value = invocationOnMock.getArguments()[1];
                 Class clazz = value.getClass();
 
-                if( type.isEmpty() )
-                    return realmQuery;
+                Case casing = Case.SENSITIVE;
+                if( argsLen >= 3 ){
+                    casing = (Case) invocationOnMock.getArguments()[2];
+                }
+
 
                 RealmList<RealmObject> queriedList = new RealmList<>();
                 RealmList<RealmObject> searchList = new RealmList<>();
@@ -211,22 +232,27 @@ public class QueryFactory {
                                 queriedList.add( realmObject);
                             }
                         }
+                        else if( condition == Compare.contains && clazz == String.class  ){
+                            if( casing == Case.SENSITIVE && ((String)thisValue).contains((String )value)  ){
+                                queriedList.add( realmObject);
+                            }
+                            else
+                            if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).contains(((String )value).toLowerCase()))
+                            {
+                                queriedList.add( realmObject);
+                            }
+                        }
+                        else if( condition == Compare.endsWith ){
 
-                    /*
-                    TODO: more conditions to search and update queryMap<realmQueryClass, collection>
-                    else if( compare == Compare.contains && clazz == String.class ){
-
-
-                    }
-                    else if( compare == Compare.startsWith && clazz == String.class ){
-
-
-                    }
-                    else if( compare == Compare.endsWith && clazz == String.class ){
-
-
-                    }*/
-
+                            if( casing == Case.SENSITIVE && ((String)thisValue).endsWith((String )value)  ){
+                                queriedList.add( realmObject);
+                            }
+                            else
+                            if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).endsWith(((String )value).toLowerCase()))
+                            {
+                                queriedList.add( realmObject);
+                            }
+                        }
                     }
                 }
 
