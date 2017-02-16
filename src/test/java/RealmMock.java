@@ -16,6 +16,7 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
@@ -42,16 +43,23 @@ public class RealmMock
         assertNotNull( realm.createObject(Dog.class));
     }
 
+    /**
+     * Realm mocked is suppose to bounce back same object to copyToRealm
+     * @throws Exception
+     */
     @Test
     public void testCopyToRealm() throws Exception {
 
         Dog dog = new Dog();
-         dog.setName("Max");
+        dog.setName("Max");
         dog.setAge(1);
 
         assertEquals("is same dog?", dog, realm.copyToRealm( dog ) );
     }
 
+    /**
+     * So lets see if I can create an object, and I can get a realmResult back, and check the size to be equal to 1
+     */
     @Test
     public void testExecuteTransaction(){
         realm.executeTransaction( realm1 -> {
@@ -61,10 +69,12 @@ public class RealmMock
             dog.setBirthdate( new Date(2011, 6, 10));
         });
 
-        //assertNotNull("there is now a List<Dog.class> in realmMap", realmMap.get(Dog.class) );
-        //assertTrue( "there is one element in ",  realmMap.get(Dog.class).size() == 1);
+        assertEquals( "there is now one element available", realm.where(Dog.class).findAll().size(), 1 );
     }
 
+    /**
+     * assures we can get back dogs who were born after 2009.
+     */
     @Test
     public void testConditions(){
         Dog dog = realm.createObject(Dog.class);
@@ -81,21 +91,9 @@ public class RealmMock
         RealmResults<Dog> dogs = realm.where(Dog.class).greaterThanOrEqualTo("birthdate", new Date(2009, 6, 10) ).findAll();
         assertNotNull( "dog is found", dogs  );
 
-        for( int i = 0; i < dogs.size(); i++ ){
-            System.out.println( "dog: " + dogs.get(i).getName() );
-        }
-
+        //iteration is working
         for( Dog iDog: dogs ){
             System.out.println( "dog: " + iDog.getName() );
-        }
-    }
-
-
-    class ArgMatcher<T> extends ArgumentMatcher<T>{
-
-        @Override
-        public boolean matches(Object o) {
-            return false;
         }
     }
 }
