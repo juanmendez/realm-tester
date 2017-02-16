@@ -2,21 +2,16 @@ package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.RealmMatchers;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
-import io.realm.Realm;
-import io.realm.RealmAsyncTask;
-import io.realm.RealmObject;
-import io.realm.RealmQuery;
+import io.realm.*;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -41,10 +36,10 @@ public class RealmFactory {
             @Override
             public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
-                HashMap<Class, ArrayList<RealmObject>> realmMap = RealmStorage.getRealmMap()
+                HashMap<Class, RealmList<RealmObject>> realmMap = RealmStorage.getRealmMap()
                         ;
                 if( !realmMap.containsKey(clazz)){
-                    realmMap.put(clazz, new ArrayList<>());
+                    realmMap.put(clazz, new RealmList<>());
                 }
 
                 Constructor constructor = clazz.getConstructor();
@@ -65,10 +60,10 @@ public class RealmFactory {
                 if( invocationOnMock.getArguments().length > 0 ){
                     RealmObject realmObject = (RealmObject) invocationOnMock.getArguments()[0];
                     Class clazz = realmObject.getClass();
-                    HashMap<Class, ArrayList<RealmObject>> realmMap = RealmStorage.getRealmMap();
+                    HashMap<Class, RealmList<RealmObject>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){
-                        realmMap.put(clazz, new ArrayList<>());
+                        realmMap.put(clazz, new RealmList<>());
                     }
 
                     realmMap.get( clazz ).add( realmObject );

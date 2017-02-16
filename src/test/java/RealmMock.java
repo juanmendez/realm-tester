@@ -15,6 +15,7 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
@@ -134,9 +135,9 @@ public class RealmMock
         realm.executeTransactionAsync( realm1 -> {
             throw new  RuntimeException("Making a big deal because there are no more dogs to add" );
         }, () ->{
-            System.out.println( "this dog made was succesfully saved!");
+            assertTrue("Expecting an error", 1==0);
         }, error -> {
-            System.err.println( "Transaction.error: " + error.getMessage() );
+            assertTrue(error.getMessage(), 1==1);
         });
     }
 }

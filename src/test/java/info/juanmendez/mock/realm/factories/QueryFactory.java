@@ -2,13 +2,13 @@ package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.Compare;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -25,8 +25,8 @@ public class QueryFactory {
 
     public static RealmQuery create(Class clazz ){
 
-        HashMap<Class, ArrayList<RealmObject>> realmMap = RealmStorage.getRealmMap();
-        HashMap<Class, ArrayList<RealmObject>> queryMap = RealmStorage.getQueryMap();
+        HashMap<Class, RealmList<RealmObject>> realmMap = RealmStorage.getRealmMap();
+        HashMap<Class, RealmList<RealmObject>> queryMap = RealmStorage.getQueryMap();
         queryMap.put(clazz, realmMap.get(clazz) );
 
         RealmQuery realmQuery = mock(RealmQuery.class);
@@ -38,7 +38,7 @@ public class QueryFactory {
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
-            ArrayList<RealmObject> realResults = queryMap.get(clazz);
+            RealmList<RealmObject> realResults = queryMap.get(clazz);
             return realResults.get(0);
         });
 
@@ -106,9 +106,9 @@ public class QueryFactory {
                 if( type.isEmpty() )
                     return realmQuery;
 
-                ArrayList<RealmObject> queriedList = new ArrayList<>();
-                ArrayList<RealmObject> searchList = new ArrayList<>();
-                HashMap<Class, ArrayList<RealmObject>> queryMap = RealmStorage.getQueryMap();
+                RealmList<RealmObject> queriedList = new RealmList<>();
+                RealmList<RealmObject> searchList = new RealmList<>();
+                HashMap<Class, RealmList<RealmObject>> queryMap = RealmStorage.getQueryMap();
                 searchList = queryMap.get(realmQueryClass);
 
                 for (RealmObject realmObject: searchList) {

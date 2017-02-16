@@ -1,13 +1,12 @@
 package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
-
-import java.util.ArrayList;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -20,7 +19,7 @@ public class ResultsFactory {
 
     public static RealmResults create( Class clazz ){
 
-        ArrayList<RealmObject> realResults = RealmStorage.getQueryMap().get(clazz);
+        RealmList<RealmObject> realResults = RealmStorage.getQueryMap().get(clazz);
         RealmResults realmResults = PowerMockito.mock( RealmResults.class );
 
         when( realmResults.get(anyInt())).thenAnswer(positionInvokation -> {

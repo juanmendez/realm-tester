@@ -1,5 +1,6 @@
 package info.juanmendez.mock.realm.dependencies;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 
 import java.util.ArrayList;
@@ -10,16 +11,16 @@ import java.util.HashMap;
  */
 public class RealmStorage {
 
-    private static HashMap<Class, ArrayList<RealmObject>> realmMap = new HashMap<>();
-    private static HashMap<Class, ArrayList<RealmObject> > queryMap = new HashMap<>();
+    private static HashMap<Class, RealmList<RealmObject>> realmMap = new HashMap<>();
+    private static HashMap<Class, RealmList<RealmObject> > queryMap = new HashMap<>();
 
     /*keeps collections keyed by a sub-class of RealmObject.*/
-    public static HashMap<Class, ArrayList<RealmObject>> getRealmMap() {
+    public static HashMap<Class, RealmList<RealmObject>> getRealmMap() {
         return realmMap;
     }
 
     /*collections queried keyed by immediate class*/
-    public static HashMap<Class, ArrayList<RealmObject>> getQueryMap() {
+    public static HashMap<Class, RealmList<RealmObject>> getQueryMap() {
         return queryMap;
     }
 }
