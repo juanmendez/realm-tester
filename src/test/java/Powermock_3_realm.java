@@ -2,7 +2,6 @@ import android.content.Context;
 import info.juanmendez.learn.realms.RealmDog;
 import io.realm.*;
 import io.realm.internal.RealmCore;
-import io.realm.internal.TableQuery;
 import io.realm.log.RealmLog;
 import org.junit.Before;
 import org.junit.Test;
@@ -230,12 +229,12 @@ public class Powermock_3_realm
     }
 
     /**
-     * This method searches and updates queryMap<realmQuery.clazz, collection>
-     * @param realmQuery queryMap.get( realmQuery.clazz ) provides collection to update
-     * @param compare condition provided from Compare enums
-     * @return same arguments.realmQuery
+     * This method filters using args.condition and updates queryMap<realmQuery.clazz, collection>
+     * @param realmQuery queryMap.get( realmQuery.clazz ) gives key to get collection from queryMap
+     * @param condition based on Compare.enums
+     * @return the same args.realmQuery
      */
-    private Answer<RealmQuery> createComparison( RealmQuery realmQuery, String compare ){
+    private Answer<RealmQuery> createComparison( RealmQuery realmQuery, String condition ){
 
         Class realmQueryClass = (Class) Whitebox.getInternalState( realmQuery, "clazz");
 
@@ -261,7 +260,7 @@ public class Powermock_3_realm
 
                     if( thisValue != null ){
 
-                        if( compare == Compare.equal ){
+                        if( condition == Compare.equal ){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) == 0 ){
                                 queriedList.add( realmObject);
@@ -270,7 +269,7 @@ public class Powermock_3_realm
                             }
                         }
                         else
-                        if( compare == Compare.less){
+                        if( condition == Compare.less){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) < 0 ){
                                 queriedList.add( realmObject);
@@ -291,7 +290,7 @@ public class Powermock_3_realm
                                 queriedList.add( realmObject);
                             }
                         }
-                        else if( compare == Compare.lessOrEqual){
+                        else if( condition == Compare.lessOrEqual){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) <= 0 ){
                                 queriedList.add( realmObject);
@@ -312,7 +311,7 @@ public class Powermock_3_realm
                                 queriedList.add( realmObject);
                             }
                         }
-                        else if( compare == Compare.more ){
+                        else if( condition == Compare.more ){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) > 0 ){
                                 queriedList.add( realmObject);
@@ -333,7 +332,7 @@ public class Powermock_3_realm
                                 queriedList.add( realmObject);
                             }
                         }
-                        else if( compare == Compare.moreOrEqual ){
+                        else if( condition == Compare.moreOrEqual ){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) >= 0 ){
                                 queriedList.add( realmObject);
