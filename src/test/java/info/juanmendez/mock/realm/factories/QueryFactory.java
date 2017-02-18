@@ -4,7 +4,7 @@ import info.juanmendez.mock.realm.dependencies.Compare;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import io.realm.Case;
 import io.realm.RealmList;
-import io.realm.RealmObject;
+import io.realm.RealmModel;
 import io.realm.RealmQuery;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.invocation.InvocationOnMock;
@@ -26,8 +26,8 @@ public class QueryFactory {
 
     public static RealmQuery create(Class clazz ){
 
-        HashMap<Class, RealmList<RealmObject>> realmMap = RealmStorage.getRealmMap();
-        HashMap<Class, RealmList<RealmObject>> queryMap = RealmStorage.getQueryMap();
+        HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+        HashMap<Class, RealmList<RealmModel>> queryMap = RealmStorage.getQueryMap();
         queryMap.put(clazz, realmMap.get(clazz) );
 
         RealmQuery realmQuery = mock(RealmQuery.class);
@@ -39,7 +39,7 @@ public class QueryFactory {
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
-            RealmList<RealmObject> realResults = queryMap.get(clazz);
+            RealmList<RealmModel> realResults = queryMap.get(clazz);
             return realResults.get(0);
         });
 
@@ -180,109 +180,109 @@ public class QueryFactory {
                 Object value = invocationOnMock.getArguments()[1];
                 Class clazz = value.getClass();
 
-                RealmList<RealmObject> queriedList = new RealmList<>();
-                RealmList<RealmObject> searchList = new RealmList<>();
-                HashMap<Class, RealmList<RealmObject>> queryMap = RealmStorage.getQueryMap();
+                RealmList<RealmModel> queriedList = new RealmList<>();
+                RealmList<RealmModel> searchList = new RealmList<>();
+                HashMap<Class, RealmList<RealmModel>> queryMap = RealmStorage.getQueryMap();
                 searchList = queryMap.get(realmQueryClass);
 
-                for (RealmObject realmObject: searchList) {
+                for (RealmModel RealmModel: searchList) {
 
                     //RunTimeErrorException if search field is not found in realmQueryClass
-                    Object thisValue = Whitebox.getInternalState( realmObject, type );
+                    Object thisValue = Whitebox.getInternalState( RealmModel, type );
 
                     if( thisValue != null ){
 
                         if( condition == Compare.equal ){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) == 0 ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }else if(value.equals(thisValue)){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                         }
                         else
                         if( condition == Compare.less){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) < 0 ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Byte.class && ((byte)thisValue) < ((byte)value)){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Integer.class && ((int)thisValue) < ((int)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Double.class && ((double)thisValue) < ((double)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Long.class && ((long)thisValue) < ((long)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Float.class && ((float)thisValue) < ((float)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                         }
                         else if( condition == Compare.lessOrEqual){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) <= 0 ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Byte.class && ((byte)thisValue) <= ((byte)value)){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Integer.class && ((int)thisValue) <= ((int)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Double.class && ((double)thisValue) <= ((double)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Long.class && ((long)thisValue) <= ((long)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Float.class && ((float)thisValue) <= ((float)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                         }
                         else if( condition == Compare.more ){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) > 0 ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Byte.class && ((byte)thisValue) > ((byte)value)){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Integer.class && ((int)thisValue) > ((int)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Double.class && ((double)thisValue) > ((double)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Long.class && ((long)thisValue) > ((long)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Float.class && ((float)thisValue) > ((float)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                         }
                         else if( condition == Compare.moreOrEqual ){
 
                             if( clazz == Date.class && ( ((Date)thisValue) ).compareTo( (Date)value ) >= 0 ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Byte.class && ((byte)thisValue) >= ((byte)value)){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Integer.class && ((int)thisValue) >= ((int)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Double.class && ((double)thisValue) >= ((double)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Long.class && ((long)thisValue) >= ((long)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                             else if( clazz == Float.class && ((float)thisValue) >= ((float)value) ){
-                                queriedList.add( realmObject);
+                                queriedList.add( RealmModel);
                             }
                         }
                         else if( clazz == String.class && (condition == Compare.contains || condition == Compare.endsWith)  ){
@@ -294,21 +294,21 @@ public class QueryFactory {
 
                             if( condition == Compare.contains ){
                                 if( casing == Case.SENSITIVE && ((String)thisValue).contains((String )value)  ){
-                                    queriedList.add( realmObject);
+                                    queriedList.add( RealmModel);
                                 }
                                 else
                                 if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).contains(((String )value).toLowerCase())) {
-                                    queriedList.add( realmObject);
+                                    queriedList.add( RealmModel);
                                 }
                             }
                             else if( condition == Compare.endsWith ){
                                 if( casing == Case.SENSITIVE && ((String)thisValue).endsWith((String )value)  ){
-                                    queriedList.add( realmObject);
+                                    queriedList.add( RealmModel);
                                 }
                                 else
                                 if(casing == Case.INSENSITIVE && (((String)thisValue).toLowerCase()).endsWith(((String )value).toLowerCase()))
                                 {
-                                    queriedList.add( realmObject);
+                                    queriedList.add( RealmModel);
                                 }
                             }
                         }

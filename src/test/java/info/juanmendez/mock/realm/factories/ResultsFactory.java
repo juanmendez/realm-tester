@@ -2,6 +2,7 @@ package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import io.realm.RealmList;
+import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import org.mockito.invocation.InvocationOnMock;
@@ -19,7 +20,7 @@ public class ResultsFactory {
 
     public static RealmResults create( Class clazz ){
 
-        RealmList<RealmObject> realResults = RealmStorage.getQueryMap().get(clazz);
+        RealmList<RealmModel> realResults = RealmStorage.getQueryMap().get(clazz);
         RealmResults realmResults = PowerMockito.mock( RealmResults.class );
 
         when( realmResults.get(anyInt())).thenAnswer(positionInvokation -> {
@@ -41,9 +42,9 @@ public class ResultsFactory {
 
         when( realmResults.listIterator() ).thenReturn( realResults.listIterator() );
 
-        when( realmResults.listIterator(anyInt()) ).thenAnswer(new Answer<RealmObject>() {
+        when( realmResults.listIterator(anyInt()) ).thenAnswer(new Answer<RealmModel>() {
             @Override
-            public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
                 int index = (int) invocationOnMock.getArguments()[0];
                 return realResults.get(index);
             }

@@ -36,8 +36,7 @@ public class RealmFactory {
             @Override
             public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
-                HashMap<Class, RealmList<RealmObject>> realmMap = RealmStorage.getRealmMap()
-                        ;
+                HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
                 if( !realmMap.containsKey(clazz)){
                     realmMap.put(clazz, new RealmList<>());
                 }
@@ -60,7 +59,7 @@ public class RealmFactory {
                 if( invocationOnMock.getArguments().length > 0 ){
                     RealmObject realmObject = (RealmObject) invocationOnMock.getArguments()[0];
                     Class clazz = realmObject.getClass();
-                    HashMap<Class, RealmList<RealmObject>> realmMap = RealmStorage.getRealmMap();
+                    HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){
                         realmMap.put(clazz, new RealmList<>());

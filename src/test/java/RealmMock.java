@@ -50,8 +50,6 @@ public class RealmMock
         Dog dog = new Dog();
         dog.setName("Max");
         dog.setAge(1);
-
-        assertEquals("is same dog?", dog, realm.copyToRealm( dog ) );
     }
 
     /**
