@@ -27,7 +27,7 @@ public class MockRealm {
         mockStatic( RealmCore.class );
         mockStatic( RealmLog.class );
         mockStatic( RealmAsyncTask.class );
-        mockStatic( Realm.Transaction.class );
+        mockStatic( RealmObject.class );
     }
 
     private static void config(){
