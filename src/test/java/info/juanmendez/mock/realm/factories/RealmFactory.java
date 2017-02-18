@@ -42,11 +42,11 @@ public class RealmFactory {
                 }
 
                 Constructor constructor = clazz.getConstructor();
-                RealmModel RealmModel = (RealmModel) constructor.newInstance();
+                RealmModel realmModel = (RealmModel) constructor.newInstance();
 
-                realmMap.get(clazz).add( RealmModel);
+                realmMap.get(clazz).add( realmModel);
 
-                return RealmModel;
+                return realmModel;
             }
         });
 
@@ -57,16 +57,16 @@ public class RealmFactory {
             public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
 
                 if( invocationOnMock.getArguments().length > 0 ){
-                    RealmModel RealmModel = (RealmModel) invocationOnMock.getArguments()[0];
-                    Class clazz = RealmModel.getClass();
+                    RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                    Class clazz = realmModel.getClass();
                     HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){
                         realmMap.put(clazz, new RealmList<>());
                     }
 
-                    realmMap.get( clazz ).add( RealmModel );
-                    return RealmModel;
+                    realmMap.get( clazz ).add( realmModel );
+                    return realmModel;
                 }
 
                 return null;

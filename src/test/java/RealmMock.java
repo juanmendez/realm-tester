@@ -50,6 +50,8 @@ public class RealmMock
         Dog dog = new Dog();
         dog.setName("Max");
         dog.setAge(1);
+
+        realm.copyToRealm( dog );
     }
 
     /**
