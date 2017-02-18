@@ -31,10 +31,10 @@ public class RealmFactory {
 
         when( Realm.getDefaultInstance() ).thenReturn( realm );
 
-        when( realm.createObject( Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmObject.class)) ) ).thenAnswer(new Answer<RealmObject>(){
+        when( realm.createObject( Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmModel.class)) ) ).thenAnswer(new Answer<RealmModel>(){
 
             @Override
-            public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
                 HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
                 if( !realmMap.containsKey(clazz)){
@@ -42,38 +42,38 @@ public class RealmFactory {
                 }
 
                 Constructor constructor = clazz.getConstructor();
-                RealmObject realmObject = (RealmObject) constructor.newInstance();
+                RealmModel RealmModel = (RealmModel) constructor.newInstance();
 
-                realmMap.get(clazz).add( realmObject);
+                realmMap.get(clazz).add( RealmModel);
 
-                return realmObject;
+                return RealmModel;
             }
         });
 
 
-        when( realm.copyToRealm(Mockito.any( RealmObject.class ))).thenAnswer( new Answer<RealmObject>(){
+        when( realm.copyToRealm(Mockito.any( RealmModel.class ))).thenAnswer( new Answer<RealmModel>(){
 
             @Override
-            public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
+            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
 
                 if( invocationOnMock.getArguments().length > 0 ){
-                    RealmObject realmObject = (RealmObject) invocationOnMock.getArguments()[0];
-                    Class clazz = realmObject.getClass();
+                    RealmModel RealmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                    Class clazz = RealmModel.getClass();
                     HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){
                         realmMap.put(clazz, new RealmList<>());
                     }
 
-                    realmMap.get( clazz ).add( realmObject );
-                    return realmObject;
+                    realmMap.get( clazz ).add( RealmModel );
+                    return RealmModel;
                 }
 
                 return null;
             }
         });
 
-         when( realm.where( Mockito.argThat( new RealmMatchers.ClassMatcher<>(RealmObject.class))  ) ).then(new Answer<RealmQuery>(){
+         when( realm.where( Mockito.argThat( new RealmMatchers.ClassMatcher<>(RealmModel.class))  ) ).then(new Answer<RealmQuery>(){
 
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
