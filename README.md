@@ -9,13 +9,13 @@ What has been done so far
 - Chaining queries (Not supporting OR yet)
 - Mocking asynchronous and synchronous transactions
 
-What is comming in the next days
+What is comming in the next phase
 - A chart of methods supported and tested from RealmQuery
 - A chart of methods supported and tested from RealmList
 - Enabling linking queries
 - Support or() for chaining queries
 
-What is comming in a few weeks
+What is comming after
 - Query groups
 - Go supporting more methods from RealmQuery and RealmList
 - Allow realmModels to delete from its realm
