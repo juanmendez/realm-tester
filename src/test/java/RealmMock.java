@@ -265,13 +265,13 @@ public class RealmMock
 
 
         RealmResults<Dog> dogs = realm.where(Dog.class).contains( "name", "Mendez" ).or().contains("name", "Fernandez" ).findAll();
-        assertEquals( "There are three dogs with those two last names", dogs.size(), 3 );
+        assertEquals( "There are three dogs with those last names", dogs.size(), 3 );
 
         //lets do the same criteria but this time from the three dogs, lets find the ones born before the date
         dogs = realm.where( Dog.class ).contains("name", "Mendez").or().contains("name", "Fernandez")
                 .beginGroup().lessThan("birthdate", new Date(2013, 0, 1 ) ).endGroup().findAll();
 
-        //Idalgo and Hernan
+        //Idalgo and Hernan were born before 2013
         assertEquals( "There is one dog born before the given date", dogs.size(), 2 );
     }
 }
