@@ -4,7 +4,6 @@ This is ongoing work to mock Realm as much as possible hammering with Mockito, a
 
 What has been done so far
 - Have Realm.getDefaultInstance()
-- Keep a hold of all realmModels based on their class
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
 - Mocking asynchronous asAnd synchronous transactions
