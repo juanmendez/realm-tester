@@ -46,6 +46,34 @@ public class QueryFactory {
             return realResults.get(0);
         });
 
+
+        when( realmQuery.or()).then( invocation -> {
+
+           return  realmQuery;
+        });
+
+        when( realmQuery.beginGroup()).then( invocation -> {
+
+            return  realmQuery;
+        });
+
+
+        when( realmQuery.endGroup()).then( invocation -> {
+
+            return  realmQuery;
+        });
+
+        handleMathMethods(realmQuery, clazz);
+        handleSearchMethods(  realmQuery );
+
+
+        return realmQuery;
+    }
+
+    private static void handleMathMethods( RealmQuery realmQuery, Class clazz ){
+
+        HashMap<Class, RealmList<RealmModel>> queryMap = RealmStorage.getQueryMap();
+
         when( realmQuery.count() ).thenAnswer(new Answer<Long>() {
             @Override
             public Long answer(InvocationOnMock invocation) throws Throwable {
@@ -53,7 +81,6 @@ public class QueryFactory {
                 return ((Number)queryMap.get(clazz).size()).longValue();
             }
         });
-
 
         when( realmQuery.sum( anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
@@ -102,8 +129,9 @@ public class QueryFactory {
                 return  null;
             }
         });
+    }
 
-        //TODO whens will also be moved over another class
+    private static void handleSearchMethods( RealmQuery realmQuery ){
         when( realmQuery.lessThan( any(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyByte()) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyDouble() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
@@ -146,7 +174,6 @@ public class QueryFactory {
         when( realmQuery.endsWith( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.endsWith ) );
         when( realmQuery.endsWith( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.endsWith ) );
 
-        return realmQuery;
     }
 
 
