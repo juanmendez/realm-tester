@@ -6,7 +6,7 @@ import io.realm.RealmModel;
 import java.util.ArrayList;
 
 /**
- * Created by musta on 2/19/2017.
+ * Created by @juanmendezinfo on 2/19/2017.
  */
 public class QueryWatch {
 
