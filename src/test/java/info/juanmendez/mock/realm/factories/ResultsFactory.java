@@ -1,6 +1,7 @@
 package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
+import info.juanmendez.mock.realm.models.QueryWatch;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -20,7 +21,8 @@ public class ResultsFactory {
 
     public static RealmResults create( Class clazz ){
 
-        RealmList<RealmModel> realResults = RealmStorage.getQueryMap().get(clazz);
+        QueryWatch queryWatch = RealmStorage.getQueryMap().get(clazz);
+        RealmList<RealmModel> realResults = queryWatch.getQueryList();
         RealmResults realmResults = PowerMockito.mock( RealmResults.class );
 
         when( realmResults.get(anyInt())).thenAnswer(positionInvokation -> {

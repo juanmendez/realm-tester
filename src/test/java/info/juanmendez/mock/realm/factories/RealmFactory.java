@@ -2,6 +2,7 @@ package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.RealmMatchers;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
+import info.juanmendez.mock.realm.models.QueryWatch;
 import io.realm.*;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -28,6 +29,9 @@ public class RealmFactory {
     }
 
     private static void prepare(Realm realm){
+
+        HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+        HashMap<Class, QueryWatch> queryMap = RealmStorage.getQueryMap();
 
         when( Realm.getDefaultInstance() ).thenReturn( realm );
 
@@ -80,6 +84,11 @@ public class RealmFactory {
 
                 //clear list being queried
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
+
+                QueryWatch queryWatch = new QueryWatch();
+                queryWatch.onWhereClause( realmMap.get(clazz));
+                queryMap.put(clazz, queryWatch );
+
                 return QueryFactory.create( clazz );
             }
         });

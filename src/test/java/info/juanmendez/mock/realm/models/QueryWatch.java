@@ -1,29 +1,27 @@
 package info.juanmendez.mock.realm.models;
 
-import io.realm.*;
+import io.realm.RealmList;
+import io.realm.RealmModel;
 
 import java.util.ArrayList;
 
 /**
  * Created by musta on 2/19/2017.
  */
-public class QueryWatcher {
-
+public class QueryWatch {
 
     private boolean asAnd = true;
     private ArrayList<RealmList<RealmModel>> groupResults = new ArrayList<>();
     private int groupLevel = 0;
 
-    public QueryWatcher(){
+    public QueryWatch(){
 
     }
 
     public void onWhereClause( RealmList<RealmModel> realmList ){
 
-        groupLevel = 0;
-        groupResults.clear();
         groupResults.add( realmList );
-        onStartGroupClause();
+        onBeginGroupClause();
     }
 
     public RealmList<RealmModel> getQueryList(){
@@ -49,7 +47,7 @@ public class QueryWatcher {
             }
         }
 
-        //default is always true!
+        //if the las query is based on OR(), then bounce back to AND()
         this.asAnd = true;
     }
 
@@ -58,7 +56,7 @@ public class QueryWatcher {
         this.asAnd = false;
     }
 
-    public void onStartGroupClause(){
+    public void onBeginGroupClause(){
 
         RealmList<RealmModel> previousGroupList = groupResults.get( groupLevel );
 
@@ -71,19 +69,20 @@ public class QueryWatcher {
         groupResults.add( nextGroupList );
     }
 
-    public void onEndGroupClause(){
+    public void onCloseGroupClause(){
 
         RealmList<RealmModel> currentGroupList = groupResults.get( groupLevel );
         groupResults.remove( groupLevel );
 
-        groupResults.set( groupLevel--, currentGroupList );
+        groupLevel--;
+        groupResults.set( groupLevel, currentGroupList );
     }
 
     public void onFindAllClause(){
-        onEndGroupClause();
+        onCloseGroupClause();
     }
 
     public void onFindFirstClause(){
-        onEndGroupClause();
+        onCloseGroupClause();
     }
 }

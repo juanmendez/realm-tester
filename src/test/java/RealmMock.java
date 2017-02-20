@@ -123,7 +123,7 @@ public class RealmMock
     }
 
     @Test
-    public void checkCount(){
+    public void testCount(){
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Idalgo Mendez");
@@ -233,5 +233,45 @@ public class RealmMock
         RealmResults<Person> people = realm.where(Person.class).contains("dogs.name", "Flores" ).findAll();
 
         assertEquals( "there is one person found with such dog", 1, people.size());
+    }
+
+
+    @Test
+    public void testOrQueries(){
+
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Idalgo Mendez");
+        dog.setBirthdate( new Date(2011, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Fido Fernandez");
+        dog.setBirthdate( new Date(2016, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2012, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2014, 6, 10));
+
+
+        RealmResults<Dog> dogs = realm.where(Dog.class).contains( "name", "Mendez" ).or().contains("name", "Fernandez" ).findAll();
+        assertEquals( "There are three dogs with those two last names", dogs.size(), 3 );
+
+        //lets do the same criteria but this time from the three dogs, lets find the ones born before the date
+        dogs = realm.where( Dog.class ).contains("name", "Mendez").or().contains("name", "Fernandez")
+                .beginGroup().lessThan("birthdate", new Date(2013, 0, 1 ) ).endGroup().findAll();
+
+        //Idalgo and Hernan
+        assertEquals( "There is one dog born before the given date", dogs.size(), 2 );
     }
 }
