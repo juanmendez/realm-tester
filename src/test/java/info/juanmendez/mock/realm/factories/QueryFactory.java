@@ -39,12 +39,12 @@ public class QueryFactory {
         Whitebox.setInternalState( realmQuery, "clazz", clazz);
 
         when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
-            queryWatch.onFindAllClause();
+            queryWatch.onTopGroupClose();
             return ResultsFactory.create( clazz );
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
-            queryWatch.onFindFirstClause();
+            queryWatch.onTopGroupClose();
             RealmList<RealmModel> realResults = queryWatch.getQueryList();
             return realResults.get(0);
         });
@@ -81,7 +81,7 @@ public class QueryFactory {
         when( realmQuery.count() ).thenAnswer(new Answer<Long>() {
             @Override
             public Long answer(InvocationOnMock invocation) throws Throwable {
-                queryWatch.onFindAllClause();
+                queryWatch.onTopGroupClose();
                 return ((Number)queryWatch.getQueryList().size()).longValue();
             }
         });
@@ -91,7 +91,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length >= 1 ){
-                    queryWatch.onFindAllClause();
+                    queryWatch.onTopGroupClose();
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return queryWatch.getQueryList().sum( fieldName );
@@ -105,7 +105,7 @@ public class QueryFactory {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
-                    queryWatch.onFindAllClause();
+                    queryWatch.onTopGroupClose();
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return queryWatch.getQueryList().average(fieldName);
@@ -121,7 +121,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryWatch.onFindAllClause();
+                    queryWatch.onTopGroupClose();
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return queryWatch.getQueryList().max(fieldName);
@@ -135,7 +135,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryWatch.onFindAllClause();
+                    queryWatch.onTopGroupClose();
                     String fieldName = (String) invocation.getArguments()[0];
                     return queryWatch.getQueryList().min(fieldName);
                 }

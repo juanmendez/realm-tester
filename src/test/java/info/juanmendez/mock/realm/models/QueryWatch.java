@@ -2,6 +2,7 @@ package info.juanmendez.mock.realm.models;
 
 import io.realm.RealmList;
 import io.realm.RealmModel;
+import io.realm.exceptions.RealmException;
 
 import java.util.ArrayList;
 
@@ -18,7 +19,7 @@ public class QueryWatch {
 
     }
 
-    public void onWhereClause( RealmList<RealmModel> realmList ){
+    public void onTopGroupBegin(RealmList<RealmModel> realmList ){
 
         groupResults.add( realmList );
         onBeginGroupClause();
@@ -75,14 +76,19 @@ public class QueryWatch {
         groupResults.remove( groupLevel );
 
         groupLevel--;
+
+        if( groupLevel < 0 ){
+            throw( new RealmException("There is an attempt to close more than the number of groups created" ));
+        }
+
         groupResults.set( groupLevel, currentGroupList );
     }
 
-    public void onFindAllClause(){
+    public void onTopGroupClose(){
         onCloseGroupClause();
-    }
 
-    public void onFindFirstClause(){
-        onCloseGroupClause();
+        if( groupLevel > 0 ){
+            throw( new RealmException("Required to close all groups. Current group level is " + groupLevel ));
+        }
     }
 }

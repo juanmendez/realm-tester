@@ -86,7 +86,7 @@ public class RealmFactory {
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
 
                 QueryWatch queryWatch = new QueryWatch();
-                queryWatch.onWhereClause( realmMap.get(clazz));
+                queryWatch.onTopGroupBegin( realmMap.get(clazz));
                 queryMap.put(clazz, queryWatch );
 
                 return QueryFactory.create( clazz );
