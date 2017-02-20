@@ -232,7 +232,7 @@ public class QueryFactory {
             try {
                 value = Whitebox.getInternalState( realmModel, types.get(level) );
             } catch (Exception e) {
-                throw (new RealmException( realmModel.toString() + " doesn't have the attribute " + types.get(level) ) );
+                throw (new RealmException( realmModel.getClass().getName() + " doesn't have the attribute " + types.get(level) ) );
             }
 
             if( value != null ){

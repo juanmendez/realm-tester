@@ -192,12 +192,16 @@ public class RealmMock
     }
 
     @Test
-    public void linkedQueries(){
+    public void testLinkingQueries(){
 
-        Person person = realm.createObject( Person.class );
+        Person person;
+        Dog dog;
+
+        //person 1
+        person = realm.createObject( Person.class );
         person.setName( "Pete" );
 
-        Dog dog = realm.createObject(Dog.class);
+        dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Idalgo Mendez");
         dog.setBirthdate( new Date(2011, 6, 10));
@@ -210,8 +214,9 @@ public class RealmMock
         person.getDogs().add( dog );
 
 
+        //person 2
         person = realm.createObject( Person.class );
-        person.setName( "Pete" );
+        person.setName( "Roger" );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(1);
