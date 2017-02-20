@@ -232,6 +232,6 @@ public class RealmMock
 
         RealmResults<Person> people = realm.where(Person.class).contains("dogs.name", "Flores" ).findAll();
 
-        assertEquals( "there is one person found", 1, people.size());
+        assertEquals( "there is one person found with such dog", 1, people.size());
     }
 }
