@@ -12,8 +12,8 @@ What has been done so far
 - Grouping works, but needs more testing
 
 What is coming in the next phase
-- A chart of methods supported asAnd tested from RealmQuery
-- A chart of methods supported asAnd tested from RealmList
+- A chart of methods supported and tested from RealmQuery
+- A chart of methods supported and tested from RealmList
 
 
 What is coming after
