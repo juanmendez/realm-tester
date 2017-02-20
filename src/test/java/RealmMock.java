@@ -1,4 +1,5 @@
 import info.juanmendez.learn.realms.models.Dog;
+import info.juanmendez.learn.realms.models.Person;
 import info.juanmendez.mock.realm.MockRealm;
 import info.juanmendez.mock.realm.factories.RealmFactory;
 import io.realm.*;
@@ -11,7 +12,9 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -178,5 +181,52 @@ public class RealmMock
         }, error -> {
             assertTrue(error.getMessage(), 1==1);
         });
+    }
+
+    @Test
+    public void testDelimitedByPeriod(){
+        String str = "abc.def.xyz";
+        List<String> items = Arrays.asList(str.split("\\."));
+
+        assertEquals("there are 3 items", items.size(), 3 );
+    }
+
+    @Test
+    public void linkedQueries(){
+
+        Person person = realm.createObject( Person.class );
+        person.setName( "Pete" );
+
+        Dog dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Idalgo Mendez");
+        dog.setBirthdate( new Date(2011, 6, 10));
+        person.getDogs().add( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Fido Fernandez");
+        dog.setBirthdate( new Date(2016, 6, 10));
+        person.getDogs().add( dog );
+
+
+        person = realm.createObject( Person.class );
+        person.setName( "Pete" );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Idalgo Martinez");
+        dog.setBirthdate( new Date(2011, 6, 10));
+        person.getDogs().add( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Fido Flores");
+        dog.setBirthdate( new Date(2016, 6, 10));
+        person.getDogs().add( dog );
+
+        RealmResults<Person> people = realm.where(Person.class).contains("dogs.name", "Flores" ).findAll();
+
+        assertEquals( "there is one person found", 1, people.size());
     }
 }
