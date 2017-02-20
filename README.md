@@ -1,12 +1,12 @@
 # Mocking-Realm
 
-This is ongoing work to mock Realm as much as possible hammering with Mockito, asAnd PowerMockito.
+This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito.
 
 What has been done so far
 - Have Realm.getDefaultInstance()
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
-- Mocking asynchronous asAnd synchronous transactions
+- Mocking asynchronous and synchronous transactions
 - Enabling linking queries
 - Support or() for chaining queries
 - Grouping works, but needs more testing
