@@ -2,10 +2,7 @@ package info.juanmendez.mock.realm.factories;
 
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import info.juanmendez.mock.realm.models.QueryWatch;
-import io.realm.RealmList;
-import io.realm.RealmModel;
-import io.realm.RealmObject;
-import io.realm.RealmResults;
+import io.realm.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
@@ -49,6 +46,19 @@ public class ResultsFactory {
             public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
                 int index = (int) invocationOnMock.getArguments()[0];
                 return realResults.get(index);
+            }
+        });
+
+        when( realmResults.where() ).then(new Answer<RealmQuery>(){
+
+            @Override
+            public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
+
+                QueryWatch queryWatch = new QueryWatch();
+                queryWatch.onTopGroupBegin(realResults);
+                RealmStorage.getQueryMap().put( clazz, queryWatch );
+
+                return QueryFactory.create( clazz );
             }
         });
 

@@ -115,6 +115,7 @@ public class RealmFactory {
 
                 if( invocation.getArguments().length > 0 ){
                     Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+
                     transaction.execute( realm );
                 }
                 return null;

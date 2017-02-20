@@ -167,9 +167,6 @@ public class RealmMock
             dog.setAge(1);
             dog.setName("Max");
             dog.setBirthdate( new Date(2011, 6, 10));
-        }, () ->{
-            System.out.println( "this dog made was succesfully saved!");
-        }, error -> {
         });
 
         assertEquals( "There are two items found after async transactions", realm.where(Dog.class).findAll().size(), 2 );
@@ -272,6 +269,41 @@ public class RealmMock
                 .beginGroup().lessThan("birthdate", new Date(2013, 0, 1 ) ).endGroup().findAll();
 
         //Idalgo and Hernan were born before 2013
-        assertEquals( "There is one dog born before the given date", dogs.size(), 2 );
+        assertEquals( "There are two dogs born before the given date", dogs.size(), 2 );
+    }
+
+    @Test
+    public void testQueryAgainstRealmResults(){
+
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Idalgo Mendez");
+        dog.setBirthdate( new Date(2011, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Fido Fernandez");
+        dog.setBirthdate( new Date(2016, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2012, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2014, 6, 10));
+
+        RealmResults<Dog> dogs = realm.where(Dog.class).contains( "name", "Mendez" ).or().contains("name", "Fernandez" ).findAll();
+
+        //rather than previous test, lets skip grouping and query against dogs
+        dogs = dogs.where().lessThan("birthdate", new Date(2013, 0, 1 ) ).findAll();
+
+        assertEquals( "There are two dogs born before the given date", dogs.size(), 2 );
     }
 }
