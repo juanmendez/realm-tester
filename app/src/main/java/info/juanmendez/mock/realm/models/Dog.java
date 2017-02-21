@@ -1,4 +1,4 @@
-package info.juanmendez.mockingrealm.models;
+package info.juanmendez.mock.realm.models;
 
 import java.util.Date;
 

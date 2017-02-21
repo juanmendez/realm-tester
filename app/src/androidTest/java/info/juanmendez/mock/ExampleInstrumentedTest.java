@@ -1,4 +1,4 @@
-package info.juanmendez.mockingrealm;
+package info.juanmendez.mock;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

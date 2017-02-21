@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'realm-android'
-def AppId = "info.juanmendez.mockingrealm"
+def AppId = "info.juanmendez.mock.realm"
 
 android {
     compileSdkVersion 25

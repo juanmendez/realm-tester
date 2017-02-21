@@ -1,4 +1,4 @@
-package info.juanmendez.mockingrealm;
+package info.juanmendez.mock;
 
 import org.junit.Test;
 
