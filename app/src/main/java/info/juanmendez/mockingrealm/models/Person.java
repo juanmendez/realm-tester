@@ -1,4 +1,4 @@
-package info.juanmendez.learn.realms.models;
+package info.juanmendez.mockingrealm.models;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;

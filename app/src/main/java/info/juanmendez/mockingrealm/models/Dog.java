@@ -1,8 +1,8 @@
-package info.juanmendez.learn.realms.models;
-
-import io.realm.RealmObject;
+package info.juanmendez.mockingrealm.models;
 
 import java.util.Date;
+
+import io.realm.RealmObject;
 
 /**
  * Created by musta on 2/10/2017.
