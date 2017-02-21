@@ -20,6 +20,8 @@ import static org.junit.Assert.*;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
+ *
+ * regex /public\s+static\s+(\w+)\s+(\w+)\((.*)?\)/gm
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "android.*"})
