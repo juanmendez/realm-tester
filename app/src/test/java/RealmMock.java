@@ -1,10 +1,3 @@
-import info.juanmendez.learn.realms.models.Dog;
-import info.juanmendez.learn.realms.models.Person;
-import info.juanmendez.mock.realm.MockRealm;
-import info.juanmendez.mock.realm.factories.RealmFactory;
-import io.realm.*;
-import io.realm.internal.RealmCore;
-import io.realm.log.RealmLog;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +9,23 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import info.juanmendez.mock.realm.MockRealm;
+import info.juanmendez.mock.realm.factories.RealmFactory;
+import info.juanmendez.mock.realm.models.Dog;
+import info.juanmendez.mock.realm.models.Person;
+import io.realm.Case;
+import io.realm.Realm;
+import io.realm.RealmAsyncTask;
+import io.realm.RealmConfiguration;
+import io.realm.RealmObject;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+import io.realm.internal.RealmCore;
+import io.realm.log.RealmLog;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
