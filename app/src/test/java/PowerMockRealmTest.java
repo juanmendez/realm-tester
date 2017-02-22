@@ -15,7 +15,6 @@ import info.juanmendez.mock.realm.models.Dog;
 import info.juanmendez.mock.realm.models.Person;
 import io.realm.Case;
 import io.realm.Realm;
-import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
@@ -34,8 +33,8 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "android.*"})
-@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmCore.class, RealmLog.class, RealmAsyncTask.class, RealmObject.class })
-public class RealmMock
+@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmCore.class, RealmLog.class, RealmObject.class })
+public class PowerMockRealmTest
 {
     Realm realm;
 
@@ -44,6 +43,7 @@ public class RealmMock
         MockRealm.prepare();
         realm = RealmFactory.create();
     }
+
     @Test
     public void checkIfDefaultIsOurRealm(){
         assertEquals("is the same?", realm, Realm.getDefaultInstance());

@@ -1,19 +1,24 @@
 package info.juanmendez.mock.realm.factories;
 
-import info.juanmendez.mock.realm.dependencies.RealmMatchers;
-import info.juanmendez.mock.realm.dependencies.RealmStorage;
-import info.juanmendez.mock.realm.models.QueryWatch;
-import io.realm.*;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
+import info.juanmendez.mock.realm.dependencies.RealmMatchers;
+import info.juanmendez.mock.realm.dependencies.RealmStorage;
+import info.juanmendez.mock.realm.models.QueryWatch;
+import io.realm.Realm;
+import io.realm.RealmAsyncTask;
+import io.realm.RealmList;
+import io.realm.RealmModel;
+import io.realm.RealmQuery;
+
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
+import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -21,19 +26,19 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class RealmFactory {
 
-    public static Realm create(){
-        Realm realm = PowerMockito.mock(Realm.class );
+    public static Realm create() throws Exception {
+        Realm realm = mock(Realm.class );
         prepare(realm);
         prepareTransactions(realm);
         return  realm;
     }
 
-    private static void prepare(Realm realm){
+    private static void prepare(Realm realm) throws Exception {
 
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
         HashMap<Class, QueryWatch> queryMap = RealmStorage.getQueryMap();
 
-        when( Realm.getDefaultInstance() ).thenReturn( realm );
+        when(Realm.getDefaultInstance()).thenReturn(realm);
 
         when( realm.createObject( Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmModel.class)) ) ).thenAnswer(new Answer<RealmModel>(){
 
