@@ -21,3 +21,4 @@ What is coming in the next phase
 What is coming after
 - Go supporting more methods from RealmQuery and RealmList
 - Allow to delete realmModels from their realm
+

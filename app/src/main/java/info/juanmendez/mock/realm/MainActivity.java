@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Dog dog = realm.createObject( Dog.class );
-        dog.setName("pitbull");
+        dog.setName("Max");
         dog.setAge(1);
         dog.setId(1);
         dog.setBirthdate( new Date() );
