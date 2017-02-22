@@ -10,7 +10,8 @@ What has been done so far
 - Enabling linking queries
 - Support or() for chaining queries
 - Grouping works, but needs more testing
-- Querying against realmResults, not just realmQueries
+- Querying against realmResults
+- Testing in PowerMock, and Robolectric 3.0 + PowerMock!
 
 What is coming in the next phase
 - A chart of methods supported and tested from RealmQuery
