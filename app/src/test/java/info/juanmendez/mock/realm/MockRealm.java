@@ -8,7 +8,6 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
-import io.realm.log.RealmLog;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
@@ -27,9 +26,8 @@ public class MockRealm {
 
     private static void makeClassesStatic() throws Exception {
         mockStatic( RealmCore.class );
-        mockStatic( RealmLog.class );
         mockStatic( Realm.class );
-        mockStatic(RealmConfiguration.class);
+        mockStatic( RealmConfiguration.class);
         mockStatic( RealmQuery.class );
         mockStatic( RealmResults.class );
         mockStatic( RealmObject.class );

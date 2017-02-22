@@ -25,7 +25,6 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
-import io.realm.log.RealmLog;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @SuppressStaticInitializationFor("io.realm.internal.Util")
-@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmLog.class, RealmResults.class, RealmCore.class, RealmLog.class, RealmObject.class })
+@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmCore.class, RealmObject.class })
 public class RobolectricRealmTest {
 
     @Rule
