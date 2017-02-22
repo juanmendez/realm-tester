@@ -60,7 +60,7 @@ public class RobolectricRealmTest {
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
         RealmList dogs = realmMap.get( Dog.class );
 
-        assertEquals( "MainActivity entered one dog!", dogs.size(), realm.where(Dog.class).findAll().size() );
+        assertEquals( "MainActivity entered one dog!", realm.where(Dog.class).count(), 1 );
         assertEquals( "Is the same dog, right!?", dogs.get(0), realm.where(Dog.class).findFirst() );
     }
 }

@@ -105,6 +105,11 @@ public class PowerMockRealmTest
         for( Dog _dog: dogs ){
             System.out.println( "dog: " + _dog.getName() );
         }
+
+        //between
+        dogs = realm.where( Dog.class ).between("birthdate", new Date( 2016, 6, 10  ), new Date(2017, 0, 1)).findAll();
+
+        assertEquals( "There is only one dog born between during or after 07/10/2016, and 01/01/2017", dogs.size(), 1 );
     }
 
     @Test

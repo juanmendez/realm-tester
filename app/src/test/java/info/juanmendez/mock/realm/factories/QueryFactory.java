@@ -1,13 +1,5 @@
 package info.juanmendez.mock.realm.factories;
 
-import info.juanmendez.mock.realm.dependencies.Compare;
-import info.juanmendez.mock.realm.dependencies.RealmStorage;
-import info.juanmendez.mock.realm.models.QueryWatch;
-import io.realm.Case;
-import io.realm.RealmList;
-import io.realm.RealmModel;
-import io.realm.RealmQuery;
-import io.realm.exceptions.RealmException;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -17,7 +9,23 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
-import static org.mockito.Matchers.*;
+import info.juanmendez.mock.realm.dependencies.Compare;
+import info.juanmendez.mock.realm.dependencies.RealmStorage;
+import info.juanmendez.mock.realm.models.QueryWatch;
+import io.realm.Case;
+import io.realm.RealmList;
+import io.realm.RealmModel;
+import io.realm.RealmQuery;
+import io.realm.exceptions.RealmException;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyByte;
+import static org.mockito.Matchers.anyDouble;
+import static org.mockito.Matchers.anyFloat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -173,6 +181,13 @@ public class QueryFactory {
         when( realmQuery.greaterThanOrEqualTo( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
         when( realmQuery.greaterThanOrEqualTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
 
+        when( realmQuery.between( anyString(), anyInt(), anyInt()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
+        when( realmQuery.between( anyString(), any(Date.class), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
+        when( realmQuery.between( anyString(), anyDouble(), anyDouble()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
+        when( realmQuery.between( anyString(), anyFloat(), anyFloat()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
+        when( realmQuery.between( anyString(), anyLong(), anyLong()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
+
+
         when( realmQuery.equalTo( anyString(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), anyByte()) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), anyDouble() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
@@ -237,6 +252,9 @@ public class QueryFactory {
         Class clazz;
         Case casing = Case.SENSITIVE;
 
+        Object left;
+        Object right;
+
         public RealmList<RealmModel> search( RealmList<RealmModel> haystack, String condition, Object[] arguments ){
 
             this.condition = condition;
@@ -250,6 +268,11 @@ public class QueryFactory {
 
            if( clazz == String.class && argsLen >= 3 ){
                 casing = (Case) arguments[2];
+            }
+
+            if( condition == Compare.between ){
+                this.left = arguments[1];
+                this.right = arguments[2];
             }
 
             RealmList<RealmModel> queriedList = new RealmList<>();
@@ -276,18 +299,22 @@ public class QueryFactory {
 
             if( value != null ){
 
-                if( level < types.size() - 1 && value instanceof RealmList  ){
+                if( level < types.size() - 1  ){
 
-                    RealmList<RealmModel> valueList = (RealmList<RealmModel>) value;
+                    if( value instanceof RealmList ){
+                        RealmList<RealmModel> valueList = (RealmList<RealmModel>) value;
 
-                    for ( RealmModel rm: valueList) {
-
-                        if( checkRealmObject(rm, level+1)){
-                            return true;
+                        for ( RealmModel rm: valueList) {
+                            //at least one item must meet the requirements!
+                            if( checkRealmObject(rm, level+1)){
+                                return checkRealmObject(rm, level+1);
+                            }
                         }
+                    }else if( value instanceof RealmModel){
+                        return checkRealmObject((RealmModel)value, level+1);
                     }
 
-                    return false;
+                    throw( new RealmException( types.get(level) + " is of neither type RealmList, or RealmModel"));
                 }
 
                 if( condition == Compare.equal ){
@@ -380,6 +407,26 @@ public class QueryFactory {
                         return true;
                     }
                     else if( clazz == Float.class && ((float)value) >= ((float) needle) ){
+                        return true;
+                    }
+                }
+                else if( condition == Compare.between ){
+
+                    if( clazz == Date.class ){
+
+                        if(  ((Date)value).getTime() >= ((Date)left).getTime() && ((Date)value).getTime() <= ((Date)right).getTime())
+                        return true;
+                    }
+                    else if( clazz == Integer.class && ((int)value) >= ((int) left) && ((int)value) <= ((int) right)  ){
+                        return true;
+                    }
+                    else if( clazz == Double.class  && ((double)value) >= ((double) left) && ((double)value) <= ((double) right) ){
+                        return true;
+                    }
+                    else if( clazz == Long.class  && ((long)value) >= ((long) left) && ((long)value) <= ((long) right) ){
+                        return true;
+                    }
+                    else if( clazz == Float.class  && ((float)value) >= ((float) left) && ((float)value) <= ((float) right) ){
                         return true;
                     }
                 }
