@@ -17,12 +17,12 @@ public class MainActivity extends AppCompatActivity {
         Realm.init(getApplicationContext());
         Realm realm = Realm.getDefaultInstance();
 
+        setContentView(R.layout.activity_main);
+
         Dog dog = realm.createObject( Dog.class );
         dog.setName("pitbull");
         dog.setAge(1);
         dog.setId(1);
         dog.setBirthdate( new Date() );
-
-        setContentView(R.layout.activity_main);
     }
 }

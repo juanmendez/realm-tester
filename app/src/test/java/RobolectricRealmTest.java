@@ -1,5 +1,3 @@
-import android.widget.TextView;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,21 +10,24 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.HashMap;
+
 import info.juanmendez.mock.realm.BuildConfig;
 import info.juanmendez.mock.realm.MainActivity;
 import info.juanmendez.mock.realm.MockRealm;
-import info.juanmendez.mock.realm.R;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import info.juanmendez.mock.realm.factories.RealmFactory;
 import info.juanmendez.mock.realm.models.Dog;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
+import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by Juan Mendez on 2/21/2017.
@@ -42,18 +43,24 @@ public class RobolectricRealmTest {
 
     @Rule
     public PowerMockRule rule = new PowerMockRule();
+    public Realm realm;
 
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
-        Realm realm = RealmFactory.create();
+        realm = RealmFactory.create();
     }
 
     @Test
     public void shouldHaveLabel(){
 
         MainActivity activity = Robolectric.setupActivity( MainActivity.class );
-        TextView textView = (TextView) activity.findViewById( R.id.textView);
-        assertEquals( "main activity entered one dog", RealmStorage.getRealmMap().get(Dog.class).size(), 1);
+
+        //During testing RealmStorage.realmMap is the RealmModel repository
+        HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+        RealmList dogs = realmMap.get( Dog.class );
+
+        assertEquals( "MainActivity entered one dog!", dogs.size(), realm.where(Dog.class).findAll().size() );
+        assertEquals( "Is the same dog, right!?", dogs.get(0), realm.where(Dog.class).findFirst() );
     }
 }
