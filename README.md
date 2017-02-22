@@ -11,7 +11,7 @@ What has been done so far
 - Support or() for chaining queries
 - Grouping works, but needs more testing
 - Querying against realmResults
-- Testing in PowerMock, and Robolectric 3.0 + PowerMock!
+- Testing in PowerMock, and Robolectric 3.0 + PowerMock at the moment
 
 What is coming in the next phase
 - A chart of methods supported and tested from RealmQuery
