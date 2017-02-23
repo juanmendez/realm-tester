@@ -5,9 +5,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import info.juanmendez.mock.realm.MockRealm;
 import info.juanmendez.mock.realm.factories.RealmFactory;
@@ -43,12 +41,12 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void checkIfDefaultIsOurRealm(){
+    public void shouldBeSameRealm(){
         assertEquals("is the same?", realm, Realm.getDefaultInstance());
     }
 
     @Test
-    public void testCreateObject(){
+    public void shouldCreateObject(){
         assertNotNull( realm.createObject(Dog.class));
     }
 
@@ -57,7 +55,7 @@ public class PowerMockRealmTest
      * @throws Exception
      */
     @Test
-    public void testCopyToRealm() throws Exception {
+    public void shouldCopyToRealm() throws Exception {
 
         Dog dog = new Dog();
         dog.setName("Max");
@@ -70,7 +68,7 @@ public class PowerMockRealmTest
      * So lets see if I can create an object, and I can get a realmResult back, and check the size to be equal to 1
      */
     @Test
-    public void testExecuteTransaction(){
+    public void shouldExecuteTransaction(){
         realm.executeTransaction( realm1 -> {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(1);
@@ -85,7 +83,7 @@ public class PowerMockRealmTest
      * assures we can get back dogs who were born after 2009.
      */
     @Test
-    public void testConditions(){
+    public void shouldQueryByConditions(){
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Max");
@@ -112,7 +110,7 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void testCaseSensitivity(){
+    public void shouldQueryByCaseSensitivity(){
 
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
@@ -137,7 +135,7 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void testCount(){
+    public void shouldCount(){
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Idalgo Mendez");
@@ -153,7 +151,7 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void testSynchronousTransaction(){
+    public void shouldQuerySynchronousTransaction(){
         realm.executeTransaction(realm1 -> {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(1);
@@ -165,7 +163,7 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void testAsyncTransactionOnSuccessAndError(){
+    public void shouldQueryAsyncTransactionOnSuccessAndError(){
 
         /*
            when testing just with PowerMockito we use main thread as schedulers.
@@ -206,15 +204,7 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void testDelimitedByPeriod(){
-        String str = "abc.def.xyz";
-        List<String> items = Arrays.asList(str.split("\\."));
-
-        assertEquals("there are 3 items", items.size(), 3 );
-    }
-
-    @Test
-    public void testLinkingQueries(){
+    public void shouldDoLinkingQueries(){
 
         Person person;
         Dog dog;
@@ -259,7 +249,7 @@ public class PowerMockRealmTest
 
 
     @Test
-    public void testOrQueries(){
+    public void shouldQueryByOr(){
 
         Dog dog;
 
@@ -298,7 +288,7 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void testQueryAgainstRealmResults(){
+    public void shouldQueryAgainstRealmResults(){
 
         Dog dog;
 
