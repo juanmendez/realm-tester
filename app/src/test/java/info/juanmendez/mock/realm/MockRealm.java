@@ -33,6 +33,11 @@ public class MockRealm {
         mockStatic( RealmObject.class );
     }
 
+    /**
+     * TODO: check if this is required as tests are doing well without it
+     * From https://github.com/realm/realm-java/blob/master/examples/unitTestExample/src/test/java/io/realm/examples/unittesting/ExampleActivityTest.java
+     * @throws Exception
+     */
     private static void config() throws Exception {
 
         final RealmConfiguration mockRealmConfig = mock(RealmConfiguration.class);

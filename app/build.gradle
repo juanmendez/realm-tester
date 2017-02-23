@@ -37,7 +37,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     testCompile 'junit:junit:4.12'
 
-    testCompile 'io.reactivex:rxjava:1.2.5'
+    testCompile 'io.reactivex:rxjava:1.2.1'
+    testCompile 'io.reactivex:rxandroid:1.2.1'
 
     //To be sane, I didn't use any higher version
     //due to errors.

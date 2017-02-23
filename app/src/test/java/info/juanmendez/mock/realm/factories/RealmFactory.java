@@ -161,7 +161,6 @@ public class RealmFactory {
                             @Override
                             public Boolean call() throws Exception {
                                 if( invocation.getArguments().length >=1 ){
-                                    System.out.println( "running on " + Thread.currentThread().getName() );
                                     Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
                                     transaction.execute( realm );
 
@@ -206,7 +205,6 @@ public class RealmFactory {
                             @Override
                             public Boolean call() throws Exception {
                                 if( invocation.getArguments().length >=1 ){
-                                    System.out.println( "running on " + Thread.currentThread().getName() );
                                     Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
                                     transaction.execute( realm );
 

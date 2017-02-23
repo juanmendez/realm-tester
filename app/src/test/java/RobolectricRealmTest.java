@@ -26,6 +26,8 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -48,11 +50,13 @@ public class RobolectricRealmTest {
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
+        RealmFactory.setTransactionScheduler(Schedulers.computation() );
+        RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread() );
         realm = RealmFactory.create();
     }
 
     @Test
-    public void shouldHaveLabel(){
+    public void shouldCreateADogInMainActivity(){
 
         MainActivity activity = Robolectric.setupActivity( MainActivity.class );
 
