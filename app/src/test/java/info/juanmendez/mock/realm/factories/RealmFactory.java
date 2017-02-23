@@ -6,6 +6,7 @@ import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 import info.juanmendez.mock.realm.dependencies.RealmMatchers;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
@@ -15,6 +16,10 @@ import io.realm.RealmAsyncTask;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmQuery;
+import rx.Observable;
+import rx.Scheduler;
+import rx.Subscription;
+import rx.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
@@ -26,11 +31,22 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class RealmFactory {
 
+    private static Scheduler observerScheduler = Schedulers.immediate();
+    private static Scheduler subscriberScheduler = Schedulers.immediate();
+
     public static Realm create() throws Exception {
         Realm realm = mock(Realm.class );
         prepare(realm);
         prepareTransactions(realm);
         return  realm;
+    }
+
+    public static void setTransactionScheduler(Scheduler observerScheduler) {
+        RealmFactory.observerScheduler = observerScheduler;
+    }
+
+    public static void setResponseScheduler(Scheduler subscriberScheduler) {
+        RealmFactory.subscriberScheduler = subscriberScheduler;
     }
 
     private static void prepare(Realm realm) throws Exception {
@@ -119,9 +135,16 @@ public class RealmFactory {
             public Void answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length > 0 ){
-                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
 
-                    transaction.execute( realm );
+                    Observable.fromCallable(new Callable<Void>() {
+                        @Override
+                        public Void call() throws Exception {
+                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                            transaction.execute( realm );
+                            return null;
+                        }
+                    }).subscribeOn( observerScheduler ).subscribe(aVoid -> {});
+
                 }
                 return null;
             }
@@ -131,27 +154,42 @@ public class RealmFactory {
         when( realm.executeTransactionAsync(any( Realm.Transaction.class ), any( Realm.Transaction.OnSuccess.class ))  ).thenAnswer(
                 new Answer<RealmAsyncTask>() {
 
-
                     @Override
                     public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
 
-                        if( invocation.getArguments().length >=1 ){
-                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
-                            transaction.execute( realm );
-                        }
+                        Subscription subscription = Observable.fromCallable(new Callable<Boolean>() {
+                            @Override
+                            public Boolean call() throws Exception {
+                                if( invocation.getArguments().length >=1 ){
+                                    System.out.println( "running on " + Thread.currentThread().getName() );
+                                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                                    transaction.execute( realm );
 
-                        if( invocation.getArguments().length >=2 ){
-                            Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
-                            onSuccess.onSuccess();
-                        }
+                                    return true;
+                                }
+
+                                return false;
+                            }
+                        })
+                        .subscribeOn(observerScheduler)
+                        .observeOn( subscriberScheduler )
+                        .subscribe(aBoolean -> {
+                            if(  aBoolean && invocation.getArguments().length >=2 ){
+                                Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                                onSuccess.onSuccess();
+                            }
+
+                        });
 
                         //this is just to meet requirements
                         return new RealmAsyncTask() {
                             @Override
-                            public void cancel() {}
+                            public void cancel() {
+                                subscription.unsubscribe();
+                            }
 
                             @Override
-                            public boolean isCancelled() {return false;}
+                            public boolean isCancelled() {return subscription.isUnsubscribed();}
                         };
                     }
                 }
@@ -161,35 +199,49 @@ public class RealmFactory {
         when( realm.executeTransactionAsync(any( Realm.Transaction.class ), any( Realm.Transaction.OnSuccess.class ), any(Realm.Transaction.OnError.class))  ).thenAnswer(
                 new Answer<RealmAsyncTask>() {
 
-
                     @Override
                     public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
 
-                        if( invocation.getArguments().length >=1 ){
-                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                        Subscription subscription = Observable.fromCallable(new Callable<Boolean>() {
+                            @Override
+                            public Boolean call() throws Exception {
+                                if( invocation.getArguments().length >=1 ){
+                                    System.out.println( "running on " + Thread.currentThread().getName() );
+                                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                                    transaction.execute( realm );
 
-                            try{
-                                transaction.execute( realm );
+                                    return true;
+                                }
 
-                                if( invocation.getArguments().length >=2 ){
-                                    Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
-                                    onSuccess.onSuccess();
-                                }
-                            }catch (Throwable error ){
-                                if( invocation.getArguments().length >=3 ){
-                                    Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
-                                    onError.onError(error);
-                                }
+                                return false;
                             }
-                        }
+                        })
+                        .subscribeOn(observerScheduler)
+                        .observeOn( subscriberScheduler )
+                        .subscribe(aBoolean -> {
+                            if(  aBoolean && invocation.getArguments().length >=2 ){
+                                Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                                onSuccess.onSuccess();
+                            }
+
+                        }, throwable -> {
+
+                            if( invocation.getArguments().length >=3 ){
+                                Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
+                                onError.onError(throwable);
+                            }
+
+                        });
 
                         //this is just to meet requirements
                         return new RealmAsyncTask() {
                             @Override
-                            public void cancel() {}
+                            public void cancel() {
+                                subscription.unsubscribe();
+                            }
 
                             @Override
-                            public boolean isCancelled() {return false;}
+                            public boolean isCancelled() {return subscription.isUnsubscribed();}
                         };
                     }
                 }
@@ -202,26 +254,45 @@ public class RealmFactory {
                     @Override
                     public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
 
-                        if( invocation.getArguments().length >=1 ){
-                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                        Subscription subscription = Observable.fromCallable(new Callable<Boolean>() {
+                            @Override
+                            public Boolean call() throws Exception {
+                                if( invocation.getArguments().length >=1 ){
+                                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                                    transaction.execute( realm );
 
-                            try{
-                                transaction.execute( realm );
-                            }catch (Throwable error ){
-                                if( invocation.getArguments().length >=2 ){
-                                    Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
-                                    onError.onError(error);
+                                    return true;
                                 }
+
+                                return false;
                             }
-                        }
+                        })
+                        .subscribeOn(observerScheduler)
+                        .observeOn( subscriberScheduler )
+                        .subscribe(aBoolean -> {
+                            if(  aBoolean && invocation.getArguments().length >=2 ){
+                                Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                                onSuccess.onSuccess();
+                            }
+
+                        }, throwable -> {
+
+                            if( invocation.getArguments().length >=2 ){
+                                Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
+                                onError.onError(throwable);
+                            }
+
+                        });
 
                         //this is just to meet requirements
                         return new RealmAsyncTask() {
                             @Override
-                            public void cancel() {}
+                            public void cancel() {
+                                subscription.unsubscribe();
+                            }
 
                             @Override
-                            public boolean isCancelled() {return false;}
+                            public boolean isCancelled() {return subscription.isUnsubscribed();}
                         };
                     }
                 }
