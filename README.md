@@ -6,8 +6,10 @@ What has been done so far
 - Have Realm.getDefaultInstance()
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
-- Real asynchronous and synchronous transactions with RxJava
-    - If running with Robolectric or just PowerMockito specify their schedulers
+- Asynchronous and synchronous transactions with RxJava
+    - Default schedulers are in main thread, feel free to update them for Robolectric
+        - RealmFactory.setTransactionScheduler(Schedulers.computation())
+        - RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread())
 - Support or() for chaining queries
 - Grouping works, but needs more testing
 - Querying against realmResults
