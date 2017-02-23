@@ -6,8 +6,8 @@ What has been done so far
 - Have Realm.getDefaultInstance()
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
-- Mocking asynchronous and synchronous transactions
-- Enabling linking queries
+- Real asynchronous and synchronous transactions with RxJava
+    - If running with Robolectric or just PowerMockito specify their schedulers
 - Support or() for chaining queries
 - Grouping works, but needs more testing
 - Querying against realmResults
