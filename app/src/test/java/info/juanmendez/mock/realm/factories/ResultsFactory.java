@@ -72,6 +72,9 @@ public class ResultsFactory {
     }
 
 
+    /**
+     * TODO: handlers for deleting methods is not yet tested, and neither used yet
+     */
     private static void deleteHandlers( RealmResults mockedResults, RealmList<RealmModel> results ){
         when( mockedResults.deleteAllFromRealm() ).thenAnswer(new Answer<Boolean>() {
             @Override

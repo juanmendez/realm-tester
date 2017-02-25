@@ -10,6 +10,9 @@ import rx.subjects.PublishSubject;
 
 /**
  * Created by @juanmendezinfo on 2/15/2017.
+ *
+ * TODO: for quick observing realmModels being removed, some functionality remained here but should be
+ * sealed in its own class
  */
 public class RealmStorage {
 
