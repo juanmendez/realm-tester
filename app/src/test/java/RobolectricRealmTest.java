@@ -30,6 +30,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * Created by Juan Mendez on 2/21/2017.
@@ -49,10 +50,19 @@ public class RobolectricRealmTest {
 
     @Before
     public void before() throws Exception {
+
         MockRealm.prepare();
         RealmFactory.setTransactionScheduler(Schedulers.computation() );
         RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread() );
         realm = RealmFactory.create();
+    }
+
+    @Test
+    public void shouldMockConfiguration() throws Exception {
+
+        // yey, no UnsupportedOperationException here!
+        RealmConfiguration.Builder builder = new RealmConfiguration.Builder();
+        assertNotNull(builder.build());
     }
 
     @Test

@@ -9,6 +9,7 @@ import io.realm.RealmObject;
 public class Person extends RealmObject {
     private String name;
     private RealmList<Dog> dogs = new RealmList<>();
+    private Dog favoriteDog;
 
 
     public String getName() {
@@ -25,5 +26,13 @@ public class Person extends RealmObject {
 
     public void setDogs(RealmList<Dog> dogs) {
         this.dogs = dogs;
+    }
+
+    public Dog getFavoriteDog() {
+        return favoriteDog;
+    }
+
+    public void setFavoriteDog(Dog favoriteDog) {
+        this.favoriteDog = favoriteDog;
     }
 }

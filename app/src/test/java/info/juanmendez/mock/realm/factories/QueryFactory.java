@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import info.juanmendez.mock.realm.dependencies.Compare;
+import info.juanmendez.mock.realm.dependencies.MockUtils;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import info.juanmendez.mock.realm.models.QueryWatch;
 import io.realm.Case;
@@ -262,7 +263,7 @@ public class QueryFactory {
             this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
 
             this.needle = arguments[1];
-            this.clazz = needle.getClass();
+            this.clazz = MockUtils.getClass( needle);
 
             int argsLen = arguments.length;
 
@@ -294,7 +295,7 @@ public class QueryFactory {
             try {
                 value = Whitebox.getInternalState( realmModel, types.get(level) );
             } catch (Exception e) {
-                throw (new RealmException( realmModel.getClass().getName() + " doesn't have the attribute " + types.get(level) ) );
+                throw (new RealmException( MockUtils.getClass(realmModel).getName() + " doesn't have the attribute " + types.get(level) ) );
             }
 
             if( value != null ){

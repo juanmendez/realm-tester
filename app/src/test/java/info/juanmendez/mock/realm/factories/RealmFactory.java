@@ -8,13 +8,16 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
+import info.juanmendez.mock.realm.dependencies.MockUtils;
 import info.juanmendez.mock.realm.dependencies.RealmMatchers;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import info.juanmendez.mock.realm.models.QueryWatch;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
+import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmModel;
+import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import rx.Observable;
 import rx.Scheduler;
@@ -23,6 +26,7 @@ import rx.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
+import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -35,6 +39,7 @@ public class RealmFactory {
     private static Scheduler subscriberScheduler = Schedulers.immediate();
 
     public static Realm create() throws Exception {
+
         Realm realm = mock(Realm.class );
         prepare(realm);
         prepareTransactions(realm);
@@ -50,6 +55,9 @@ public class RealmFactory {
     }
 
     private static void prepare(Realm realm) throws Exception {
+        doNothing().when( Realm.class, "init", any());
+
+        when( Realm.deleteRealm( any(RealmConfiguration.class))).thenReturn( true );
 
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
         HashMap<Class, QueryWatch> queryMap = RealmStorage.getQueryMap();
@@ -62,6 +70,7 @@ public class RealmFactory {
             public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
                 HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+
                 if( !realmMap.containsKey(clazz)){
                     realmMap.put(clazz, new RealmList<>());
                 }
@@ -69,7 +78,12 @@ public class RealmFactory {
                 Constructor constructor = clazz.getConstructor();
                 RealmModel realmModel = (RealmModel) constructor.newInstance();
 
-                realmMap.get(clazz).add( realmModel);
+                if( realmModel instanceof RealmObject ){
+
+                    realmModel = ModelFactory.mockRealmObject( (RealmObject) realmModel );
+                }
+
+                RealmStorage.addModel( realmModel );
 
                 return realmModel;
             }
@@ -83,14 +97,20 @@ public class RealmFactory {
 
                 if( invocationOnMock.getArguments().length > 0 ){
                     RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
-                    Class clazz = realmModel.getClass();
+
+                    if( realmModel instanceof RealmObject ){
+                        realmModel = ModelFactory.mockRealmObject( (RealmObject) realmModel );
+                    }
+
+                    Class clazz = MockUtils.getClass(realmModel);
                     HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){
                         realmMap.put(clazz, new RealmList<>());
                     }
 
-                    realmMap.get( clazz ).add( realmModel );
+
+                    RealmStorage.addModel( realmModel );
                     return realmModel;
                 }
 

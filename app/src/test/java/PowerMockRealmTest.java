@@ -4,8 +4,11 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
+import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.Set;
 
 import info.juanmendez.mock.realm.MockRealm;
 import info.juanmendez.mock.realm.factories.RealmFactory;
@@ -14,13 +17,17 @@ import info.juanmendez.mock.realm.models.Person;
 import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
+import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
+import rx.Observable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
@@ -320,5 +327,63 @@ public class PowerMockRealmTest
         dogs = dogs.where().lessThan("birthdate", new Date(2013, 0, 1 ) ).findAll();
 
         assertEquals( "There are two dogs born before the given date", dogs.size(), 2 );
+    }
+
+    @Test
+    public void shouldDeleteRealmObject(){
+
+        Dog dog = realm.createObject( Dog.class );
+        dog.setName("Max");
+        dog.setAge(1);
+        dog.setId(1);
+        dog.setBirthdate( new Date() );
+
+        dog.deleteFromRealm();
+
+        Person person = realm.createObject( Person.class );
+        person.setFavoriteDog( dog );
+        dog.deleteFromRealm();
+
+        assertEquals( "The only dog added has been removed", realm.where(Dog.class).count(), 0 );
+        assertNull( "Person's favorite dog is gone", person.getFavoriteDog() );
+    }
+
+    @Test
+    public void findModelRelationship(){
+
+        Person person = realm.createObject( Person.class );
+        person.setDogs( new RealmList<>());
+
+        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(person);
+
+        for (Field field: fieldSet) {
+
+            if( RealmModel.class.isAssignableFrom( field.getType() )){
+                System.out.println( "we will watch for " + field.getName() );
+            }
+        }
+    }
+
+    @Test
+    public void shouldFilterByPersonClass(){
+
+        RealmList list = new RealmList();
+        list.add( new Dog() );
+        list.add( new Person() );
+        list.add( new Dog() );
+        list.add( new Dog() );
+        list.add( new Dog() );
+        list.add( new Dog() );
+        list.add( new Person() );
+        list.add( new Person() );
+        list.add( new Person() );
+        list.add( new Person() );
+        list.add( new Person() );
+
+        Observable.from( list )
+                .ofType(Person.class)
+                .subscribe(o -> {
+                    System.out.println( o.getClass().getSimpleName() );
+        });
     }
 }
