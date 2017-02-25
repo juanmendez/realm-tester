@@ -9,7 +9,7 @@ import io.realm.RealmObject;
  */
 
 public class MockUtils {
-    
+
     public static Class getClass( Object realmModel ){
 
         Class clazz = realmModel.getClass();
