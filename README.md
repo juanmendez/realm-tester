@@ -16,10 +16,13 @@ What has been done so far
 - Testing in PowerMock, and Robolectric 3.0 + PowerMock at the moment
 
 What is coming in the next phase
-- A chart of methods supported and tested from RealmQuery
-- A chart of methods supported and tested from RealmList
-
+- delete reamModels in cascading mode
+    - Right now realmObjects can be deleted, next is to include realmModels
+- support also for deleting methods found in realmResults, and realmLists
 
 What is coming after
-- Go supporting more methods from RealmQuery and RealmList
-- Allow to delete realmModels from their realm
+- A chart with what's being covered and what is not from RealmModel, RealmObject, RealmQuery, RealmResults, and RealmList
+
+What is not intended to cover during this phase
+- mocking event listeners for realmResults
+- realmQuery.findAllAsync is going to work synchronously like findAll method
