@@ -340,23 +340,8 @@ public class PowerMockRealmTest
 
         Person person = realm.createObject( Person.class );
         person.setFavoriteDog( dog );
+        person.setDogs( new RealmList<>(dog, dog, dog, dog ));
 
-
-        person = realm.createObject( Person.class );
-        person.setFavoriteDog( dog );
-
-        person = realm.createObject( Person.class );
-        person.setFavoriteDog( dog );
-        person.deleteFromRealm();
-
-        person = realm.createObject( Person.class );
-        person.setFavoriteDog( dog );
-
-        person = realm.createObject( Person.class );
-        person.setFavoriteDog( dog );
-
-        person = realm.createObject( Person.class );
-        person.setFavoriteDog( dog );
         dog.deleteFromRealm();
 
         //assertEquals( "The only dog added has been removed", realm.where(Dog.class).count(), 0 );

@@ -15,7 +15,6 @@ import io.realm.RealmObject;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
-import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 
 /**
@@ -25,18 +24,7 @@ import static org.powermock.api.mockito.PowerMockito.doAnswer;
  */
 
 public class ModelFactory {
-
-    //TODO: working on making some static methods work
-    public static void prepare() throws Exception {
-
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                return null;
-            }
-        }).when( RealmObject.class, "deleteFromRealm", any( RealmModel.class ) );
-    }
-
+    
     public static RealmObject mockRealmObject(RealmObject realmModel ){
         RealmObject spied = PowerMockito.spy( realmModel );
 
@@ -76,8 +64,11 @@ public class ModelFactory {
 
                             RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState( spied, field.getName());
 
-                            if( realmList != null && realmList.contains( o ) ){
-                                realmList.remove( o );
+                            if( realmList != null ){
+
+                                while( realmList.contains( o ) ){
+                                    realmList.remove( o );
+                                }
                             }
 
                         });//end subscription
