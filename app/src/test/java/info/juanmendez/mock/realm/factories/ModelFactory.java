@@ -15,6 +15,7 @@ import io.realm.RealmObject;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
+import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 
 /**
@@ -25,26 +26,61 @@ import static org.powermock.api.mockito.PowerMockito.doAnswer;
 
 public class ModelFactory {
 
+    //TODO: working on making some static methods work
+    public static void prepare() throws Exception {
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                return null;
+            }
+        }).when( RealmObject.class, "deleteFromRealm", any( RealmModel.class ) );
+    }
 
     public static RealmObject mockRealmObject(RealmObject realmModel ){
         RealmObject spied = PowerMockito.spy( realmModel );
 
-
         CompositeSubscription allSubscriptions = new CompositeSubscription();
         Set<Field> fieldSet =  Whitebox.getAllInstanceFields(spied);
+        Class fieldClass;
+        Subscription subscription;
 
+        /**
+         * There is one observable per each member observed either it's a realmModel or a realmResult
+         */
         for (Field field: fieldSet) {
 
-            if( RealmModel.class.isAssignableFrom( field.getType() )){
-                Subscription subscription = RealmStorage.getDeleteObservable()
-                        .ofType(field.getType())
-                        .subscribe(o -> {
+            fieldClass = field.getType();
 
-                            if( Whitebox.getInternalState( spied, field.getName() ) == o ){
+            if( RealmModel.class.isAssignableFrom(fieldClass) ){
+
+                //RealmModels are filtered by its inmediate class
+                subscription = RealmStorage.getDeleteObservable()
+                        .ofType(fieldClass)
+                        .subscribe( o -> {
+
+                            Object variable = Whitebox.getInternalState( spied, field.getName());
+
+                            if( variable != null && variable == o ){
                                 Whitebox.setInternalState( spied, field.getName(), (Object[]) null);
                             }
-
                         });
+
+                allSubscriptions.add( subscription );
+            }
+            else if( fieldClass == RealmList.class ){
+
+                //RealmResults are not filtered
+                subscription = RealmStorage.getDeleteObservable()
+                        .subscribe(o -> {
+
+                            RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState( spied, field.getName());
+
+                            if( realmList != null && realmList.contains( o ) ){
+                                realmList.remove( o );
+                            }
+
+                        });//end subscription
 
                 allSubscriptions.add( subscription );
             }
@@ -61,14 +97,12 @@ public class ModelFactory {
 
                     if( field.getType() == RealmList.class ){
 
-                        RealmList list = (RealmList) Whitebox.getInternalState( spied, field.getName() );
+                        RealmList list = (RealmList) Whitebox.getInternalState( spied, field.getName());
 
                         if( list != null )
                             list.clear();
                     }
                 }
-
-
 
                 RealmStorage.removeModel( spied );
                 return null;
