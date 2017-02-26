@@ -19,6 +19,7 @@ What is coming in the next phase
 - delete reamModels in cascading mode
     - This has been covered, yet needs more polishing and testing
 - support also for deleting methods found in realmResults, and realmLists
+    - This has been covered, yet needs more polishing and testing
 
 What is coming after
 - A chart with what's being covered and what is not from RealmModel, RealmObject, RealmQuery, RealmResults, and RealmList
