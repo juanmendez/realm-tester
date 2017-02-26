@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.Set;
 
 import info.juanmendez.mock.realm.MockRealm;
-import info.juanmendez.mock.realm.factories.RealmFactory;
 import info.juanmendez.mock.realm.models.Dog;
 import info.juanmendez.mock.realm.models.Person;
 import io.realm.Case;
@@ -36,7 +35,7 @@ import static org.junit.Assert.assertNull;
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "android.*"})
-@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmCore.class, RealmObject.class })
+@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmCore.class, RealmObject.class })
 public class PowerMockRealmTest
 {
     Realm realm;
@@ -44,7 +43,7 @@ public class PowerMockRealmTest
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
-        realm = RealmFactory.create();
+        realm = Realm.getDefaultInstance();
     }
 
     @Test
@@ -69,6 +68,8 @@ public class PowerMockRealmTest
         dog.setAge(1);
 
         realm.copyToRealm( dog );
+
+        assertEquals( "There is one dog", realm.where( Dog.class ).count(), 1);
     }
 
     /**

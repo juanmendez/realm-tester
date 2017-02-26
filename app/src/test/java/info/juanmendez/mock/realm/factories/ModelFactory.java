@@ -27,7 +27,7 @@ import static org.powermock.api.mockito.PowerMockito.doAnswer;
 public class ModelFactory {
 
     //TODO: temporary location for static methods of Realmobject
-    public static void prepare() throws Exception {
+    public static void create() throws Exception {
 
         doAnswer(new Answer<Void>() {
             @Override

@@ -15,7 +15,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 public class ConfigurationFactory {
 
 
-    public static void mockBuilder() throws Exception {
+    public static void create() throws Exception {
 
         RealmConfiguration mockRealmConfig = mock(RealmConfiguration.class);
 

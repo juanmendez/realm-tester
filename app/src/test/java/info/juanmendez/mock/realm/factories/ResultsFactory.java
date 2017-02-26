@@ -75,64 +75,18 @@ public class ResultsFactory {
     /**
      * TODO: handlers for deleting methods is not yet tested, and neither used yet
      */
-    private static void deleteHandlers( RealmResults mockedResults, RealmList<RealmModel> results ){
-        when( mockedResults.deleteAllFromRealm() ).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+    private static void deleteHandlers( RealmResults mockedResults, RealmList<RealmModel> list ){
 
-                for (RealmModel realmModel: results) {
-                    deleteRealmModel( realmModel );
-                }
-
-                return true;
-            }
-        });
-
-
-        when( mockedResults.deleteFirstFromRealm() ).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-
-                if( results.size() >= 1 ){
-                    RealmModel realmModel = results.get(0);
-                    deleteRealmModel( realmModel );
-                    return true;
-                }
-
-                return false;
-            }
-        });
-
-
-        when( mockedResults.deleteLastFromRealm() ).thenAnswer(new Answer<Boolean>() {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-
-                int position = (int) invocation.getArguments()[0];
-
-
-                if( results.size()-1 >= position ){
-                    RealmModel realmModel = results.get( position );
-
-                    deleteRealmModel( realmModel );
-                    return true;
-                }
-
-                return false;
-            }
-        });
-
+        when( mockedResults.deleteAllFromRealm() ).thenReturn( list.deleteAllFromRealm() );
+        when( mockedResults.deleteFirstFromRealm() ).thenReturn( list.deleteFirstFromRealm() );
+        when( mockedResults.deleteLastFromRealm() ).thenReturn( list.deleteLastFromRealm() );
 
         doReturn( new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
 
-                if( results.size() >= 1 ){
-                    RealmModel realmModel = results.get( mockedResults.size() - 1 );
-
-                    deleteRealmModel( realmModel );
-                }
-
+                int position = (int) invocation.getArguments()[0];
+                list.deleteFromRealm( position );
                 return null;
             }
         }).when( mockedResults ).deleteFromRealm( anyInt() );

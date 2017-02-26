@@ -41,7 +41,7 @@ import static junit.framework.Assert.assertNotNull;
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @SuppressStaticInitializationFor("io.realm.internal.Util")
-@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmCore.class, RealmObject.class })
+@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmCore.class, RealmObject.class })
 public class RobolectricRealmTest {
 
     @Rule
@@ -54,7 +54,7 @@ public class RobolectricRealmTest {
         MockRealm.prepare();
         RealmFactory.setTransactionScheduler(Schedulers.computation() );
         RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread() );
-        realm = RealmFactory.create();
+        realm = Realm.getDefaultInstance();
     }
 
     @Test

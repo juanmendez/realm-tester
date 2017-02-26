@@ -1,5 +1,6 @@
 package info.juanmendez.mock.realm.dependencies;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 
 /**
@@ -7,14 +8,13 @@ import io.realm.RealmObject;
  * www.juanmendez.info
  * contact@juanmendez.info
  */
-
 public class MockUtils {
 
-    public static Class getClass( Object realmModel ){
+    public static Class getClass( Object object ){
 
-        Class clazz = realmModel.getClass();
+        Class clazz = object.getClass();
 
-        if( realmModel instanceof RealmObject){
+        if( object instanceof RealmObject || object instanceof RealmList ){
             return clazz.getSuperclass();
         }
 
