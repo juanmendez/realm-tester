@@ -368,7 +368,7 @@ public class PowerMockRealmTest
     @Test
     public void shouldFilterByPersonClass(){
 
-        RealmList list = new RealmList();
+        RealmList list = new RealmList(new Dog(), new Dog(), new Dog() );
         list.add( new Dog() );
         list.add( new Person() );
         list.add( new Dog() );

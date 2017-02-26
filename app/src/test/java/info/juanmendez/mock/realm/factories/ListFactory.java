@@ -8,9 +8,9 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 
 import static org.mockito.Matchers.anyInt;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.mockito.Matchers.anyVararg;
+import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
@@ -23,32 +23,38 @@ public class ListFactory {
 
     public static void prepare() throws Exception {
 
-        whenNew( RealmList.class ).withNoArguments().thenAnswer(invocation -> {
+        whenNew( RealmList.class ).withArguments(anyVararg()).thenAnswer(invocation -> {
 
-            RealmList spiedList = spy( new RealmList());
-            handleDeleteMethods( spiedList );
+            RealmList list = spy(new RealmList());
+            Object[] args = invocation.getArguments();
 
-            return new RealmList<>();
+            for (Object arg:args) {
+                list.add((RealmModel)arg);
+            }
+
+            handleDeleteMethods( list );
+
+            return list;
         });
 
     }
 
-    private  static void handleDeleteMethods( RealmList<RealmModel> list ){
+    private  static void handleDeleteMethods( RealmList list ){
 
-        when( list.deleteAllFromRealm() ).thenAnswer(new Answer<Boolean>() {
+        doAnswer(new Answer<Boolean>() {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
 
-                for (RealmModel realmModel: list) {
-                    deleteRealmModel( realmModel );
+                for (Object realmModel: list) {
+                    deleteRealmModel( (RealmModel) realmModel );
                 }
 
                 return true;
             }
-        });
+        }).when( list ).deleteAllFromRealm();
 
 
-        when( list.deleteFirstFromRealm() ).thenAnswer(new Answer<Boolean>() {
+        doAnswer(new Answer<Boolean>() {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
 
@@ -60,10 +66,10 @@ public class ListFactory {
 
                 return false;
             }
-        });
+        }).when( list ).deleteFirstFromRealm();
 
 
-        when( list.deleteLastFromRealm() ).thenAnswer(new Answer<Boolean>() {
+        doAnswer(new Answer<Boolean>() {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
 
@@ -79,10 +85,10 @@ public class ListFactory {
 
                 return false;
             }
-        });
+        }).when( list ).deleteLastFromRealm() ;
 
 
-        doReturn( new Answer<Void>() {
+        doAnswer( new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
 
