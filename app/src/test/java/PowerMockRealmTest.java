@@ -73,7 +73,7 @@ public class PowerMockRealmTest
     }
 
     /**
-     * So lets see if I can create an object, and I can get a realmResult back, and check the size to be equal to 1
+     * So lets see if I can prepare an object, and I can get a realmResult back, and check the size to be equal to 1
      */
     @Test
     public void shouldExecuteTransaction(){

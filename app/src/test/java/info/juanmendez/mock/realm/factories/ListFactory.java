@@ -21,7 +21,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 public class ListFactory {
 
-    public static void create() throws Exception {
+    public static void prepare() throws Exception {
 
         whenNew( RealmList.class ).withNoArguments().thenAnswer(invocation -> {
 

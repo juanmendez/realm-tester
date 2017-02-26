@@ -2,7 +2,6 @@ package info.juanmendez.mock.realm.factories;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
@@ -17,6 +16,7 @@ import rx.subscriptions.CompositeSubscription;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
+import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
  * Created by Juan Mendez on 2/24/2017.
@@ -26,22 +26,27 @@ import static org.powermock.api.mockito.PowerMockito.doAnswer;
 
 public class ModelFactory {
 
-    //TODO: temporary location for static methods of Realmobject
-    public static void create() throws Exception {
+    public static void prepare() throws Exception {
 
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+
+                RealmModel realmModel = (RealmModel) invocation.getArguments()[0];
+                RealmStorage.removeModel( realmModel );
                 return null;
             }
         }).when( RealmObject.class, "deleteFromRealm", any( RealmModel.class ) );
     }
 
-    public static RealmObject mockRealmObject(RealmObject realmModel ){
-        RealmObject spied = PowerMockito.spy( realmModel );
+    public static RealmModel mockRealmObject(RealmModel realmModel ){
+
+        if( realmModel instanceof RealmObject ){
+            realmModel = spy( realmModel );
+        }
 
         CompositeSubscription allSubscriptions = new CompositeSubscription();
-        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(spied);
+        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
         Class fieldClass;
         Subscription subscription;
 
@@ -55,14 +60,15 @@ public class ModelFactory {
             if( RealmModel.class.isAssignableFrom(fieldClass) ){
 
                 //RealmModels are filtered by its inmediate class
+                RealmModel finalRealmModel = realmModel;
                 subscription = RealmStorage.getDeleteObservable()
                         .ofType(fieldClass)
                         .subscribe( o -> {
 
-                            Object variable = Whitebox.getInternalState( spied, field.getName());
+                            Object variable = Whitebox.getInternalState(finalRealmModel, field.getName());
 
                             if( variable != null && variable == o ){
-                                Whitebox.setInternalState( spied, field.getName(), (Object[]) null);
+                                Whitebox.setInternalState(finalRealmModel, field.getName(), (Object[]) null);
                             }
                         });
 
@@ -71,10 +77,11 @@ public class ModelFactory {
             else if( fieldClass == RealmList.class ){
 
                 //RealmResults are not filtered
+                RealmModel finalRealmModel1 = realmModel;
                 subscription = RealmStorage.getDeleteObservable()
                         .subscribe(o -> {
 
-                            RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState( spied, field.getName());
+                            RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(finalRealmModel1, field.getName());
 
                             if( realmList != null ){
 
@@ -89,29 +96,34 @@ public class ModelFactory {
             }
         }
 
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                allSubscriptions.clear();
+        if( realmModel instanceof RealmObject ){
 
-                Set<Field> fieldSet =  Whitebox.getAllInstanceFields(spied);
+            RealmModel finalRealmModel2 = realmModel;
 
-                for (Field field: fieldSet) {
+            doAnswer(new Answer<Void>() {
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    allSubscriptions.clear();
 
-                    if( field.getType() == RealmList.class ){
+                    Set<Field> fieldSet =  Whitebox.getAllInstanceFields(finalRealmModel2);
 
-                        RealmList list = (RealmList) Whitebox.getInternalState( spied, field.getName());
+                    for (Field field: fieldSet) {
 
-                        if( list != null )
-                            list.clear();
+                        if( field.getType() == RealmList.class ){
+
+                            RealmList list = (RealmList) Whitebox.getInternalState(finalRealmModel2, field.getName());
+
+                            if( list != null )
+                                list.clear();
+                        }
                     }
+
+                    RealmStorage.removeModel(finalRealmModel2);
+                    return null;
                 }
+            }).when( (RealmObject) realmModel ).deleteFromRealm();
+        }
 
-                RealmStorage.removeModel( spied );
-                return null;
-            }
-        }).when( spied ).deleteFromRealm();
-
-        return spied;
+        return realmModel;
     }
 }

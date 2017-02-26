@@ -38,7 +38,7 @@ public class RealmFactory {
     private static Scheduler observerScheduler = Schedulers.immediate();
     private static Scheduler subscriberScheduler = Schedulers.immediate();
 
-    public static Realm create() throws Exception {
+    public static Realm prepare() throws Exception {
 
         Realm realm = mock(Realm.class );
         prepare(realm);
