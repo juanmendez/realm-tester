@@ -58,7 +58,7 @@ public class ListFactory {
             @Override
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
 
-                if( list.size() >= 1 ){
+                if( !list.isEmpty() ){
                     RealmModel realmModel = list.get(0);
                     deleteRealmModel( realmModel );
                     return true;
@@ -75,8 +75,7 @@ public class ListFactory {
 
                 int position = (int) invocation.getArguments()[0];
 
-
-                if( list.size()-1 >= position ){
+                if( !list.isEmpty() && list.size()-1 >= position ){
                     RealmModel realmModel = list.get( position );
 
                     deleteRealmModel( realmModel );
@@ -92,7 +91,7 @@ public class ListFactory {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
 
-                if( list.size() >= 1 ){
+                if( !list.isEmpty()){
                     RealmModel realmModel = list.get( list.size() - 1 );
 
                     deleteRealmModel( realmModel );
