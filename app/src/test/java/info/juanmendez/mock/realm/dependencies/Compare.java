@@ -7,6 +7,7 @@ public class Compare{
     public static final String less = "less";
     public static final String lessOrEqual = "lessOrEqual";
     public static final String equal = "equal";
+    public static final String not_equal = "notEqual";
     public static final String more = "more";
     public static final String moreOrEqual = "moreOrEqual";
     public static final String between = "between";

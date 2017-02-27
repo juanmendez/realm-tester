@@ -198,6 +198,17 @@ public class QueryFactory {
         when( realmQuery.equalTo( anyString(), anyBoolean() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
 
+
+        when( realmQuery.notEqualTo( anyString(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyByte()) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyDouble() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyFloat() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyBoolean() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+
+
         when( realmQuery.contains( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.contains ) );
         when( realmQuery.contains( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.contains ) );
         when( realmQuery.endsWith( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.endsWith ) );
@@ -323,6 +334,15 @@ public class QueryFactory {
                     if( clazz == Date.class && ( ((Date)value) ).compareTo( (Date) needle) == 0 ){
                         return true;
                     }else if(needle.equals(value)){
+                        return true;
+                    }
+                }
+                else
+                if( condition == Compare.not_equal ){
+
+                    if( clazz == Date.class && ( ((Date)value) ).compareTo( (Date) needle) != 0 ){
+                        return true;
+                    }else if(!needle.equals(value)){
                         return true;
                     }
                 }
