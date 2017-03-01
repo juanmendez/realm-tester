@@ -26,6 +26,7 @@ import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyFloat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyShort;
 import static org.mockito.Matchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -159,6 +160,7 @@ public class QueryFactory {
         when( realmQuery.lessThan( anyString(), anyDouble() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyFloat() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
+        when( realmQuery.lessThan( anyString(), anyShort() ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
         when( realmQuery.lessThan( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.less ) );
 
         when( realmQuery.lessThanOrEqualTo( any(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.lessOrEqual ) );
@@ -166,6 +168,7 @@ public class QueryFactory {
         when( realmQuery.lessThanOrEqualTo( anyString(), anyDouble() ) ).thenAnswer( createComparison( realmQuery, Compare.lessOrEqual) );
         when( realmQuery.lessThanOrEqualTo( anyString(), anyFloat() ) ).thenAnswer( createComparison( realmQuery, Compare.lessOrEqual) );
         when( realmQuery.lessThanOrEqualTo( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.lessOrEqual) );
+        when( realmQuery.lessThanOrEqualTo( anyString(), anyShort() ) ).thenAnswer( createComparison( realmQuery, Compare.lessOrEqual) );
         when( realmQuery.lessThanOrEqualTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.lessOrEqual) );
 
         when( realmQuery.greaterThan( any(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.more) );
@@ -173,6 +176,7 @@ public class QueryFactory {
         when( realmQuery.greaterThan( anyString(), anyDouble() ) ).thenAnswer( createComparison( realmQuery, Compare.more) );
         when( realmQuery.greaterThan( anyString(), anyFloat() ) ).thenAnswer( createComparison( realmQuery, Compare.more) );
         when( realmQuery.greaterThan( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.more) );
+        when( realmQuery.greaterThan( anyString(), anyShort() ) ).thenAnswer( createComparison( realmQuery, Compare.more) );
         when( realmQuery.greaterThan( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.more) );
 
         when( realmQuery.greaterThanOrEqualTo( any(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
@@ -180,6 +184,7 @@ public class QueryFactory {
         when( realmQuery.greaterThanOrEqualTo( anyString(), anyDouble() ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
         when( realmQuery.greaterThanOrEqualTo( anyString(), anyFloat() ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
         when( realmQuery.greaterThanOrEqualTo( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
+        when( realmQuery.greaterThanOrEqualTo( anyString(), anyShort() ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
         when( realmQuery.greaterThanOrEqualTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.moreOrEqual) );
 
         when( realmQuery.between( anyString(), anyInt(), anyInt()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
@@ -187,6 +192,7 @@ public class QueryFactory {
         when( realmQuery.between( anyString(), anyDouble(), anyDouble()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
         when( realmQuery.between( anyString(), anyFloat(), anyFloat()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
         when( realmQuery.between( anyString(), anyLong(), anyLong()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
+        when( realmQuery.between( anyString(), anyShort(), anyShort()  ) ).thenAnswer( createComparison( realmQuery, Compare.between) );
 
 
         when( realmQuery.equalTo( anyString(), anyInt() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
@@ -195,7 +201,9 @@ public class QueryFactory {
         when( realmQuery.equalTo( anyString(), anyFloat() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
+        when( realmQuery.equalTo( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), anyBoolean() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
+        when( realmQuery.equalTo( anyString(), anyShort() ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
         when( realmQuery.equalTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.equal ) );
 
 
@@ -205,15 +213,27 @@ public class QueryFactory {
         when( realmQuery.notEqualTo( anyString(), anyFloat() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
         when( realmQuery.notEqualTo( anyString(), anyLong() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
         when( realmQuery.notEqualTo( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
         when( realmQuery.notEqualTo( anyString(), anyBoolean() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyShort() ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
         when( realmQuery.notEqualTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison( realmQuery, Compare.not_equal ) );
-
 
         when( realmQuery.contains( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.contains ) );
         when( realmQuery.contains( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.contains ) );
         when( realmQuery.endsWith( anyString(), anyString() ) ).thenAnswer( createComparison( realmQuery, Compare.endsWith ) );
         when( realmQuery.endsWith( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.endsWith ) );
 
+
+        when( realmQuery.in( anyString(), any(Integer[].class))).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(Byte[].class)) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(Double[].class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(Float[].class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(Long[].class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(String[].class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(String[].class), any(Case.class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(Boolean[].class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(Short[].class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
+        when( realmQuery.in( anyString(), any(Date[].class) ) ).thenAnswer( createComparison( realmQuery, Compare.in ) );
     }
 
 
@@ -261,6 +281,8 @@ public class QueryFactory {
         ArrayList<String> types;
         Object[] arguments;
         Object needle;
+        ArrayList<Object> needles;
+
         Class clazz;
         Case casing = Case.SENSITIVE;
 
@@ -278,7 +300,7 @@ public class QueryFactory {
 
             int argsLen = arguments.length;
 
-           if( clazz == String.class && argsLen >= 3 ){
+           if( (clazz == String.class || clazz == String[].class) && argsLen >= 3 ){
                 casing = (Case) arguments[2];
             }
 
@@ -286,6 +308,27 @@ public class QueryFactory {
                 this.left = arguments[1];
                 this.right = arguments[2];
             }
+            else
+            if( condition == Compare.in ){
+                needles =  new ArrayList<>( Arrays.asList( (Object[]) needle) );
+            }
+
+
+            if( casing == Case.INSENSITIVE ){
+
+                if( condition == Compare.in ){
+
+                    for( int i = 0; i < needles.size(); i++ ){
+                        needles.set(i, ((String) needles.get(i)).toLowerCase());
+                    }
+                }
+                else {
+                    this.needle = ((String)needle).toLowerCase();
+                }
+
+            }
+
+
 
             RealmList<RealmModel> queriedList = new RealmList<>();
 
@@ -333,7 +376,11 @@ public class QueryFactory {
 
                     if( clazz == Date.class && ( ((Date)value) ).compareTo( (Date) needle) == 0 ){
                         return true;
-                    }else if(needle.equals(value)){
+                    }
+                    else if( casing == Case.INSENSITIVE ){
+                        return needle.equals( ((String)value ).toLowerCase() );
+                    }
+                    else if(needle.equals(value)){
                         return true;
                     }
                 }
@@ -342,7 +389,11 @@ public class QueryFactory {
 
                     if( clazz == Date.class && ( ((Date)value) ).compareTo( (Date) needle) != 0 ){
                         return true;
-                    }else if(!needle.equals(value)){
+                    }
+                    else if( casing == Case.INSENSITIVE ){
+                        return !needle.equals( ((String)value ).toLowerCase() );
+                    }
+                    else if(!needle.equals(value)){
                         return true;
                     }
                 }
@@ -367,6 +418,9 @@ public class QueryFactory {
                     else if( clazz == Float.class && ((float)value) < ((float) needle) ){
                         return true;
                     }
+                    else if( clazz == Short.class && ((short)value) < ((short) needle) ){
+                        return true;
+                    }
                 }
                 else if( condition == Compare.lessOrEqual){
 
@@ -386,6 +440,9 @@ public class QueryFactory {
                         return true;
                     }
                     else if( clazz == Float.class && ((float)value) <= ((float) needle) ){
+                        return true;
+                    }
+                    else if( clazz == Short.class && ((short)value) <= ((short) needle) ){
                         return true;
                     }
                 }
@@ -409,6 +466,9 @@ public class QueryFactory {
                     else if( clazz == Float.class && ((float)value) > ((float) needle) ){
                         return true;
                     }
+                    else if( clazz == Short.class && ((short)value) > ((short) needle) ){
+                        return true;
+                    }
                 }
                 else if( condition == Compare.moreOrEqual ){
 
@@ -428,6 +488,9 @@ public class QueryFactory {
                         return true;
                     }
                     else if( clazz == Float.class && ((float)value) >= ((float) needle) ){
+                        return true;
+                    }
+                    else if( clazz == Short.class && ((short)value) >= ((short) needle) ){
                         return true;
                     }
                 }
@@ -450,6 +513,26 @@ public class QueryFactory {
                     else if( clazz == Float.class  && ((float)value) >= ((float) left) && ((float)value) <= ((float) right) ){
                         return true;
                     }
+                    else if( clazz == Short.class  && ((short)value) >= ((short) left) && ((short)value) <= ((short) right) ){
+                        return true;
+                    }
+                }
+                else if( condition == Compare.in ){
+
+                    if( clazz == Date[].class ){
+
+                        for ( Object needle:needles) {
+                            if( ( ((Date)value) ).compareTo( (Date) needle) == 0 )
+                                return true;
+                        }
+                    }else{
+                        if( clazz == String[].class && casing == Case.INSENSITIVE ){
+                            return needles.contains( ((String)value).toLowerCase() );
+                        }
+                        else{
+                            return needles.contains( value );
+                        }
+                    }
                 }
                 else if( clazz == String.class && (condition == Compare.contains || condition == Compare.endsWith)  ){
 
@@ -458,7 +541,7 @@ public class QueryFactory {
                             return true;
                         }
                         else
-                        if(casing == Case.INSENSITIVE && (((String)value).toLowerCase()).contains(((String ) needle).toLowerCase())) {
+                        if(casing == Case.INSENSITIVE && (((String)value).toLowerCase()).contains(((String ) needle))) {
                             return true;
                         }
                     }
@@ -467,7 +550,7 @@ public class QueryFactory {
                             return true;
                         }
                         else
-                        if(casing == Case.INSENSITIVE && (((String)value).toLowerCase()).endsWith(((String ) needle).toLowerCase()))
+                        if(casing == Case.INSENSITIVE && (((String)value).toLowerCase()).endsWith(((String ) needle)))
                         {
                             return true;
                         }

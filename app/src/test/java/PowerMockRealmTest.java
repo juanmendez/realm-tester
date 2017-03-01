@@ -387,4 +387,49 @@ public class PowerMockRealmTest
                     System.out.println( o.getClass().getSimpleName() );
         });
     }
+
+    @Test
+    public void shouldBeIn(){
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Idalgo Mendez");
+        dog.setBirthdate( new Date(2011, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Fido Fernandez");
+        dog.setBirthdate( new Date(2016, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2012, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2014, 6, 10));
+
+        RealmResults<Dog> dogs = realm.where( Dog.class ).in( "age", new Integer[]{2,5} ).findAll();
+
+        assertEquals( "There are two dogs born before the given date", dogs.size(), 3 );
+
+        dogs = realm.where( Dog.class ).in( "name", new String[]{"Idalgo Mendez"} ).findAll();
+        assertEquals( "There is one dog with that name", dogs.size(), 1 );
+
+        dogs = realm.where( Dog.class ).in( "name", new String[]{"IdAlgo MendEz", "HERNAN FerNandeZ"}, Case.INSENSITIVE ).findAll();
+        assertEquals( "There are two dogs with those names", dogs.size(), 2 );
+
+
+        dogs = realm.where( Dog.class ).in( "name", new String[]{"IdAlgo MendEz", "HERNAN FerNandeZ"} ).findAll();
+        assertEquals( "There are no dogs with names like that", dogs.size(), 0 );
+
+        dogs = realm.where( Dog.class ).in( "birthdate", new Date[]{new Date(2011, 6, 10), new Date(2014, 6, 10)} ).findAll();
+        assertEquals( "There are two dogs with those names", dogs.size(), 2 );
+
+    }
 }
