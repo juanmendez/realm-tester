@@ -17,6 +17,7 @@ import io.realm.Case;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
 import static org.mockito.Matchers.any;
@@ -38,7 +39,7 @@ public class QueryFactory {
 
     //collections queried keyed by immediate class
 
-    public static RealmQuery create(Class clazz ){
+    public static RealmQuery create( Class clazz ){
 
 
         HashMap<Class, QueryWatch> queryMap = RealmStorage.getQueryMap();
@@ -92,7 +93,8 @@ public class QueryFactory {
             @Override
             public Long answer(InvocationOnMock invocation) throws Throwable {
                 queryWatch.onTopGroupClose();
-                return ((Number)queryWatch.getQueryList().size()).longValue();
+                RealmResults<RealmModel> results = ResultsFactory.create( clazz );
+                return ((Number)results.size()).longValue();
             }
         });
 
@@ -102,9 +104,10 @@ public class QueryFactory {
 
                 if( invocation.getArguments().length >= 1 ){
                     queryWatch.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create( clazz );
 
                     String fieldName = (String) invocation.getArguments()[0];
-                    return queryWatch.getQueryList().sum( fieldName );
+                    return results.sum( fieldName );
                 }
 
                 return  null;
@@ -116,9 +119,10 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
                     queryWatch.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create( clazz );
 
                     String fieldName = (String) invocation.getArguments()[0];
-                    return queryWatch.getQueryList().average(fieldName);
+                    return results.average(fieldName);
                 }
 
                 return  null;
@@ -132,9 +136,10 @@ public class QueryFactory {
                 if( invocation.getArguments().length >= 1 ){
 
                     queryWatch.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create( clazz );
 
                     String fieldName = (String) invocation.getArguments()[0];
-                    return queryWatch.getQueryList().max(fieldName);
+                    return results.max(fieldName);
                 }
                 return  null;
             }
@@ -146,8 +151,10 @@ public class QueryFactory {
                 if( invocation.getArguments().length >= 1 ){
 
                     queryWatch.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create( clazz );
+
                     String fieldName = (String) invocation.getArguments()[0];
-                    return queryWatch.getQueryList().min(fieldName);
+                    return results.min(fieldName);
                 }
                 return  null;
             }
@@ -330,7 +337,7 @@ public class QueryFactory {
 
 
 
-            RealmList<RealmModel> queriedList = new RealmList<>();
+            RealmList<RealmModel> queriedList = ListFactory.create();
 
             for (RealmModel realmModel: haystack) {
                 if( checkRealmObject( realmModel, 0 )){

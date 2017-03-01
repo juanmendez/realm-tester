@@ -26,8 +26,8 @@ public class MockRealm {
         mockStatic( RealmObject.class );
         mockStatic( RealmList.class );
 
-        ModelFactory.prepare();
         ListFactory.prepare();
+        ModelFactory.prepare();
         RealmFactory.prepare();
         ConfigurationFactory.prepare();
     }

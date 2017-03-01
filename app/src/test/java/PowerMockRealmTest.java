@@ -1,3 +1,5 @@
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -430,6 +432,64 @@ public class PowerMockRealmTest
 
         dogs = realm.where( Dog.class ).in( "birthdate", new Date[]{new Date(2011, 6, 10), new Date(2014, 6, 10)} ).findAll();
         assertEquals( "There are two dogs with those names", dogs.size(), 2 );
+    }
 
+
+    @Test
+    public void shouldDoMax(){
+
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Idalgo Mendez");
+        dog.setBirthdate( new Date(2010, 6, 9));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Fido Fernandez");
+        dog.setBirthdate( new Date(2016, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2012, 2, 1));
+
+
+
+        assertEquals( "max age is ", 6, realm.where(Dog.class).max("age"));
+       // assertEquals( "min age is ", 1, realm.where(Dog.class).min("age"));
+       // assertEquals( "min age is ", 3.5, realm.where(Dog.class).average("age"));
+    }
+
+
+    @Test
+    public void shouldCreateADogInMainActivity(){
+
+
+        realm.executeTransactionAsync(realm1 -> {
+            Dog dog = realm1.createObject( Dog.class );
+            dog.setName("Max");
+            dog.setAge(1);
+            dog.setId(1);
+            dog.setBirthdate( new Date() );
+
+            Person person = realm1.createObject( Person.class );
+            person.setDogs( new RealmList<>(dog));
+        }, () -> {
+            System.out.println( "MainActivity. Number of dogs: " + realm.where(Person.class).findFirst().getClass().getSuperclass() );
+        }, error -> {
+            System.err.println( "MainActivity. There was an error completing transaction" + error.getMessage() );
+        });
+
+        Assert.assertEquals( "MainActivity entered one dog!", realm.where(Dog.class).count(), 1 );
+        Assert.assertEquals( "MainActivity entered one person!", realm.where(Person.class).count(), 1 );
     }
 }

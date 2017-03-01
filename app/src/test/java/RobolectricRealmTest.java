@@ -1,3 +1,5 @@
+import android.widget.TextView;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,25 +11,20 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
-
-import java.util.HashMap;
+import org.robolectric.shadows.ShadowLog;
 
 import info.juanmendez.mock.realm.BuildConfig;
 import info.juanmendez.mock.realm.MainActivity;
 import info.juanmendez.mock.realm.MockRealm;
-import info.juanmendez.mock.realm.dependencies.RealmStorage;
-import info.juanmendez.mock.realm.factories.RealmFactory;
-import info.juanmendez.mock.realm.models.Dog;
+import info.juanmendez.mock.realm.R;
+import info.juanmendez.mock.realm.models.Person;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
-import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -48,12 +45,14 @@ public class RobolectricRealmTest {
     public PowerMockRule rule = new PowerMockRule();
     public Realm realm;
 
+    static{
+        ShadowLog.stream = System.out;
+    }
+
     @Before
     public void before() throws Exception {
 
         MockRealm.prepare();
-        RealmFactory.setTransactionScheduler(Schedulers.computation() );
-        RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread() );
         realm = Realm.getDefaultInstance();
     }
 
@@ -70,11 +69,7 @@ public class RobolectricRealmTest {
 
         MainActivity activity = Robolectric.setupActivity( MainActivity.class );
 
-        //During testing RealmStorage.realmMap is the RealmModel repository
-        HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
-        RealmList dogs = realmMap.get( Dog.class );
-
-        assertEquals( "MainActivity entered one dog!", realm.where(Dog.class).count(), 1 );
-        assertEquals( "Is the same dog, right!?", dogs.get(0), realm.where(Dog.class).findFirst() );
+        assertEquals( "same print", ((TextView)activity.findViewById(R.id.textView)).getText(), "Hello World!");
+        assertEquals( "MainActivity entered one person!", realm.where(Person.class).count(), 1 );
     }
 }

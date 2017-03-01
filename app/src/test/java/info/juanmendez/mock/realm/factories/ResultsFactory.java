@@ -14,6 +14,8 @@ import io.realm.RealmResults;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -28,14 +30,15 @@ public class ResultsFactory {
         RealmList<RealmModel> results = queryWatch.getQueryList();
         RealmResults mockedResults = PowerMockito.mock( RealmResults.class );
 
-        when( mockedResults.get(anyInt())).thenAnswer(positionInvokation -> {
+        doAnswer(positionInvokation -> {
             int position = (int) positionInvokation.getArguments()[0];
             return results.get( position );
-        });
+        }).when( mockedResults).get(anyInt());
 
-        when( mockedResults.size() ).thenReturn( results.size() );
-        when( mockedResults.iterator() ).thenReturn( results.iterator() );
-        when( mockedResults.set(anyInt(), any(RealmObject.class)) ).thenAnswer(new Answer<RealmObject>() {
+        doReturn( results.size() ).when( mockedResults ).size();
+        doReturn( results.iterator() ).when( mockedResults ).iterator();
+
+        doAnswer(new Answer<RealmObject>() {
             @Override
             public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
                 int index = (int) invocationOnMock.getArguments()[0];
@@ -43,19 +46,18 @@ public class ResultsFactory {
                 results.set(index, value);
                 return value;
             }
-        });
+        }).when( mockedResults ).set(anyInt(), any(RealmObject.class) );
 
-        when( mockedResults.listIterator() ).thenReturn( results.listIterator() );
 
-        when( mockedResults.listIterator(anyInt()) ).thenAnswer(new Answer<RealmModel>() {
+        doAnswer(new Answer<RealmModel>() {
             @Override
             public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
                 int index = (int) invocationOnMock.getArguments()[0];
                 return results.get(index);
             }
-        });
+        }).when( mockedResults ).listIterator(anyInt());
 
-        when( mockedResults.where() ).then(new Answer<RealmQuery>(){
+        doAnswer(new Answer<RealmQuery>(){
 
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -66,8 +68,10 @@ public class ResultsFactory {
 
                 return QueryFactory.create( clazz );
             }
-        });
+        }).when( mockedResults ).where();
 
+      //handleDeleteMethods( mockedResults, results );
+      //handleMathMethods( mockedResults, results );
         return mockedResults;
     }
 
@@ -75,29 +79,97 @@ public class ResultsFactory {
     /**
      * TODO: handlers for deleting methods is not yet tested, and neither used yet
      */
-    private static void deleteHandlers( RealmResults mockedResults, RealmList<RealmModel> list ){
+    private static void handleDeleteMethods( RealmResults mockedResults, RealmList<RealmModel> list ){
 
-        when( mockedResults.deleteAllFromRealm() ).thenReturn( list.deleteAllFromRealm() );
-        when( mockedResults.deleteFirstFromRealm() ).thenReturn( list.deleteFirstFromRealm() );
-        when( mockedResults.deleteLastFromRealm() ).thenReturn( list.deleteLastFromRealm() );
 
-        doReturn( new Answer<Void>() {
+        doAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return list.deleteAllFromRealm();
+            }
+        }).when(mockedResults).deleteAllFromRealm();
+
+
+        doAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return list.deleteFirstFromRealm();
+            }
+        }).when( mockedResults  ).deleteFirstFromRealm();
+
+
+        doAnswer(new Answer<Boolean>() {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return list.deleteLastFromRealm();
+            }
+        }).when( mockedResults ).deleteLastFromRealm();
+
+
+        doAnswer( new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
 
                 int position = (int) invocation.getArguments()[0];
                 list.deleteFromRealm( position );
+
                 return null;
             }
         }).when( mockedResults ).deleteFromRealm( anyInt() );
     }
 
-    private static void deleteRealmModel( RealmModel realmModel ){
-        if( realmModel instanceof RealmObject ){
-            ((RealmObject) realmModel ).deleteFromRealm();
-        }
-        else{
-            RealmObject.deleteFromRealm( realmModel );
-        }
+    private static void handleMathMethods( RealmResults mockedResults, RealmList<RealmModel> list ){
+
+        when( mockedResults.sum( anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+
+                if( invocation.getArguments().length >= 1 ){
+
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return list.sum( fieldName );
+                }
+
+                return  null;
+            }
+        });
+
+        when( mockedResults.average(anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+                if( invocation.getArguments().length >= 1 ){
+
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return list.average(fieldName);
+                }
+
+                return  null;
+            }
+        });
+
+
+        when( mockedResults.max(anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+                if( invocation.getArguments().length >= 1 ){
+
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return list.max(fieldName);
+                }
+                return  null;
+            }
+        });
+
+        when( mockedResults.min(anyString()) ).thenAnswer(new Answer<Number>() {
+            @Override
+            public Number answer(InvocationOnMock invocation) throws Throwable {
+                if( invocation.getArguments().length >= 1 ){
+
+                    String fieldName = (String) invocation.getArguments()[0];
+                    return list.min(fieldName);
+                }
+                return  null;
+            }
+        });
     }
 }

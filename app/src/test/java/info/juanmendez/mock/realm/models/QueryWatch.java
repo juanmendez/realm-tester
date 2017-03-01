@@ -1,10 +1,11 @@
 package info.juanmendez.mock.realm.models;
 
+import java.util.ArrayList;
+
+import info.juanmendez.mock.realm.factories.ListFactory;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.exceptions.RealmException;
-
-import java.util.ArrayList;
 
 /**
  * Created by @juanmendezinfo on 2/19/2017.
@@ -61,7 +62,7 @@ public class QueryWatch {
 
         RealmList<RealmModel> previousGroupList = groupResults.get( groupLevel );
 
-        RealmList<RealmModel> nextGroupList = new RealmList<>();
+        RealmList<RealmModel> nextGroupList = ListFactory.create();
         for (RealmModel realmModel: previousGroupList) {
             nextGroupList.add( realmModel );
         }

@@ -55,6 +55,7 @@ public class RealmFactory {
     }
 
     private static void prepare(Realm realm) throws Exception {
+
         doNothing().when( Realm.class, "init", any());
 
         when( Realm.deleteRealm( any(RealmConfiguration.class))).thenReturn( true );
@@ -72,7 +73,7 @@ public class RealmFactory {
                 HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                 if( !realmMap.containsKey(clazz)){
-                    realmMap.put(clazz, new RealmList<>());
+                    realmMap.put(clazz, ListFactory.create());
                 }
 
                 Constructor constructor = clazz.getConstructor();
@@ -88,7 +89,6 @@ public class RealmFactory {
                 return realmModel;
             }
         });
-
 
         when( realm.copyToRealm(Mockito.any( RealmModel.class ))).thenAnswer( new Answer<RealmModel>(){
 
@@ -106,7 +106,7 @@ public class RealmFactory {
                     HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){
-                        realmMap.put(clazz, new RealmList<>());
+                        realmMap.put(clazz, ListFactory.create());
                     }
 
 
@@ -118,7 +118,8 @@ public class RealmFactory {
             }
         });
 
-         when( realm.where( Mockito.argThat( new RealmMatchers.ClassMatcher<>(RealmModel.class))  ) ).then(new Answer<RealmQuery>(){
+        when( realm.where( Mockito.argThat( new RealmMatchers.ClassMatcher<>(RealmModel.class))  ) ).then(new Answer<RealmQuery>(){
+
 
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -163,7 +164,8 @@ public class RealmFactory {
                             transaction.execute( realm );
                             return null;
                         }
-                    }).subscribeOn( observerScheduler ).subscribe(aVoid -> {});
+                    }).subscribeOn(observerScheduler)
+                            .observeOn( subscriberScheduler ).subscribe(aVoid -> {});
 
                 }
                 return null;
