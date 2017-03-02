@@ -464,9 +464,9 @@ public class PowerMockRealmTest
 
 
 
-        assertEquals( "max age is ", 6, realm.where(Dog.class).max("age"));
-       // assertEquals( "min age is ", 1, realm.where(Dog.class).min("age"));
-       // assertEquals( "min age is ", 3.5, realm.where(Dog.class).average("age"));
+        assertEquals( "max age is ", 6, realm.where(Dog.class).max("age").intValue());
+        assertEquals( "min age is ", 1, realm.where(Dog.class).min("age").intValue());
+        assertEquals( "average age is ", 3.5f, ((float) realm.where(Dog.class).average("age")));
     }
 
 

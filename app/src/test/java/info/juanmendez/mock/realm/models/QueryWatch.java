@@ -21,7 +21,6 @@ public class QueryWatch {
     }
 
     public void onTopGroupBegin(RealmList<RealmModel> realmList ){
-
         groupResults.add( realmList );
         onBeginGroupClause();
     }

@@ -19,12 +19,12 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 public class MockRealm {
 
     public static void prepare() throws Exception {
+        mockStatic( RealmList.class );
         mockStatic( Realm.class );
         mockStatic( RealmConfiguration.class);
         mockStatic( RealmQuery.class );
         mockStatic( RealmResults.class );
         mockStatic( RealmObject.class );
-        mockStatic( RealmList.class );
 
         ListFactory.prepare();
         ModelFactory.prepare();

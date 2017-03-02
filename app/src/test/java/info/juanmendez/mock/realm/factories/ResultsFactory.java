@@ -70,8 +70,8 @@ public class ResultsFactory {
             }
         }).when( mockedResults ).where();
 
-      //handleDeleteMethods( mockedResults, results );
-      //handleMathMethods( mockedResults, results );
+        handleDeleteMethods( mockedResults, results );
+        handleMathMethods( mockedResults, results );
         return mockedResults;
     }
 
