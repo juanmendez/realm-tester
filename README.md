@@ -3,6 +3,7 @@
 This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito.
 
 What has been done so far
+- Supporting Realm 2.3
 - Have Realm.getDefaultInstance()
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
