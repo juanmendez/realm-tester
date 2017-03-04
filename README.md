@@ -27,4 +27,4 @@ What is coming after
 
 What is not intended to cover during this phase
 - mocking event listeners for realmResults
-- realmQuery.findAllAsync is going to work synchronously like findAll method
+- any realmQuery.*Async is going to work synchronously like findAll method
