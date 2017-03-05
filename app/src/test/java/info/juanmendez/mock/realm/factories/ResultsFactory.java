@@ -5,7 +5,7 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
-import info.juanmendez.mock.realm.models.QueryWatch;
+import info.juanmendez.mock.realm.models.Query;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -26,8 +26,8 @@ public class ResultsFactory {
 
     public static RealmResults create( Class clazz ){
 
-        QueryWatch queryWatch = RealmStorage.getQueryMap().get(clazz);
-        RealmList<RealmModel> results = queryWatch.getQueryList();
+        Query query = RealmStorage.getQueryMap().get(clazz);
+        RealmList<RealmModel> results = query.getQueryList();
         RealmResults mockedResults = PowerMockito.mock( RealmResults.class );
 
         doAnswer(positionInvokation -> {
@@ -62,9 +62,9 @@ public class ResultsFactory {
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                QueryWatch queryWatch = new QueryWatch();
-                queryWatch.onTopGroupBegin(results);
-                RealmStorage.getQueryMap().put( clazz, queryWatch );
+                Query query = new Query();
+                query.onTopGroupBegin(results);
+                RealmStorage.getQueryMap().put( clazz, query);
 
                 return QueryFactory.create( clazz );
             }

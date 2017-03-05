@@ -1,6 +1,6 @@
 package info.juanmendez.mock.realm.factories;
 
-import info.juanmendez.mock.realm.models.ExtRealmList;
+import info.juanmendez.mock.realm.models.SubRealmList;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -24,7 +24,7 @@ public class ListFactory {
 
         whenNew( RealmList.class ).withArguments(anyVararg()).thenAnswer(invocation -> {
 
-            RealmList<RealmModel> realmList = new ExtRealmList<RealmModel>();
+            RealmList<RealmModel> realmList = new SubRealmList<RealmModel>();
             Object[] args = invocation.getArguments();
 
             for (Object arg:args) {
@@ -39,7 +39,7 @@ public class ListFactory {
 
     public static RealmList<RealmModel> create(){
 
-        return new ExtRealmList();
+        return new SubRealmList();
     }
 
     public static void deleteRealmModel( RealmModel realmModel ){

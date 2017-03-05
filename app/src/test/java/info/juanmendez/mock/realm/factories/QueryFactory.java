@@ -12,7 +12,7 @@ import java.util.HashMap;
 import info.juanmendez.mock.realm.dependencies.Compare;
 import info.juanmendez.mock.realm.dependencies.MockUtils;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
-import info.juanmendez.mock.realm.models.QueryWatch;
+import info.juanmendez.mock.realm.models.Query;
 import io.realm.Case;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -42,38 +42,38 @@ public class QueryFactory {
     public static RealmQuery create( Class clazz ){
 
 
-        HashMap<Class, QueryWatch> queryMap = RealmStorage.getQueryMap();
-        QueryWatch queryWatch = queryMap.get( clazz);
+        HashMap<Class, Query> queryMap = RealmStorage.getQueryMap();
+        Query query = queryMap.get( clazz);
 
         RealmQuery realmQuery = mock(RealmQuery.class);
         when( realmQuery.toString() ).thenReturn( "Realm:" + clazz.getName() );
         Whitebox.setInternalState( realmQuery, "clazz", clazz);
 
         when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
-            queryWatch.onTopGroupClose();
+            query.onTopGroupClose();
             return ResultsFactory.create( clazz );
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
-            queryWatch.onTopGroupClose();
-            RealmList<RealmModel> realResults = queryWatch.getQueryList();
+            query.onTopGroupClose();
+            RealmList<RealmModel> realResults = query.getQueryList();
             return realResults.get(0);
         });
 
 
         when( realmQuery.or()).then( invocation -> {
-            queryWatch.onOrClause();
+            query.onOrClause();
            return  realmQuery;
         });
 
         when( realmQuery.beginGroup()).then( invocation -> {
-            queryWatch.onBeginGroupClause();
+            query.onBeginGroupClause();
             return  realmQuery;
         });
 
 
         when( realmQuery.endGroup()).then( invocation -> {
-            queryWatch.onCloseGroupClause();
+            query.onCloseGroupClause();
             return  realmQuery;
         });
 
@@ -86,13 +86,13 @@ public class QueryFactory {
 
     private static void handleMathMethods( RealmQuery realmQuery, Class clazz ){
 
-        HashMap<Class, QueryWatch> queryMap = RealmStorage.getQueryMap();
-        QueryWatch queryWatch = RealmStorage.getQueryMap().get( clazz );
+        HashMap<Class, Query> queryMap = RealmStorage.getQueryMap();
+        Query query = RealmStorage.getQueryMap().get( clazz );
 
         when( realmQuery.count() ).thenAnswer(new Answer<Long>() {
             @Override
             public Long answer(InvocationOnMock invocation) throws Throwable {
-                queryWatch.onTopGroupClose();
+                query.onTopGroupClose();
                 RealmResults<RealmModel> results = ResultsFactory.create( clazz );
                 return ((Number)results.size()).longValue();
             }
@@ -103,7 +103,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length >= 1 ){
-                    queryWatch.onTopGroupClose();
+                    query.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create( clazz );
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -118,7 +118,7 @@ public class QueryFactory {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
-                    queryWatch.onTopGroupClose();
+                    query.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create( clazz );
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -135,7 +135,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryWatch.onTopGroupClose();
+                    query.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create( clazz );
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -150,7 +150,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryWatch.onTopGroupClose();
+                    query.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create( clazz );
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -271,11 +271,11 @@ public class QueryFactory {
                     return realmQuery;
                 }
 
-                QueryWatch queryWatch = RealmStorage.getQueryMap().get( realmQueryClass );
-                RealmList<RealmModel> searchList = queryWatch.getQueryList();
+                Query query = RealmStorage.getQueryMap().get( realmQueryClass );
+                RealmList<RealmModel> searchList = query.getQueryList();
 
                 RealmList<RealmModel> realmList = new QueryList().search( searchList, condition, invocationOnMock.getArguments() );
-                queryWatch.setQueryList( realmList );
+                query.setQueryList( realmList );
 
                 return realmQuery;
             }

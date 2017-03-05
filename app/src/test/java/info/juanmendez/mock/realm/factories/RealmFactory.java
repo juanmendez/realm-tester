@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 import info.juanmendez.mock.realm.dependencies.MockUtils;
 import info.juanmendez.mock.realm.dependencies.RealmMatchers;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
-import info.juanmendez.mock.realm.models.QueryWatch;
+import info.juanmendez.mock.realm.models.Query;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
@@ -61,7 +61,7 @@ public class RealmFactory {
         when( Realm.deleteRealm( any(RealmConfiguration.class))).thenReturn( true );
 
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
-        HashMap<Class, QueryWatch> queryMap = RealmStorage.getQueryMap();
+        HashMap<Class, Query> queryMap = RealmStorage.getQueryMap();
 
         when(Realm.getDefaultInstance()).thenReturn(realm);
 
@@ -127,9 +127,9 @@ public class RealmFactory {
                 //clear list being queried
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
 
-                QueryWatch queryWatch = new QueryWatch();
-                queryWatch.onTopGroupBegin( realmMap.get(clazz));
-                queryMap.put(clazz, queryWatch );
+                Query query = new Query();
+                query.onTopGroupBegin( realmMap.get(clazz));
+                queryMap.put(clazz, query);
 
                 return QueryFactory.create( clazz );
             }

@@ -11,9 +11,11 @@ import io.realm.RealmModel;
  * Created by Juan Mendez on 3/1/2017.
  * www.juanmendez.info
  * contact@juanmendez.info
+ *
+ * This subclass replaces functionality from RealmList.
  */
 
-public class ExtRealmList<T extends  RealmModel> extends RealmList<T> {
+public class SubRealmList<T extends  RealmModel> extends RealmList<T> {
 
     @Override
     public boolean deleteFirstFromRealm() {

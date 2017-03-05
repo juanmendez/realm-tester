@@ -10,13 +10,13 @@ import io.realm.exceptions.RealmException;
 /**
  * Created by @juanmendezinfo on 2/19/2017.
  */
-public class QueryWatch {
+public class Query {
 
     private boolean asAnd = true;
     private ArrayList<RealmList<RealmModel>> groupResults = new ArrayList<>();
     private int groupLevel = 0;
 
-    public QueryWatch(){
+    public Query(){
 
     }
 
