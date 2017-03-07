@@ -58,13 +58,13 @@ public class QueryFactory {
     private static void handleCollectingMethods(RealmQuery realmQuery, QueryNest queryNest) {
 
         when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
-            queryNest.appendQuery( new Query(Compare.endGroup));
+            queryNest.appendQuery( new Query(Compare.endTopGroup));
             queryNest.onTopGroupClose();
             return ResultsFactory.create(queryNest);
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
-            queryNest.appendQuery( new Query(Compare.endGroup));
+            queryNest.appendQuery( new Query(Compare.endTopGroup));
             queryNest.onTopGroupClose();
             RealmList<RealmModel> realResults = queryNest.getQueryList();
             return realResults.get(0);
@@ -98,7 +98,7 @@ public class QueryFactory {
         when( realmQuery.count() ).thenAnswer(new Answer<Long>() {
             @Override
             public Long answer(InvocationOnMock invocation) throws Throwable {
-                queryNest.appendQuery( new Query(Compare.endGroup));
+                queryNest.appendQuery( new Query(Compare.endTopGroup));
                 queryNest.onTopGroupClose();
                 RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
                 return ((Number)results.size()).longValue();
@@ -110,7 +110,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length >= 1 ){
-                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.appendQuery( new Query(Compare.endTopGroup));
                     queryNest.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
@@ -126,7 +126,7 @@ public class QueryFactory {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
-                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.appendQuery( new Query(Compare.endTopGroup));
                     queryNest.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
@@ -144,7 +144,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.appendQuery( new Query(Compare.endTopGroup));
                     queryNest.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
@@ -160,7 +160,7 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.appendQuery( new Query(Compare.endTopGroup));
                     queryNest.onTopGroupClose();
                     RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
@@ -292,6 +292,12 @@ public class QueryFactory {
                 return realmQuery;
             }
         };
+    }
+
+
+    private static void runComparisons( ArrayList<Query> queries ){
+
+
     }
 
     static class QueryList {

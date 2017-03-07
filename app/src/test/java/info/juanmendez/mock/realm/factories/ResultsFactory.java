@@ -64,7 +64,7 @@ public class ResultsFactory {
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
                 QueryNest resultsQueryNest = queryNest.clone();
-                resultsQueryNest.appendQuery( new Query(Compare.startGroup));
+                resultsQueryNest.appendQuery( new Query(Compare.startTopGroup, "", new Object[]{results}));
                 resultsQueryNest.onTopGroupBegin(results);
 
                 RealmQuery realmQuery = QueryFactory.create(resultsQueryNest);
