@@ -15,6 +15,9 @@ public class Compare{
     public static final String contains = "contains";
     public static final String startWith = "starsWith";
     public static final String endsWith = "endsWith";
-
     public static final String in = "in";
+
+    public static final String or = "or";
+    public static final String startGroup = "startGroup";
+    public static final String endGroup = "endGroup";
 }

@@ -12,6 +12,7 @@ import info.juanmendez.mock.realm.dependencies.Compare;
 import info.juanmendez.mock.realm.dependencies.MockUtils;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import info.juanmendez.mock.realm.models.Query;
+import info.juanmendez.mock.realm.models.QueryNest;
 import io.realm.Case;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -38,55 +39,68 @@ public class QueryFactory {
 
     //collections queried keyed by immediate class
 
-    public static RealmQuery create( Query query ){
+    public static RealmQuery create( QueryNest queryNest){
 
         RealmQuery realmQuery = mock(RealmQuery.class);
 
-        when( realmQuery.toString() ).thenReturn( "Realm:" + query.getClazz() );
-        Whitebox.setInternalState( realmQuery, "clazz", query.getClazz());
+        when( realmQuery.toString() ).thenReturn( "Realm:" + queryNest.getClazz() );
+        Whitebox.setInternalState( realmQuery, "clazz", queryNest.getClazz());
 
-        when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
-            query.onTopGroupClose();
-            return ResultsFactory.create( query );
-        });
-
-        when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
-            query.onTopGroupClose();
-            RealmList<RealmModel> realResults = query.getQueryList();
-            return realResults.get(0);
-        });
-
-
-        when( realmQuery.or()).then( invocation -> {
-            query.onOrClause();
-           return  realmQuery;
-        });
-
-        when( realmQuery.beginGroup()).then( invocation -> {
-            query.onBeginGroupClause();
-            return  realmQuery;
-        });
-
-
-        when( realmQuery.endGroup()).then( invocation -> {
-            query.onCloseGroupClause();
-            return  realmQuery;
-        });
-
-        handleMathMethods( realmQuery, query );
+        handleCollectingMethods( realmQuery, queryNest );
+        handleNestingMethods( realmQuery, queryNest );
+        handleMathMethods( realmQuery, queryNest);
         handleSearchMethods(  realmQuery );
 
 
         return realmQuery;
     }
 
-    private static void handleMathMethods( RealmQuery realmQuery, Query query){
+    private static void handleCollectingMethods(RealmQuery realmQuery, QueryNest queryNest) {
+
+        when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
+            queryNest.appendQuery( new Query(Compare.endGroup));
+            queryNest.onTopGroupClose();
+            return ResultsFactory.create(queryNest);
+        });
+
+        when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
+            queryNest.appendQuery( new Query(Compare.endGroup));
+            queryNest.onTopGroupClose();
+            RealmList<RealmModel> realResults = queryNest.getQueryList();
+            return realResults.get(0);
+        });
+    }
+
+    private static void handleNestingMethods(RealmQuery realmQuery, QueryNest queryNest) {
+
+        when( realmQuery.or()).then( invocation -> {
+            queryNest.appendQuery( new Query(Compare.or));
+            queryNest.onOrClause();
+            return  realmQuery;
+        });
+
+        when( realmQuery.beginGroup()).then( invocation -> {
+            queryNest.appendQuery( new Query(Compare.startGroup));
+            queryNest.onBeginGroupClause();
+            return  realmQuery;
+        });
+
+
+        when( realmQuery.endGroup()).then( invocation -> {
+            queryNest.appendQuery( new Query(Compare.endGroup));
+            queryNest.onCloseGroupClause();
+            return  realmQuery;
+        });
+    }
+
+    private static void handleMathMethods( RealmQuery realmQuery, QueryNest queryNest){
 
         when( realmQuery.count() ).thenAnswer(new Answer<Long>() {
             @Override
             public Long answer(InvocationOnMock invocation) throws Throwable {
-                query.onTopGroupClose();
-                RealmResults<RealmModel> results = ResultsFactory.create( query );
+                queryNest.appendQuery( new Query(Compare.endGroup));
+                queryNest.onTopGroupClose();
+                RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
                 return ((Number)results.size()).longValue();
             }
         });
@@ -96,8 +110,9 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length >= 1 ){
-                    query.onTopGroupClose();
-                    RealmResults<RealmModel> results = ResultsFactory.create( query );
+                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return results.sum( fieldName );
@@ -111,8 +126,9 @@ public class QueryFactory {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
-                    query.onTopGroupClose();
-                    RealmResults<RealmModel> results = ResultsFactory.create( query );
+                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return results.average(fieldName);
@@ -128,8 +144,9 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    query.onTopGroupClose();
-                    RealmResults<RealmModel> results = ResultsFactory.create( query );
+                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return results.max(fieldName);
@@ -143,8 +160,9 @@ public class QueryFactory {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    query.onTopGroupClose();
-                    RealmResults<RealmModel> results = ResultsFactory.create( query );
+                    queryNest.appendQuery( new Query(Compare.endGroup));
+                    queryNest.onTopGroupClose();
+                    RealmResults<RealmModel> results = ResultsFactory.create(queryNest);
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return results.min(fieldName);
@@ -246,7 +264,7 @@ public class QueryFactory {
     private static Answer<RealmQuery> createComparison( RealmQuery realmQuery, String condition ){
 
         Class realmQueryClass = (Class) Whitebox.getInternalState( realmQuery, "clazz");
-        
+
         return new Answer<RealmQuery>() {
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -264,11 +282,12 @@ public class QueryFactory {
                     return realmQuery;
                 }
 
-                Query query = RealmStorage.getQueryMap().get( realmQuery );
-                RealmList<RealmModel> searchList = query.getQueryList();
+                QueryNest queryNest = RealmStorage.getQueryMap().get( realmQuery );
+                RealmList<RealmModel> searchList = queryNest.getQueryList();
+                queryNest.appendQuery( new Query(condition, type, invocationOnMock.getArguments()));
 
                 RealmList<RealmModel> realmList = new QueryList().search( searchList, condition, invocationOnMock.getArguments() );
-                query.setQueryList( realmList );
+                queryNest.setQueryList( realmList );
 
                 return realmQuery;
             }

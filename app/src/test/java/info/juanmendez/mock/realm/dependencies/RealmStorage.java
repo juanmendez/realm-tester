@@ -2,7 +2,7 @@ package info.juanmendez.mock.realm.dependencies;
 
 import java.util.HashMap;
 
-import info.juanmendez.mock.realm.models.Query;
+import info.juanmendez.mock.realm.models.QueryNest;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmQuery;
@@ -19,7 +19,7 @@ public class RealmStorage {
 
     private static PublishSubject<RealmModel> deleteSubject = PublishSubject.create();
     private static HashMap<Class, RealmList<RealmModel>> realmMap = new HashMap<>();
-    private static HashMap<RealmQuery, Query> queryMap = new HashMap<>();
+    private static HashMap<RealmQuery, QueryNest> queryMap = new HashMap<>();
 
     /*keeps collections keyed by a sub-class of RealmModel.*/
     public static HashMap<Class, RealmList<RealmModel>> getRealmMap() {
@@ -27,7 +27,7 @@ public class RealmStorage {
     }
 
     /*collections queried keyed by immediate class*/
-    public static HashMap<RealmQuery, Query> getQueryMap() {
+    public static HashMap<RealmQuery, QueryNest> getQueryMap() {
         return queryMap;
     }
 

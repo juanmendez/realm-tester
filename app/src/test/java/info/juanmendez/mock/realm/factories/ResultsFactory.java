@@ -4,8 +4,10 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 
+import info.juanmendez.mock.realm.dependencies.Compare;
 import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import info.juanmendez.mock.realm.models.Query;
+import info.juanmendez.mock.realm.models.QueryNest;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -24,9 +26,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class ResultsFactory {
 
-    public static RealmResults create( Query query ){
+    public static RealmResults create( QueryNest queryNest){
 
-        RealmList<RealmModel> results = query.getQueryList();
+        RealmList<RealmModel> results = queryNest.getQueryList();
         RealmResults mockedResults = PowerMockito.mock( RealmResults.class );
 
         doAnswer(positionInvokation -> {
@@ -61,11 +63,12 @@ public class ResultsFactory {
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                Query resultsQuery = query.clone();
-                resultsQuery.onTopGroupBegin(results);
+                QueryNest resultsQueryNest = queryNest.clone();
+                resultsQueryNest.appendQuery( new Query(Compare.startGroup));
+                resultsQueryNest.onTopGroupBegin(results);
 
-                RealmQuery realmQuery = QueryFactory.create(resultsQuery);
-                RealmStorage.getQueryMap().put(realmQuery, resultsQuery);
+                RealmQuery realmQuery = QueryFactory.create(resultsQueryNest);
+                RealmStorage.getQueryMap().put(realmQuery, resultsQueryNest);
 
                 return realmQuery;
             }
