@@ -24,9 +24,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class ResultsFactory {
 
-    public static RealmResults create( Class clazz ){
+    public static RealmResults create( Query query ){
 
-        Query query = RealmStorage.getQueryMap().get(clazz);
         RealmList<RealmModel> results = query.getQueryList();
         RealmResults mockedResults = PowerMockito.mock( RealmResults.class );
 
@@ -57,18 +56,20 @@ public class ResultsFactory {
             }
         }).when( mockedResults ).listIterator(anyInt());
 
-        doAnswer(new Answer<RealmQuery>(){
+        RealmQuery where = doAnswer(new Answer<RealmQuery>() {
 
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                Query query = new Query();
-                query.onTopGroupBegin(results);
-                RealmStorage.getQueryMap().put( clazz, query);
+                Query resultsQuery = query.clone();
+                resultsQuery.onTopGroupBegin(results);
 
-                return QueryFactory.create( clazz );
+                RealmQuery realmQuery = QueryFactory.create(resultsQuery);
+                RealmStorage.getQueryMap().put(realmQuery, resultsQuery);
+
+                return realmQuery;
             }
-        }).when( mockedResults ).where();
+        }).when(mockedResults).where();
 
         handleDeleteMethods( mockedResults, results );
         handleMathMethods( mockedResults, results );

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import info.juanmendez.mock.realm.models.Query;
 import io.realm.RealmList;
 import io.realm.RealmModel;
+import io.realm.RealmQuery;
 import io.realm.exceptions.RealmException;
 import rx.subjects.PublishSubject;
 
@@ -17,10 +18,8 @@ import rx.subjects.PublishSubject;
 public class RealmStorage {
 
     private static PublishSubject<RealmModel> deleteSubject = PublishSubject.create();
-
-
     private static HashMap<Class, RealmList<RealmModel>> realmMap = new HashMap<>();
-    private static HashMap<Class, Query> queryMap = new HashMap<>();
+    private static HashMap<RealmQuery, Query> queryMap = new HashMap<>();
 
     /*keeps collections keyed by a sub-class of RealmModel.*/
     public static HashMap<Class, RealmList<RealmModel>> getRealmMap() {
@@ -28,7 +27,7 @@ public class RealmStorage {
     }
 
     /*collections queried keyed by immediate class*/
-    public static HashMap<Class, Query> getQueryMap() {
+    public static HashMap<RealmQuery, Query> getQueryMap() {
         return queryMap;
     }
 
@@ -76,5 +75,12 @@ public class RealmStorage {
                 throw new RealmException( clazz.getName() + " is not an instance of RealmModel"  );
             }
         }
+    }
+
+    public static void clear(){
+
+        deleteSubject = PublishSubject.create();
+        realmMap.clear();
+        queryMap.clear();
     }
 }

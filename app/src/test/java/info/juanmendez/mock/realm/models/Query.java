@@ -15,9 +15,10 @@ public class Query {
     private boolean asAnd = true;
     private ArrayList<RealmList<RealmModel>> groupResults = new ArrayList<>();
     private int groupLevel = 0;
+    private Class clazz;
 
-    public Query(){
-
+    public Query(Class clazz){
+        this.clazz = clazz;
     }
 
     public void onTopGroupBegin(RealmList<RealmModel> realmList ){
@@ -90,5 +91,13 @@ public class Query {
         if( groupLevel > 0 ){
             throw( new RealmException("Required to close all groups. Current group level is " + groupLevel ));
         }
+    }
+
+    public Class getClazz() {
+        return clazz;
+    }
+
+    public Query clone(){
+        return new Query( this.clazz );
     }
 }

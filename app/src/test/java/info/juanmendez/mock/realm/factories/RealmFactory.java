@@ -61,7 +61,7 @@ public class RealmFactory {
         when( Realm.deleteRealm( any(RealmConfiguration.class))).thenReturn( true );
 
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
-        HashMap<Class, Query> queryMap = RealmStorage.getQueryMap();
+        HashMap<RealmQuery, Query> queryMap = RealmStorage.getQueryMap();
 
         when(Realm.getDefaultInstance()).thenReturn(realm);
 
@@ -126,12 +126,15 @@ public class RealmFactory {
 
                 //clear list being queried
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
+                Query query = new Query(clazz);
 
-                Query query = new Query();
+                RealmQuery realmQuery = QueryFactory.create( query );
+                queryMap.put(realmQuery, query);
+
                 query.onTopGroupBegin( realmMap.get(clazz));
-                queryMap.put(clazz, query);
 
-                return QueryFactory.create( clazz );
+
+                return realmQuery;
             }
         });
     }

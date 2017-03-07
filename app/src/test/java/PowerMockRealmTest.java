@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Set;
 
 import info.juanmendez.mock.realm.MockRealm;
+import info.juanmendez.mock.realm.dependencies.RealmStorage;
 import info.juanmendez.mock.realm.models.Dog;
 import info.juanmendez.mock.realm.models.Person;
 import io.realm.Case;
@@ -55,6 +56,7 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldCreateObject(){
+        RealmStorage.clear();
         assertNotNull( realm.createObject(Dog.class));
     }
 
@@ -64,7 +66,7 @@ public class PowerMockRealmTest
      */
     @Test
     public void shouldCopyToRealm() throws Exception {
-
+        RealmStorage.clear();
         Dog dog = new Dog();
         dog.setName("Max");
         dog.setAge(1);
@@ -79,6 +81,7 @@ public class PowerMockRealmTest
      */
     @Test
     public void shouldExecuteTransaction(){
+        RealmStorage.clear();
         realm.executeTransaction( realm1 -> {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(1);
@@ -94,6 +97,7 @@ public class PowerMockRealmTest
      */
     @Test
     public void shouldQueryByConditions(){
+        RealmStorage.clear();
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Max");
@@ -122,6 +126,8 @@ public class PowerMockRealmTest
     @Test
     public void shouldQueryByCaseSensitivity(){
 
+        RealmStorage.clear();
+
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Idalgo Mendez");
@@ -146,6 +152,8 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldCount(){
+        RealmStorage.clear();
+
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Idalgo Mendez");
@@ -162,6 +170,8 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldQuerySynchronousTransaction(){
+        RealmStorage.clear();
+
         realm.executeTransaction(realm1 -> {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(1);
@@ -174,6 +184,8 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldQueryAsyncTransactionOnSuccessAndError(){
+
+        RealmStorage.clear();
 
         /*
            when testing just with PowerMockito we use main thread as schedulers.
@@ -215,6 +227,7 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldDoLinkingQueries(){
+        RealmStorage.clear();
 
         Person person;
         Dog dog;
@@ -261,6 +274,8 @@ public class PowerMockRealmTest
     @Test
     public void shouldQueryByOr(){
 
+        RealmStorage.clear();
+
         Dog dog;
 
         dog = realm.createObject(Dog.class);
@@ -300,6 +315,8 @@ public class PowerMockRealmTest
     @Test
     public void shouldQueryAgainstRealmResults(){
 
+        RealmStorage.clear();
+
         Dog dog;
 
         dog = realm.createObject(Dog.class);
@@ -335,6 +352,8 @@ public class PowerMockRealmTest
     @Test
     public void shouldDeleteRealmObject(){
 
+        RealmStorage.clear();
+
         Dog dog = realm.createObject( Dog.class );
         dog.setName("Max");
         dog.setAge(1);
@@ -354,6 +373,8 @@ public class PowerMockRealmTest
     @Test
     public void findModelRelationship(){
 
+        RealmStorage.clear();
+
         Person person = realm.createObject( Person.class );
         person.setDogs( new RealmList<>());
 
@@ -369,6 +390,8 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldFilterByPersonClass(){
+
+        RealmStorage.clear();
 
         RealmList list = new RealmList(new Dog(), new Dog(), new Dog() );
         list.add( new Dog() );
@@ -392,6 +415,9 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldBeIn(){
+
+        RealmStorage.clear();
+
         Dog dog;
 
         dog = realm.createObject(Dog.class);
@@ -438,6 +464,8 @@ public class PowerMockRealmTest
     @Test
     public void shouldDoMax(){
 
+        RealmStorage.clear();
+
         Dog dog;
 
         dog = realm.createObject(Dog.class);
@@ -472,7 +500,7 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldCreateADogInMainActivity(){
-
+        RealmStorage.clear();
 
         realm.executeTransactionAsync(realm1 -> {
             Dog dog = realm1.createObject( Dog.class );
