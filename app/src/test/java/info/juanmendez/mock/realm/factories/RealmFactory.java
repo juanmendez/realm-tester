@@ -135,6 +135,7 @@ public class RealmFactory {
 
                 queryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
 
+
                 return realmQuery;
             }
         });

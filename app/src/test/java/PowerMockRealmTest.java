@@ -24,7 +24,6 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import io.realm.internal.RealmCore;
 import rx.Observable;
 
 import static org.junit.Assert.assertEquals;
@@ -38,7 +37,7 @@ import static org.junit.Assert.assertNull;
  */
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "android.*"})
-@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmCore.class, RealmObject.class })
+@PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class })
 public class PowerMockRealmTest
 {
     Realm realm;
