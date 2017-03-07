@@ -15,16 +15,13 @@ What has been done so far
 - Grouping works, but needs more testing
 - Querying against realmResults
 - Testing in PowerMock, and Robolectric 3.0 + PowerMock at the moment
+- delete reamModels in cascading mode, more testing required
+- support also for deleting methods found in realmResults, and realmLists, mroe testing required
 
 What is coming in the next phase
-- delete reamModels in cascading mode
-    - This has been covered, yet needs more polishing and testing
-- support also for deleting methods found in realmResults, and realmLists
-    - This has been covered, yet needs more polishing and testing
+- support realmQuery.*asc() methods
+- realmResult.addEventListener()
+- realmResult.asObservable()
 
 What is coming after
 - A chart with what's being covered and what is not from RealmModel, RealmObject, RealmQuery, RealmResults, and RealmList
-
-What is not intended to cover during this phase
-- mocking event listeners for realmResults
-- any realmQuery.*Async is going to work synchronously like findAll method
