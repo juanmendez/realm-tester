@@ -9,25 +9,30 @@ package info.juanmendez.mock.realm.models;
 public class Query {
 
     private String field;
-    private String comparisson;
+    private String condition;
     private Object[] args;
 
-    public Query(String comparisson) {
-        this.comparisson = comparisson;
+    public Query(String condition) {
+        this.condition = condition;
     }
 
-    public Query(String comparisson, String field, Object[] args) {
-        this.comparisson = comparisson;
+    public Query(String condition, String field, Object[] args) {
+        this.condition = condition;
         this.args = args;
         this.field = field;
+    }
+
+    public Query( String condition, Object[] args ){
+        this.condition = condition;
+        this.args = args;
     }
 
     public String getField() {
         return field;
     }
 
-    public String getComparisson() {
-        return comparisson;
+    public String getCondition() {
+        return condition;
     }
 
     public Object[] getArgs() {

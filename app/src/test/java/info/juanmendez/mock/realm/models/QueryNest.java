@@ -2,6 +2,7 @@ package info.juanmendez.mock.realm.models;
 
 import java.util.ArrayList;
 
+import info.juanmendez.mock.realm.dependencies.Compare;
 import info.juanmendez.mock.realm.factories.ListFactory;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -110,5 +111,37 @@ public class QueryNest {
     @Override
     public QueryNest clone(){
         return new QueryNest( this.clazz );
+    }
+
+
+    public Boolean isUsedByQuery( Query query ){
+
+        Boolean used = false;
+
+        switch ( query.getCondition() ){
+
+            case Compare.startTopGroup:
+                onTopGroupBegin( (RealmList<RealmModel>) query.getArgs()[0] );
+                used = true;
+                break;
+            case Compare.startGroup:
+                onBeginGroupClause();
+                used = true;
+                break;
+            case Compare.or:
+                onOrClause();
+                used = true;
+                break;
+            case Compare.endGroup:
+                onCloseGroupClause();
+                used = true;
+                break;
+            case Compare.endTopGroup:
+                onTopGroupClose();
+                used = true;
+                break;
+        }
+
+        return used;
     }
 }

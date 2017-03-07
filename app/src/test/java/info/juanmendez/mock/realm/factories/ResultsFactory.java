@@ -58,14 +58,13 @@ public class ResultsFactory {
             }
         }).when( mockedResults ).listIterator(anyInt());
 
-        RealmQuery where = doAnswer(new Answer<RealmQuery>() {
+        doAnswer(new Answer<RealmQuery>() {
 
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
                 QueryNest resultsQueryNest = queryNest.clone();
-                resultsQueryNest.appendQuery( new Query(Compare.startTopGroup, "", new Object[]{results}));
-                resultsQueryNest.onTopGroupBegin(results);
+                resultsQueryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
 
                 RealmQuery realmQuery = QueryFactory.create(resultsQueryNest);
                 RealmStorage.getQueryMap().put(realmQuery, resultsQueryNest);

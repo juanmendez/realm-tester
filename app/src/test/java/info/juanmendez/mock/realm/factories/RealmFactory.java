@@ -133,9 +133,7 @@ public class RealmFactory {
                 RealmQuery realmQuery = QueryFactory.create(queryNest);
                 queryMap.put(realmQuery, queryNest);
 
-                queryNest.appendQuery( new Query(Compare.startTopGroup, "", new Object[]{realmMap.get(clazz)} ));
-                queryNest.onTopGroupBegin( realmMap.get(clazz));
-
+                queryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
 
                 return realmQuery;
             }
