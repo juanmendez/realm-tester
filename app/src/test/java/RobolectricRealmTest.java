@@ -25,6 +25,7 @@ import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.internal.RealmCore;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -36,10 +37,10 @@ import static junit.framework.Assert.assertEquals;
  * contact@juanmendez.info
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21 )
+@Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @SuppressStaticInitializationFor("io.realm.internal.Util")
-@PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class })
+@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmCore.class, RealmObject.class })
 public class RobolectricRealmTest {
 
     @Rule
@@ -55,7 +56,7 @@ public class RobolectricRealmTest {
 
         MockRealm.prepare();
         RealmFactory.setTransactionScheduler(Schedulers.computation());
-        RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread());
+        RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread() );
         realm = Realm.getDefaultInstance();
     }
 
