@@ -5,6 +5,8 @@ This is ongoing work to mock Realm as much as possible hammering with Mockito, a
 What has been done so far
 - Supporting Realm 2.3
 - Supporting Robolectric 3.3.1
+- Works with Mockito 1.10.19
+- Works with PowerMockito 1.6.4
 - Have Realm.getDefaultInstance()
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
@@ -15,7 +17,6 @@ What has been done so far
 - Support or() for chaining queries
 - Grouping works, but needs more testing
 - Querying against realmResults
-- Testing in PowerMock, and Robolectric 3.0 + PowerMock at the moment
 - delete reamModels in cascading mode, more testing required
 - support also for deleting methods found in realmResults, and realmLists, mroe testing required
 
