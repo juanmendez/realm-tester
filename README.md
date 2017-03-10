@@ -4,11 +4,12 @@ This is ongoing work to mock Realm as much as possible hammering with Mockito, a
 
 What has been done so far
 - Supporting Realm 2.3
+- Supporting Robolectric 3.3.1
 - Have Realm.getDefaultInstance()
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
 - Asynchronous and synchronous transactions with RxJava
-    - Default schedulers are in main thread, feel free to update them for Robolectric
+    - Default schedulers are in main thread, feel free to update them when using Robolectric
         - RealmFactory.setTransactionScheduler(Schedulers.computation())
         - RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread())
 - Support or() for chaining queries
