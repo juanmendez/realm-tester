@@ -21,7 +21,7 @@ What has been done so far
 - support also for deleting methods found in realmResults, and realmLists, mroe testing required
 
 What is coming in the next phase
-- support realmQuery.*asc() methods
+- support realmQuery.*Async() methods
 - realmResult.addEventListener()
 - realmResult.asObservable()
 
