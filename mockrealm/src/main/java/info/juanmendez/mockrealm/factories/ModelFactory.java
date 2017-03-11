@@ -7,7 +7,9 @@ import org.powermock.reflect.Whitebox;
 import java.lang.reflect.Field;
 import java.util.Set;
 
+import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
+import info.juanmendez.mockrealm.models.ModelEmit;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -45,7 +47,7 @@ public class ModelFactory {
             realmModel = spy( realmModel );
         }
 
-        CompositeSubscription allSubscriptions = new CompositeSubscription();
+        CompositeSubscription subscriptions = new CompositeSubscription();
         Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
         Class fieldClass;
         Subscription subscription;
@@ -59,28 +61,29 @@ public class ModelFactory {
 
             if( RealmModel.class.isAssignableFrom(fieldClass) ){
 
-                //RealmModels are filtered by its inmediate class
                 RealmModel finalRealmModel = realmModel;
-                subscription = RealmStorage.getDeleteObservable()
+                subscriptions.add(
+
+                        RealmObservable.asObservable()
+                        .filter(modelEmit -> modelEmit.getState() == ModelEmit.REMOVED )
+                        .map(modelEmit -> modelEmit.getRealmModel())
                         .ofType(fieldClass)
                         .subscribe( o -> {
-
                             Object variable = Whitebox.getInternalState(finalRealmModel, field.getName());
 
                             if( variable != null && variable == o ){
                                 Whitebox.setInternalState(finalRealmModel, field.getName(), (Object[]) null);
                             }
-                        });
-
-                allSubscriptions.add( subscription );
+                        })
+                    );
             }
             else if( fieldClass == RealmList.class ){
 
                 //RealmResults are not filtered
                 RealmModel finalRealmModel1 = realmModel;
-                subscription = RealmStorage.getDeleteObservable()
+                subscriptions.add( RealmObservable.asObservable()
+                        .filter(modelEmit -> modelEmit.getState() == ModelEmit.REMOVED)
                         .subscribe(o -> {
-
                             RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(finalRealmModel1, field.getName());
 
                             if( realmList != null ){
@@ -89,36 +92,35 @@ public class ModelFactory {
                                     realmList.remove( o );
                                 }
                             }
-
-                        });//end subscription
-
-                allSubscriptions.add( subscription );
+                        })
+                );
             }
         }
 
         if( realmModel instanceof RealmObject ){
 
-            RealmModel finalRealmModel2 = realmModel;
+            RealmModel modelDeleted = realmModel;
 
+            //when deleting then also make all subscriptions be unsubscribed
             doAnswer(new Answer<Void>() {
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    allSubscriptions.clear();
+                    subscriptions.clear();
 
-                    Set<Field> fieldSet =  Whitebox.getAllInstanceFields(finalRealmModel2);
+                    Set<Field> fieldSet =  Whitebox.getAllInstanceFields(modelDeleted);
 
                     for (Field field: fieldSet) {
 
                         if( field.getType() == RealmList.class ){
 
-                            RealmList list = (RealmList) Whitebox.getInternalState(finalRealmModel2, field.getName());
+                            RealmList list = (RealmList) Whitebox.getInternalState(modelDeleted, field.getName());
 
                             if( list != null )
                                 list.clear();
                         }
                     }
 
-                    RealmStorage.removeModel(finalRealmModel2);
+                    RealmStorage.removeModel(modelDeleted);
                     return null;
                 }
             }).when( (RealmObject) realmModel ).deleteFromRealm();

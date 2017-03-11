@@ -56,6 +56,14 @@ public class RealmFactory {
         RealmFactory.subscriberScheduler = subscriberScheduler;
     }
 
+    public static Scheduler getObserverScheduler() {
+        return observerScheduler;
+    }
+
+    public static Scheduler getSubscriberScheduler() {
+        return subscriberScheduler;
+    }
+
     private static void prepare(Realm realm) throws Exception {
 
         doNothing().when( Realm.class, "init", any());

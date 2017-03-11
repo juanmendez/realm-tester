@@ -15,7 +15,9 @@ import java.util.Date;
 import java.util.Set;
 
 import info.juanmendez.mockrealm.MockRealm;
+import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
+import info.juanmendez.mockrealm.models.ModelEmit;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Case;
@@ -518,5 +520,46 @@ public class PowerMockRealmTest
 
         Assert.assertEquals( "MainActivity entered one dog!", realm.where(Dog.class).count(), 1 );
         Assert.assertEquals( "MainActivity entered one person!", realm.where(Person.class).count(), 1 );
+    }
+
+    @Test
+    public void shouldModelObservableWork(){
+        RealmStorage.clear();
+
+        RealmObservable.add(
+                RealmObservable.asObservable()
+                .subscribe(modelEmit -> System.out.println( "onNext " + modelEmit.getState() ))
+        );
+
+
+        //lets now find only people
+        RealmObservable.add(
+                RealmObservable.asObservable()
+                        .filter(modelEmit -> {
+                            return modelEmit.getRealmModel() instanceof Person;
+                        }).subscribe(modelEmit -> {
+                    System.out.println( "nextPerson: " + modelEmit.getState() );
+                })
+        );
+
+
+        RealmObservable.add(
+                RealmObservable.asObservable()
+                        .filter( modelEmit -> modelEmit.getState()== ModelEmit.REMOVED )
+                        .map(modelEmit -> modelEmit.getRealmModel() )
+                        .ofType( Dog.class )
+                        .subscribe(realmModel -> System.out.println( "onNextDogRemoved-> " + realmModel.toString() ))
+        );
+
+
+        Person person = realm.createObject(Person.class);
+        Dog dog = realm.createObject( Dog.class );
+        dog.deleteFromRealm();
+        person.deleteFromRealm();
+    }
+
+    @Test
+    public void shouldUpdateUponAsynMethod(){
+
     }
 }

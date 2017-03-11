@@ -3,21 +3,17 @@ package info.juanmendez.mockrealm.dependencies;
 import java.util.HashMap;
 
 import info.juanmendez.mockrealm.models.QueryNest;
+import info.juanmendez.mockrealm.models.ModelEmit;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmQuery;
 import io.realm.exceptions.RealmException;
-import rx.subjects.PublishSubject;
 
 /**
  * Created by @juanmendezinfo on 2/15/2017.
- *
- * TODO: for quick observing realmModels being removed, some functionality remained here but should be
- * sealed in its own class
  */
 public class RealmStorage {
 
-    private static PublishSubject<RealmModel> deleteSubject = PublishSubject.create();
     private static HashMap<Class, RealmList<RealmModel>> realmMap = new HashMap<>();
     private static HashMap<RealmQuery, QueryNest> queryMap = new HashMap<>();
 
@@ -31,10 +27,6 @@ public class RealmStorage {
         return queryMap;
     }
 
-    public static PublishSubject<RealmModel> getDeleteObservable() {
-        return deleteSubject;
-    }
-
     public static void removeModel( RealmModel realmModel ){
 
         if( realmModel != null ){
@@ -44,8 +36,8 @@ public class RealmStorage {
             if( RealmModel.class.isAssignableFrom(clazz) ){
 
                 if( realmMap.get(clazz) != null && realmMap.get(clazz).contains( realmModel ) ){
-                    deleteSubject.onNext( realmModel );
                     realmMap.get( clazz ).remove( realmModel );
+                    RealmObservable.onNext( new ModelEmit( ModelEmit.REMOVED, realmModel ) );
                 }else{
                     throw new RealmException( "Instance of " + clazz.getName() + " cannot be deleted as it's not part of the realm database" );
                 }
@@ -67,6 +59,7 @@ public class RealmStorage {
 
                 if( !realmMap.get(clazz).contains( realmModel ) ){
                     realmMap.get(MockUtils.getClass(realmModel) ).add( realmModel );
+                    RealmObservable.onNext( new ModelEmit( ModelEmit.ADDED, realmModel ) );
                 }else{
                     throw new RealmException( "Instance of " + clazz.getName() + " cannot be added more than once" );
                 }
@@ -78,9 +71,8 @@ public class RealmStorage {
     }
 
     public static void clear(){
-
-        deleteSubject = PublishSubject.create();
         realmMap.clear();
         queryMap.clear();
+        RealmObservable.unsubscribe();
     }
 }
