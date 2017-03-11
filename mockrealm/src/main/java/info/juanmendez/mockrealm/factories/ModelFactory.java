@@ -14,7 +14,6 @@ import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
@@ -47,7 +46,6 @@ public class ModelFactory {
             realmModel = spy( realmModel );
         }
 
-        CompositeSubscription subscriptions = new CompositeSubscription();
         Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
         Class fieldClass;
         Subscription subscription;
@@ -62,7 +60,7 @@ public class ModelFactory {
             if( RealmModel.class.isAssignableFrom(fieldClass) ){
 
                 RealmModel finalRealmModel = realmModel;
-                subscriptions.add(
+                RealmObservable.add( realmModel,
 
                         RealmObservable.asObservable()
                         .filter(modelEmit -> modelEmit.getState() == ModelEmit.REMOVED )
@@ -81,8 +79,10 @@ public class ModelFactory {
 
                 //RealmResults are not filtered
                 RealmModel finalRealmModel1 = realmModel;
-                subscriptions.add( RealmObservable.asObservable()
+
+                RealmObservable.add( realmModel, RealmObservable.asObservable()
                         .filter(modelEmit -> modelEmit.getState() == ModelEmit.REMOVED)
+                        .map(modelEmit -> modelEmit.getRealmModel())
                         .subscribe(o -> {
                             RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(finalRealmModel1, field.getName());
 
@@ -105,7 +105,7 @@ public class ModelFactory {
             doAnswer(new Answer<Void>() {
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    subscriptions.clear();
+                    RealmObservable.unsubcribe( modelDeleted );
 
                     Set<Field> fieldSet =  Whitebox.getAllInstanceFields(modelDeleted);
 

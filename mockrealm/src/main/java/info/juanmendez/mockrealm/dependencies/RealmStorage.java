@@ -71,8 +71,9 @@ public class RealmStorage {
     }
 
     public static void clear(){
+
+        RealmObservable.unsubscribe();
         realmMap.clear();
         queryMap.clear();
-        RealmObservable.unsubscribe();
     }
 }

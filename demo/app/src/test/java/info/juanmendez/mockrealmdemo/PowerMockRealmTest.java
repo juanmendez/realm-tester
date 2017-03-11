@@ -556,10 +556,7 @@ public class PowerMockRealmTest
         Dog dog = realm.createObject( Dog.class );
         dog.deleteFromRealm();
         person.deleteFromRealm();
-    }
 
-    @Test
-    public void shouldUpdateUponAsynMethod(){
-
+        RealmStorage.clear();
     }
 }
