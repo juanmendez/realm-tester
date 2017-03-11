@@ -27,17 +27,21 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class ResultsFactory {
 
     public static RealmResults create( QueryNest queryNest){
+        return create( queryNest, PowerMockito.mock( RealmResults.class ) );
+    }
+
+    public static RealmResults create( QueryNest queryNest, RealmResults realmResults ){
 
         RealmList<RealmModel> results = queryNest.getQueryList();
-        RealmResults mockedResults = PowerMockito.mock( RealmResults.class );
 
         doAnswer(positionInvokation -> {
             int position = (int) positionInvokation.getArguments()[0];
             return results.get( position );
-        }).when( mockedResults).get(anyInt());
+        }).when( realmResults).get(anyInt());
 
-        doReturn( results.size() ).when( mockedResults ).size();
-        doReturn( results.iterator() ).when( mockedResults ).iterator();
+        doReturn( results.size() ).when( realmResults ).size();
+
+        doReturn( results.iterator() ).when( realmResults ).iterator();
 
         doAnswer(new Answer<RealmObject>() {
             @Override
@@ -47,8 +51,7 @@ public class ResultsFactory {
                 results.set(index, value);
                 return value;
             }
-        }).when( mockedResults ).set(anyInt(), any(RealmObject.class) );
-
+        }).when( realmResults ).set(anyInt(), any(RealmObject.class) );
 
         doAnswer(new Answer<RealmModel>() {
             @Override
@@ -56,7 +59,7 @@ public class ResultsFactory {
                 int index = (int) invocationOnMock.getArguments()[0];
                 return results.get(index);
             }
-        }).when( mockedResults ).listIterator(anyInt());
+        }).when( realmResults ).listIterator(anyInt());
 
         doAnswer(new Answer<RealmQuery>() {
 
@@ -71,18 +74,15 @@ public class ResultsFactory {
 
                 return realmQuery;
             }
-        }).when(mockedResults).where();
+        }).when(realmResults).where();
 
-        handleDeleteMethods( mockedResults, results );
-        handleMathMethods( mockedResults, results );
-        return mockedResults;
+        handleDeleteMethods( realmResults, results );
+        handleMathMethods( realmResults, results );
+
+        return realmResults;
     }
 
-
-    /**
-     * TODO: handlers for deleting methods is not yet tested, and neither used yet
-     */
-    private static void handleDeleteMethods( RealmResults mockedResults, RealmList<RealmModel> list ){
+    private static void handleDeleteMethods( RealmResults realmResults, RealmList<RealmModel> list ){
 
 
         doAnswer(new Answer<Boolean>() {
@@ -90,7 +90,7 @@ public class ResultsFactory {
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
                 return list.deleteAllFromRealm();
             }
-        }).when(mockedResults).deleteAllFromRealm();
+        }).when(realmResults).deleteAllFromRealm();
 
 
         doAnswer(new Answer<Boolean>() {
@@ -98,7 +98,7 @@ public class ResultsFactory {
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
                 return list.deleteFirstFromRealm();
             }
-        }).when( mockedResults  ).deleteFirstFromRealm();
+        }).when( realmResults  ).deleteFirstFromRealm();
 
 
         doAnswer(new Answer<Boolean>() {
@@ -106,7 +106,7 @@ public class ResultsFactory {
             public Boolean answer(InvocationOnMock invocation) throws Throwable {
                 return list.deleteLastFromRealm();
             }
-        }).when( mockedResults ).deleteLastFromRealm();
+        }).when( realmResults ).deleteLastFromRealm();
 
 
         doAnswer( new Answer<Void>() {
@@ -118,12 +118,12 @@ public class ResultsFactory {
 
                 return null;
             }
-        }).when( mockedResults ).deleteFromRealm( anyInt() );
+        }).when( realmResults ).deleteFromRealm( anyInt() );
     }
 
-    private static void handleMathMethods( RealmResults mockedResults, RealmList<RealmModel> list ){
+    private static void handleMathMethods( RealmResults realmResults, RealmList<RealmModel> list ){
 
-        when( mockedResults.sum( anyString()) ).thenAnswer(new Answer<Number>() {
+        when( realmResults.sum( anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
@@ -137,7 +137,7 @@ public class ResultsFactory {
             }
         });
 
-        when( mockedResults.average(anyString()) ).thenAnswer(new Answer<Number>() {
+        when( realmResults.average(anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
@@ -151,7 +151,7 @@ public class ResultsFactory {
         });
 
 
-        when( mockedResults.max(anyString()) ).thenAnswer(new Answer<Number>() {
+        when( realmResults.max(anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
@@ -163,7 +163,7 @@ public class ResultsFactory {
             }
         });
 
-        when( mockedResults.min(anyString()) ).thenAnswer(new Answer<Number>() {
+        when( realmResults.min(anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){

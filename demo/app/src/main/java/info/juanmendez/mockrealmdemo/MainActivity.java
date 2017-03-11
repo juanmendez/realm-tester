@@ -17,33 +17,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        //configurations throw errors.
         Realm.init(this);
-
-        /**
-         * upon testing, we should ommit these lines
-         */
-       /*
-        RealmConfiguration configuration = new RealmConfiguration.Builder().build();
-        Realm.setDefaultConfiguration( configuration );
-        Realm.deleteRealm( configuration );*/
-
         Realm realm = Realm.getDefaultInstance();
 
         setContentView(R.layout.activity_main);
 
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Dog dog = realm.createObject( Dog.class );
-                dog.setName("Max");
-                dog.setAge(1);
-                dog.setId(1);
-                dog.setBirthdate( new Date() );
+        realm.executeTransactionAsync(thisRealm -> {
+            Dog dog = thisRealm.createObject( Dog.class );
+            dog.setName("Max");
+            dog.setAge(1);
+            dog.setId(1);
+            dog.setBirthdate( new Date() );
 
-                Person person = realm.createObject( Person.class );
-                person.setDogs( new RealmList<>(dog));
-            }
+            Person person = thisRealm.createObject( Person.class );
+            person.setDogs( new RealmList<>(dog));
         }, () -> {
             Log.i( "MainActivity", "Number of people: " + realm.where(Person.class).count() );
         }, error -> {

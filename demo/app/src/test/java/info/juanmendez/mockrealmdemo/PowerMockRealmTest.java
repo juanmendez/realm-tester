@@ -352,7 +352,6 @@ public class PowerMockRealmTest
 
     @Test
     public void shouldDeleteRealmObject(){
-
         RealmStorage.clear();
 
         Dog dog = realm.createObject( Dog.class );
@@ -556,7 +555,6 @@ public class PowerMockRealmTest
         Dog dog = realm.createObject( Dog.class );
         dog.deleteFromRealm();
         person.deleteFromRealm();
-
-        RealmStorage.clear();
     }
+
 }

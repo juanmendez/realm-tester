@@ -66,9 +66,7 @@ public class QueryNest {
         RealmList<RealmModel> previousGroupList = groupResults.get( groupLevel );
 
         RealmList<RealmModel> nextGroupList = ListFactory.create();
-        for (RealmModel realmModel: previousGroupList) {
-            nextGroupList.add( realmModel );
-        }
+        nextGroupList.addAll( previousGroupList );
 
         groupLevel++;
         groupResults.add( nextGroupList );
@@ -85,7 +83,8 @@ public class QueryNest {
             throw( new RealmException("There is an attempt to close more than the number of groups created" ));
         }
 
-        groupResults.set( groupLevel, currentGroupList );
+        groupResults.get(groupLevel).clear();
+        groupResults.get(groupLevel).addAll( currentGroupList );
     }
 
     public void onTopGroupClose(){

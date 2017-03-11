@@ -92,7 +92,7 @@ public class SubRealmList<T extends  RealmModel> extends RealmList<T> {
     @Override
     public Number sum(String fieldName) {
 
-        double value, sumValue = 0;
+        double sumValue = 0;
 
         for (Object item: this ) {
 
@@ -105,7 +105,7 @@ public class SubRealmList<T extends  RealmModel> extends RealmList<T> {
     @Override
     public double average(String fieldName) {
 
-        float value, sumValue = 0;
+        float sumValue = 0;
 
         for (Object item: this ) {
 

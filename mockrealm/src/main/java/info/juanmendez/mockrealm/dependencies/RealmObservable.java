@@ -54,9 +54,9 @@ public class RealmObservable {
     public static void unsubscribe(){
 
         for (HashMap.Entry<Object, CompositeSubscription> entry : mapSubscription.entrySet()) {
-            unsubcribe( entry.getKey() );
+            mapSubscription.get( entry.getKey() ).unsubscribe();
         }
-
+        mapSubscription.clear();
         compositeSubscription.unsubscribe();
     }
 
