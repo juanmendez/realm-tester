@@ -1,6 +1,6 @@
-package info.juanmendez.mockrealm.factories;
+package info.juanmendez.mockrealm.decorators;
 
-import info.juanmendez.mockrealm.models.SubRealmList;
+import info.juanmendez.mockrealm.models.RealmListStubbed;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -16,7 +16,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  * contact@juanmendez.info
  */
 
-public class ListFactory {
+public class RealmListDecorator {
 
     public static void prepare() throws Exception {
 
@@ -24,7 +24,7 @@ public class ListFactory {
 
         whenNew( RealmList.class ).withArguments(anyVararg()).thenAnswer(invocation -> {
 
-            RealmList<RealmModel> realmList = new SubRealmList<RealmModel>();
+            RealmList<RealmModel> realmList = new RealmListStubbed<RealmModel>();
             Object[] args = invocation.getArguments();
 
             for (Object arg:args) {
@@ -39,7 +39,7 @@ public class ListFactory {
 
     public static RealmList<RealmModel> create(){
 
-        return new SubRealmList();
+        return new RealmListStubbed();
     }
 
     public static void deleteRealmModel( RealmModel realmModel ){

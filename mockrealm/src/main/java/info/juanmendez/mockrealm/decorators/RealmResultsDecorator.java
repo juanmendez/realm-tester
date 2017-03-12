@@ -1,4 +1,4 @@
-package info.juanmendez.mockrealm.factories;
+package info.juanmendez.mockrealm.decorators;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -24,7 +24,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 /**
  * Created by @juanmendezinfo on 2/15/2017.
  */
-public class ResultsFactory {
+public class RealmResultsDecorator {
 
     public static RealmResults create( QueryNest queryNest){
         return create( queryNest, PowerMockito.mock( RealmResults.class ) );
@@ -69,7 +69,7 @@ public class ResultsFactory {
                 QueryNest resultsQueryNest = queryNest.clone();
                 resultsQueryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
 
-                RealmQuery realmQuery = QueryFactory.create(resultsQueryNest);
+                RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryNest);
                 RealmStorage.getQueryMap().put(realmQuery, resultsQueryNest);
 
                 return realmQuery;

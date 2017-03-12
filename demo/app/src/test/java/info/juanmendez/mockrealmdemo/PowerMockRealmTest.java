@@ -191,8 +191,8 @@ public class PowerMockRealmTest
         /*
            when testing just with PowerMockito we use main thread as schedulers.
            if you are using Robolectric then use instead:
-            RealmFactory.setTransactionScheduler(Schedulers.computation());
-            RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread());
+            RealmDecorator.setTransactionScheduler(Schedulers.computation());
+            RealmDecorator.setResponseScheduler(AndroidSchedulers.mainThread());
        */
 
 

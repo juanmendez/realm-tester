@@ -16,7 +16,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.factories.RealmFactory;
+import info.juanmendez.mockrealm.decorators.RealmDecorator;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -54,8 +54,8 @@ public class RobolectricRealmTest {
     public void before() throws Exception {
 
         MockRealm.prepare();
-        RealmFactory.setTransactionScheduler(Schedulers.computation());
-        RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread() );
+        RealmDecorator.setTransactionScheduler(Schedulers.computation());
+        RealmDecorator.setResponseScheduler(AndroidSchedulers.mainThread() );
         realm = Realm.getDefaultInstance();
     }
 

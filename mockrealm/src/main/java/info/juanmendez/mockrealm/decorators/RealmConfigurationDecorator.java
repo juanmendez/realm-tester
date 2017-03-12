@@ -1,4 +1,4 @@
-package info.juanmendez.mockrealm.factories;
+package info.juanmendez.mockrealm.decorators;
 
 import io.realm.RealmConfiguration;
 
@@ -12,7 +12,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  * contact@juanmendez.info
  */
 
-public class ConfigurationFactory {
+public class RealmConfigurationDecorator {
 
 
     public static void prepare() throws Exception {

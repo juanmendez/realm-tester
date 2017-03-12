@@ -3,7 +3,7 @@ package info.juanmendez.mockrealm.models;
 import java.util.ArrayList;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
-import info.juanmendez.mockrealm.factories.ListFactory;
+import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.exceptions.RealmException;
@@ -65,7 +65,7 @@ public class QueryNest {
 
         RealmList<RealmModel> previousGroupList = groupResults.get( groupLevel );
 
-        RealmList<RealmModel> nextGroupList = ListFactory.create();
+        RealmList<RealmModel> nextGroupList = RealmListDecorator.create();
         nextGroupList.addAll( previousGroupList );
 
         groupLevel++;

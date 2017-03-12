@@ -1,4 +1,4 @@
-package info.juanmendez.mockrealm.factories;
+package info.juanmendez.mockrealm.decorators;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -25,7 +25,7 @@ import static org.powermock.api.mockito.PowerMockito.spy;
  * contact@juanmendez.info
  */
 
-public class ModelFactory {
+public class RealmModelDecorator {
 
     public static void prepare() throws Exception {
 
@@ -63,14 +63,17 @@ public class ModelFactory {
                 RealmObservable.add( realmModel,
 
                         RealmObservable.asObservable()
-                        .filter(modelEmit -> modelEmit.getState() == ModelEmit.REMOVED )
+                        .filter(modelEmit -> modelEmit.getState()==ModelEmit.REMOVED )
                         .map(modelEmit -> modelEmit.getRealmModel())
                         .ofType(fieldClass)
                         .subscribe( o -> {
-                            Object variable = Whitebox.getInternalState(finalRealmModel, field.getName());
+                            Object variable = Whitebox.getInternalState(finalRealmModel,
+                                    field.getName());
 
                             if( variable != null && variable == o ){
-                                Whitebox.setInternalState(finalRealmModel, field.getName(), (Object[]) null);
+                                Whitebox.setInternalState(finalRealmModel,
+                                        field.getName(),
+                                        (Object[]) null);
                             }
                         })
                     );

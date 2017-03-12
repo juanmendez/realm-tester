@@ -1,4 +1,4 @@
-package info.juanmendez.mockrealm.factories;
+package info.juanmendez.mockrealm.decorators;
 
 import org.mockito.internal.util.reflection.Whitebox;
 
@@ -68,7 +68,7 @@ public class QuerySearch {
 
         }
 
-        RealmList<RealmModel> queriedList = ListFactory.create();
+        RealmList<RealmModel> queriedList = RealmListDecorator.create();
 
         for (RealmModel realmModel : haystack) {
             if (checkRealmObject(realmModel, 0)) {

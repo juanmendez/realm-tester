@@ -1,4 +1,4 @@
-package info.juanmendez.mockrealm.factories;
+package info.juanmendez.mockrealm.decorators;
 
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -35,7 +35,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 /**
  * Created by @juanmendezinfo on 2/15/2017.
  */
-public class RealmFactory {
+public class RealmDecorator {
 
     private static Scheduler observerScheduler = Schedulers.immediate();
     private static Scheduler subscriberScheduler = Schedulers.immediate();
@@ -49,11 +49,11 @@ public class RealmFactory {
     }
 
     public static void setTransactionScheduler(Scheduler observerScheduler) {
-        RealmFactory.observerScheduler = observerScheduler;
+        RealmDecorator.observerScheduler = observerScheduler;
     }
 
     public static void setResponseScheduler(Scheduler subscriberScheduler) {
-        RealmFactory.subscriberScheduler = subscriberScheduler;
+        RealmDecorator.subscriberScheduler = subscriberScheduler;
     }
 
     public static Scheduler getObserverScheduler() {
@@ -83,7 +83,7 @@ public class RealmFactory {
                 HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                 if( !realmMap.containsKey(clazz)){
-                    realmMap.put(clazz, ListFactory.create());
+                    realmMap.put(clazz, RealmListDecorator.create());
                 }
 
                 Constructor constructor = clazz.getConstructor();
@@ -91,7 +91,7 @@ public class RealmFactory {
 
                 if( realmModel instanceof RealmObject ){
 
-                    realmModel = ModelFactory.mockRealmObject( (RealmObject) realmModel );
+                    realmModel = RealmModelDecorator.mockRealmObject( (RealmObject) realmModel );
                 }
 
                 RealmStorage.addModel( realmModel );
@@ -109,14 +109,14 @@ public class RealmFactory {
                     RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
 
                     if( realmModel instanceof RealmObject ){
-                        realmModel = ModelFactory.mockRealmObject( (RealmObject) realmModel );
+                        realmModel = RealmModelDecorator.mockRealmObject( (RealmObject) realmModel );
                     }
 
                     Class clazz = MockUtils.getClass(realmModel);
                     HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){
-                        realmMap.put(clazz, ListFactory.create());
+                        realmMap.put(clazz, RealmListDecorator.create());
                     }
 
 
@@ -138,7 +138,7 @@ public class RealmFactory {
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
                 QueryNest queryNest = new QueryNest(clazz);
 
-                RealmQuery realmQuery = QueryFactory.create(queryNest);
+                RealmQuery realmQuery = RealmQueryDecorator.create(queryNest);
                 queryMap.put(realmQuery, queryNest);
 
                 queryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));

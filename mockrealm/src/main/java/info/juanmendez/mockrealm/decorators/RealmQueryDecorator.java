@@ -1,4 +1,4 @@
-package info.juanmendez.mockrealm.factories;
+package info.juanmendez.mockrealm.decorators;
 
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.invocation.InvocationOnMock;
@@ -32,7 +32,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 /**
  * Created by @juanmendezinfo on 2/15/2017.
  */
-public class QueryFactory {
+public class RealmQueryDecorator {
 
     //collections queried keyed by immediate class
 
@@ -280,7 +280,7 @@ public class QueryFactory {
             }
         }
 
-        return ResultsFactory.create( queryNest );
+        return RealmResultsDecorator.create( queryNest );
     }
 
 }

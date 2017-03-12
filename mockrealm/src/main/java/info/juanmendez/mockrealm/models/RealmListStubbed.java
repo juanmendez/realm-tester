@@ -2,7 +2,7 @@ package info.juanmendez.mockrealm.models;
 
 import org.mockito.internal.util.reflection.Whitebox;
 
-import info.juanmendez.mockrealm.factories.ListFactory;
+import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 
@@ -15,13 +15,13 @@ import io.realm.RealmModel;
  * This subclass replaces functionality from RealmList.
  */
 
-public class SubRealmList<T extends  RealmModel> extends RealmList<T> {
+public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
     @Override
     public boolean deleteFirstFromRealm() {
         if( !isEmpty() ){
             RealmModel realmModel = get(0);
-            ListFactory.deleteRealmModel( realmModel );
+            RealmListDecorator.deleteRealmModel( realmModel );
             return true;
         }
 
@@ -33,7 +33,7 @@ public class SubRealmList<T extends  RealmModel> extends RealmList<T> {
 
         if( !isEmpty()  ){
             RealmModel realmModel = get( size()-1 );
-            ListFactory.deleteRealmModel( realmModel );
+            RealmListDecorator.deleteRealmModel( realmModel );
             return true;
         }
 
@@ -45,7 +45,7 @@ public class SubRealmList<T extends  RealmModel> extends RealmList<T> {
         if( !isEmpty()){
             RealmModel realmModel = get( size() - 1 );
 
-            ListFactory.deleteRealmModel( realmModel );
+            RealmListDecorator.deleteRealmModel( realmModel );
         }
     }
 
@@ -118,7 +118,7 @@ public class SubRealmList<T extends  RealmModel> extends RealmList<T> {
     @Override
     public boolean deleteAllFromRealm() {
         for (Object realmModel: this) {
-            ListFactory.deleteRealmModel( (RealmModel) realmModel );
+            RealmListDecorator.deleteRealmModel( (RealmModel) realmModel );
         }
 
         return true;

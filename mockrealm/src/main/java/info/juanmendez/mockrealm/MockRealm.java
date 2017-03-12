@@ -1,9 +1,9 @@
 package info.juanmendez.mockrealm;
 
-import info.juanmendez.mockrealm.factories.ConfigurationFactory;
-import info.juanmendez.mockrealm.factories.ListFactory;
-import info.juanmendez.mockrealm.factories.ModelFactory;
-import info.juanmendez.mockrealm.factories.RealmFactory;
+import info.juanmendez.mockrealm.decorators.RealmConfigurationDecorator;
+import info.juanmendez.mockrealm.decorators.RealmDecorator;
+import info.juanmendez.mockrealm.decorators.RealmListDecorator;
+import info.juanmendez.mockrealm.decorators.RealmModelDecorator;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
@@ -26,9 +26,9 @@ public class MockRealm {
         mockStatic( RealmResults.class );
         mockStatic( RealmObject.class );
 
-        ListFactory.prepare();
-        ModelFactory.prepare();
-        RealmFactory.prepare();
-        ConfigurationFactory.prepare();
+        RealmListDecorator.prepare();
+        RealmModelDecorator.prepare();
+        RealmDecorator.prepare();
+        RealmConfigurationDecorator.prepare();
     }
 }
