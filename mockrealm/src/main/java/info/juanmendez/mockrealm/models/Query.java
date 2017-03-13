@@ -16,15 +16,14 @@ public class Query {
         this.condition = condition;
     }
 
-    public Query(String condition, String field, Object[] args) {
-        this.condition = condition;
+    public Query( String condition, Object[] args ){
+        this( condition );
         this.args = args;
-        this.field = field;
     }
 
-    public Query( String condition, Object[] args ){
-        this.condition = condition;
-        this.args = args;
+    public Query(String condition, String field, Object[] args) {
+        this( condition, args );
+        this.field = field;
     }
 
     public String getField() {
