@@ -6,7 +6,7 @@ import org.powermock.api.mockito.PowerMockito;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.models.Query;
-import info.juanmendez.mockrealm.models.QueryNest;
+import info.juanmendez.mockrealm.models.QueryHolder;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -25,13 +25,13 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class RealmResultsDecorator {
 
-    public static RealmResults create( QueryNest queryNest){
-        return create( queryNest, PowerMockito.mock( RealmResults.class ) );
+    public static RealmResults create( QueryHolder queryHolder){
+        return create(queryHolder, PowerMockito.mock( RealmResults.class ) );
     }
 
-    public static RealmResults create( QueryNest queryNest, RealmResults realmResults ){
+    public static RealmResults create(QueryHolder queryHolder, RealmResults realmResults ){
 
-        RealmList<RealmModel> results = queryNest.getQueryList();
+        RealmList<RealmModel> results = queryHolder.getQueryList();
 
         doAnswer(positionInvokation -> {
             int position = (int) positionInvokation.getArguments()[0];
@@ -65,13 +65,13 @@ public class RealmResultsDecorator {
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                QueryNest resultsQueryNest = queryNest.clone();
-                resultsQueryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
+                QueryHolder resultsQueryHolder = queryHolder.clone();
+                resultsQueryHolder.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
 
-                RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryNest);
+                RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryHolder);
 
                 //TODO update queryMap
-                //RealmStorage.getQueryMap().put(realmQuery, resultsQueryNest);
+                //RealmStorage.getQueryMap().put(realmQuery, resultsQueryHolder);
 
                 return realmQuery;
             }

@@ -13,7 +13,7 @@ import info.juanmendez.mockrealm.dependencies.MockUtils;
 import info.juanmendez.mockrealm.dependencies.RealmMatchers;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.Query;
-import info.juanmendez.mockrealm.models.QueryNest;
+import info.juanmendez.mockrealm.models.QueryHolder;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
@@ -72,7 +72,7 @@ public class RealmDecorator {
         when( Realm.deleteRealm( any(RealmConfiguration.class))).thenReturn( true );
 
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
-        HashMap<RealmResults<RealmModel>, QueryNest> queryMap = RealmStorage.getQueryMap();
+        HashMap<RealmResults<RealmModel>, QueryHolder> queryMap = RealmStorage.getQueryMap();
 
         when(Realm.getDefaultInstance()).thenReturn(realm);
 
@@ -137,12 +137,12 @@ public class RealmDecorator {
 
                 //clear list being queried
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
-                QueryNest queryNest = new QueryNest(clazz);
+                QueryHolder queryHolder = new QueryHolder(clazz);
 
-                RealmQuery realmQuery = RealmQueryDecorator.create(queryNest);
-                //TODO, use it with realmResults next.. queryMap.put(realmQuery, queryNest);
+                RealmQuery realmQuery = RealmQueryDecorator.create(queryHolder);
+                //TODO, use it with realmResults next.. queryMap.put(realmQuery, queryHolder);
 
-                queryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
+                queryHolder.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
 
 
                 return realmQuery;

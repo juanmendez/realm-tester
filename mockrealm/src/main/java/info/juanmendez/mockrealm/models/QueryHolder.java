@@ -2,11 +2,14 @@ package info.juanmendez.mockrealm.models;
 
 import java.util.ArrayList;
 
-import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
+import info.juanmendez.mockrealm.decorators.RealmResultsDecorator;
+import info.juanmendez.mockrealm.dependencies.Compare;
+import info.juanmendez.mockrealm.utils.QuerySearch;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -14,7 +17,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 /**
  * Created by @juanmendezinfo on 2/19/2017.
  */
-public class QueryNest {
+public class QueryHolder {
 
     private ArrayList<Query> queries = new ArrayList<>();
 
@@ -22,9 +25,9 @@ public class QueryNest {
     private ArrayList<RealmList<RealmModel>> groupResults = new ArrayList<>();
     private int groupLevel = 0;
     private Class clazz;
-    RealmQuery realmQuery;
+    private RealmQuery realmQuery;
 
-    public QueryNest(Class clazz){
+    public QueryHolder(Class clazz){
         this.clazz = clazz;
         realmQuery = mock(RealmQuery.class);
     }
@@ -112,11 +115,11 @@ public class QueryNest {
     }
 
     @Override
-    public QueryNest clone(){
-        return new QueryNest( this.clazz );
+    public QueryHolder clone(){
+        return new QueryHolder( this.clazz );
     }
 
-    public Boolean isUsedByQuery( Query query ){
+    private Boolean executeGroupQuery(Query query ){
 
         Boolean used = false;
 
@@ -149,5 +152,22 @@ public class QueryNest {
 
     public RealmQuery getRealmQuery() {
         return realmQuery;
+    }
+
+
+    public RealmResults rewindQueries(){
+        ArrayList<Query> queries = getQueries();
+        RealmList<RealmModel> searchList;
+
+        for ( Query query: queries ){
+
+            if( !executeGroupQuery( query ) ){
+
+                searchList = new QuerySearch().search( query.getCondition(), query.getArgs(), getQueryList()  );
+                setQueryList( searchList );
+            }
+        }
+
+        return RealmResultsDecorator.create(this);
     }
 }
