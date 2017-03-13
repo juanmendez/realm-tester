@@ -3,7 +3,7 @@ package info.juanmendez.mockrealm.dependencies;
 import java.util.HashMap;
 
 import info.juanmendez.mockrealm.models.ModelEmit;
-import info.juanmendez.mockrealm.models.QueryHolder;
+import info.juanmendez.mockrealm.utils.QueryHolder;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmResults;

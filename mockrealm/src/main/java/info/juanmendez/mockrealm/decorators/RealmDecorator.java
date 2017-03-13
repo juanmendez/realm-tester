@@ -13,7 +13,7 @@ import info.juanmendez.mockrealm.dependencies.MockUtils;
 import info.juanmendez.mockrealm.dependencies.RealmMatchers;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.Query;
-import info.juanmendez.mockrealm.models.QueryHolder;
+import info.juanmendez.mockrealm.utils.QueryHolder;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;

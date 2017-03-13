@@ -6,7 +6,7 @@ import org.powermock.api.mockito.PowerMockito;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.models.Query;
-import info.juanmendez.mockrealm.models.QueryHolder;
+import info.juanmendez.mockrealm.utils.QueryHolder;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;

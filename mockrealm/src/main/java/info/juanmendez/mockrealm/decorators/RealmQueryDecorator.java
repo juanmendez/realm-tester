@@ -8,7 +8,7 @@ import java.util.Date;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.models.Query;
-import info.juanmendez.mockrealm.models.QueryHolder;
+import info.juanmendez.mockrealm.utils.QueryHolder;
 import io.realm.Case;
 import io.realm.RealmModel;
 import io.realm.RealmQuery;
@@ -52,12 +52,12 @@ public class RealmQueryDecorator {
         RealmQuery realmQuery = queryHolder.getRealmQuery();
 
         when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
-            return queryHolder.rewindQueries();
+            return queryHolder.rewind();
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
 
-            RealmResults<RealmModel> realmResults = queryHolder.rewindQueries();
+            RealmResults<RealmModel> realmResults = queryHolder.rewind();
             return realmResults.get(0);
         });
     }
@@ -89,7 +89,7 @@ public class RealmQueryDecorator {
         when( realmQuery.count() ).thenAnswer(new Answer<Integer>() {
             @Override
             public Integer answer(InvocationOnMock invocation) throws Throwable {
-                RealmResults<RealmModel> realmResults = queryHolder.rewindQueries();
+                RealmResults<RealmModel> realmResults = queryHolder.rewind();
                 return realmResults.size();
             }
         });
@@ -99,7 +99,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length >= 1 ){
-                    RealmResults<RealmModel> realmResults = queryHolder.rewindQueries();
+                    RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return realmResults.sum( fieldName );
@@ -113,7 +113,7 @@ public class RealmQueryDecorator {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
-                    RealmResults<RealmModel> realmResults = queryHolder.rewindQueries();
+                    RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return realmResults.average(fieldName);
@@ -129,7 +129,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    RealmResults<RealmModel> realmResults = queryHolder.rewindQueries();
+                    RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return realmResults.max(fieldName);
@@ -143,7 +143,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    RealmResults<RealmModel> realmResults = queryHolder.rewindQueries();
+                    RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
                     return realmResults.min(fieldName);

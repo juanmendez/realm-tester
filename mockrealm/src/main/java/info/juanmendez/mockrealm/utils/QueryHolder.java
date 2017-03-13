@@ -1,11 +1,11 @@
-package info.juanmendez.mockrealm.models;
+package info.juanmendez.mockrealm.utils;
 
 import java.util.ArrayList;
 
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import info.juanmendez.mockrealm.decorators.RealmResultsDecorator;
 import info.juanmendez.mockrealm.dependencies.Compare;
-import info.juanmendez.mockrealm.utils.QuerySearch;
+import info.juanmendez.mockrealm.models.Query;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmQuery;
@@ -155,7 +155,7 @@ public class QueryHolder {
     }
 
 
-    public RealmResults rewindQueries(){
+    public RealmResults rewind(){
         ArrayList<Query> queries = getQueries();
         RealmList<RealmModel> searchList;
 
