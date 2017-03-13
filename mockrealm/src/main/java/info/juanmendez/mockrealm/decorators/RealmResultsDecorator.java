@@ -5,7 +5,6 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
-import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.models.QueryNest;
 import io.realm.RealmList;
@@ -70,7 +69,9 @@ public class RealmResultsDecorator {
                 resultsQueryNest.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
 
                 RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryNest);
-                RealmStorage.getQueryMap().put(realmQuery, resultsQueryNest);
+
+                //TODO update queryMap
+                //RealmStorage.getQueryMap().put(realmQuery, resultsQueryNest);
 
                 return realmQuery;
             }

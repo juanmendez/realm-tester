@@ -6,7 +6,10 @@ import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import io.realm.RealmList;
 import io.realm.RealmModel;
+import io.realm.RealmQuery;
 import io.realm.exceptions.RealmException;
+
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 /**
  * Created by @juanmendezinfo on 2/19/2017.
@@ -19,9 +22,11 @@ public class QueryNest {
     private ArrayList<RealmList<RealmModel>> groupResults = new ArrayList<>();
     private int groupLevel = 0;
     private Class clazz;
+    RealmQuery realmQuery;
 
     public QueryNest(Class clazz){
         this.clazz = clazz;
+        realmQuery = mock(RealmQuery.class);
     }
 
     public void onTopGroupBegin(RealmList<RealmModel> realmList ){
@@ -55,7 +60,6 @@ public class QueryNest {
         //if the las query is based on OR(), then bounce back to AND()
         this.asAnd = true;
     }
-
 
     public void onOrClause() {
         this.asAnd = false;
@@ -112,7 +116,6 @@ public class QueryNest {
         return new QueryNest( this.clazz );
     }
 
-
     public Boolean isUsedByQuery( Query query ){
 
         Boolean used = false;
@@ -142,5 +145,9 @@ public class QueryNest {
         }
 
         return used;
+    }
+
+    public RealmQuery getRealmQuery() {
+        return realmQuery;
     }
 }

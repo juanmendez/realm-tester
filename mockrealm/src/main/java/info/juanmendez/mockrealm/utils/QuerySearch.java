@@ -1,4 +1,4 @@
-package info.juanmendez.mockrealm.decorators;
+package info.juanmendez.mockrealm.utils;
 
 import org.mockito.internal.util.reflection.Whitebox;
 
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.dependencies.MockUtils;
 import io.realm.Case;
