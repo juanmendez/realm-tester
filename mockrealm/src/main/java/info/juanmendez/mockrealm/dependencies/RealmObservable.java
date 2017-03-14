@@ -37,7 +37,7 @@ public class RealmObservable {
 
     public static void add( Object object, Subscription subscription ){
 
-       if( mapSubscription.get( object ) == null ){
+       if( !mapSubscription.containsKey( object ) ){
            mapSubscription.put( object, new CompositeSubscription() );
        }
        mapSubscription.get(object).add(subscription);
@@ -61,7 +61,7 @@ public class RealmObservable {
     }
 
     public static void unsubcribe( Object object ){
-        if( mapSubscription.get( object ) != null ){
+        if( mapSubscription.containsKey( object )  ){
             mapSubscription.get( object ).unsubscribe();
             mapSubscription.remove( object );
         }

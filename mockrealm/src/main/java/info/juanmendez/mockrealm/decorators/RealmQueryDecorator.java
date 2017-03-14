@@ -56,11 +56,23 @@ public class RealmQueryDecorator {
             return queryHolder.rewind();
         });
 
+        when( realmQuery.findAllAsync() ).thenAnswer(invocation -> {
+            queryHolder.appendQuery( new Query(Compare.endTopGroup));
+            return queryHolder.getRealmResults();
+        });
+
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
             queryHolder.appendQuery( new Query(Compare.endTopGroup));
             RealmResults<RealmModel> realmResults = queryHolder.rewind();
             return realmResults.get(0);
         });
+
+        /*when( realmQuery.findFirstAsync() ).thenAnswer(invocation -> {
+            queryHolder.appendQuery( new Query(Compare.endTopGroup));
+            RealmObject realmObject = mock( RealmObject.class );
+
+            return realmObject;
+        });*/
     }
 
     private static void handleGroupingQueries(QueryHolder queryHolder) {

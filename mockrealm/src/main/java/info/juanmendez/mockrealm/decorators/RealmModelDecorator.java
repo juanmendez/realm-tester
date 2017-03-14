@@ -13,7 +13,6 @@ import info.juanmendez.mockrealm.models.ModelEmit;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import rx.Subscription;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
@@ -46,9 +45,19 @@ public class RealmModelDecorator {
             realmModel = spy( realmModel );
         }
 
+        handleDeleteEvents( realmModel);
+
+        if( realmModel instanceof RealmObject ){
+            handleDeleteActions( (RealmObject) realmModel);
+        }
+
+        return realmModel;
+    }
+
+    private static void handleDeleteEvents( RealmModel realmModel ){
+
         Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
         Class fieldClass;
-        Subscription subscription;
 
         /**
          * There is one observable per each member observed either it's a realmModel or a realmResult
@@ -63,20 +72,20 @@ public class RealmModelDecorator {
                 RealmObservable.add( realmModel,
 
                         RealmObservable.asObservable()
-                        .filter(modelEmit -> modelEmit.getState()==ModelEmit.REMOVED )
-                        .map(modelEmit -> modelEmit.getRealmModel())
-                        .ofType(fieldClass)
-                        .subscribe( o -> {
-                            Object variable = Whitebox.getInternalState(finalRealmModel,
-                                    field.getName());
+                                .filter(modelEmit -> modelEmit.getState()== ModelEmit.REMOVED )
+                                .map(modelEmit -> modelEmit.getRealmModel())
+                                .ofType(fieldClass)
+                                .subscribe( o -> {
+                                    Object variable = Whitebox.getInternalState(finalRealmModel,
+                                            field.getName());
 
-                            if( variable != null && variable == o ){
-                                Whitebox.setInternalState(finalRealmModel,
-                                        field.getName(),
-                                        (Object[]) null);
-                            }
-                        })
-                    );
+                                    if( variable != null && variable == o ){
+                                        Whitebox.setInternalState(finalRealmModel,
+                                                field.getName(),
+                                                (Object[]) null);
+                                    }
+                                })
+                );
             }
             else if( fieldClass == RealmList.class ){
 
@@ -99,36 +108,35 @@ public class RealmModelDecorator {
                 );
             }
         }
+    }
 
-        if( realmModel instanceof RealmObject ){
+    private static void handleDeleteActions( RealmObject realmObject ){
 
-            RealmModel modelDeleted = realmModel;
+        RealmModel modelDeleted = realmObject;
 
-            //when deleting then also make all subscriptions be unsubscribed
-            doAnswer(new Answer<Void>() {
-                @Override
-                public Void answer(InvocationOnMock invocation) throws Throwable {
-                    RealmObservable.unsubcribe( modelDeleted );
+        //when deleting then also make all subscriptions be unsubscribed
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                RealmObservable.unsubcribe( modelDeleted );
 
-                    Set<Field> fieldSet =  Whitebox.getAllInstanceFields(modelDeleted);
+                Set<Field> fieldSet =  Whitebox.getAllInstanceFields(modelDeleted);
 
-                    for (Field field: fieldSet) {
+                for (Field field: fieldSet) {
 
-                        if( field.getType() == RealmList.class ){
+                    if( field.getType() == RealmList.class ){
 
-                            RealmList list = (RealmList) Whitebox.getInternalState(modelDeleted, field.getName());
+                        RealmList list = (RealmList) Whitebox.getInternalState(modelDeleted, field.getName());
 
-                            if( list != null )
-                                list.clear();
-                        }
+                        if( list != null )
+                            list.clear();
                     }
-
-                    RealmStorage.removeModel(modelDeleted);
-                    return null;
                 }
-            }).when( (RealmObject) realmModel ).deleteFromRealm();
-        }
 
-        return realmModel;
+                RealmObservable.unsubcribe( modelDeleted );
+                RealmStorage.removeModel(modelDeleted);
+                return null;
+            }
+        }).when( (RealmObject) realmObject ).deleteFromRealm();
     }
 }

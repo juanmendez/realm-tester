@@ -4,7 +4,6 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
@@ -14,6 +13,7 @@ import info.juanmendez.mockrealm.dependencies.RealmMatchers;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.utils.QueryHolder;
+import info.juanmendez.mockrealm.utils.RealmModelUtils;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
@@ -56,11 +56,11 @@ public class RealmDecorator {
         RealmDecorator.subscriberScheduler = subscriberScheduler;
     }
 
-    public static Scheduler getObserverScheduler() {
+    public static Scheduler getTransactionScheduler() {
         return observerScheduler;
     }
 
-    public static Scheduler getSubscriberScheduler() {
+    public static Scheduler getResponseScheduler() {
         return subscriberScheduler;
     }
 
@@ -74,29 +74,23 @@ public class RealmDecorator {
 
         when(Realm.getDefaultInstance()).thenReturn(realm);
 
-        when( realm.createObject( Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmModel.class)) ) ).thenAnswer(new Answer<RealmModel>(){
+        when( realm.createObject( Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmModel.class)) ) ).thenAnswer(invocation -> {
+            Class clazz = (Class) invocation.getArguments()[0];
 
-            @Override
-            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
-                Class clazz = (Class) invocationOnMock.getArguments()[0];
-                HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
-
-                if( !realmMap.containsKey(clazz)){
-                    realmMap.put(clazz, RealmListDecorator.create());
-                }
-
-                Constructor constructor = clazz.getConstructor();
-                RealmModel realmModel = (RealmModel) constructor.newInstance();
-
-                if( realmModel instanceof RealmObject ){
-
-                    realmModel = RealmModelDecorator.mockRealmObject( (RealmObject) realmModel );
-                }
-
-                RealmStorage.addModel( realmModel );
-
-                return realmModel;
+            if( !realmMap.containsKey(clazz)){
+                realmMap.put(clazz, RealmListDecorator.create());
             }
+
+            RealmModel realmModel = RealmModelUtils.fromClass( clazz );
+
+            if( realmModel instanceof RealmObject ){
+
+                realmModel = RealmModelDecorator.mockRealmObject( realmModel );
+            }
+
+            RealmStorage.addModel( realmModel );
+
+            return realmModel;
         });
 
         when( realm.copyToRealm(Mockito.any( RealmModel.class ))).thenAnswer( new Answer<RealmModel>(){

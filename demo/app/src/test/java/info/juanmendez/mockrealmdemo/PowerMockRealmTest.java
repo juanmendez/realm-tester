@@ -22,6 +22,7 @@ import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Case;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -554,5 +555,46 @@ public class PowerMockRealmTest
         Dog dog = realm.createObject( Dog.class );
         dog.deleteFromRealm();
         person.deleteFromRealm();
+    }
+
+    @Test
+    public void shouldAllAsync(){
+
+        RealmStorage.clear();
+
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Idalgo Mendez");
+        dog.setBirthdate( new Date(2010, 6, 9));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Fido Fernandez");
+        dog.setBirthdate( new Date(2016, 6, 10));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2012, 2, 1));
+
+
+        RealmResults realmResults = realm.where( Dog.class ).findAllAsync();
+
+
+        realmResults.addChangeListener(new RealmChangeListener<RealmResults>() {
+            @Override
+            public void onChange(RealmResults element) {
+                assertEquals("there should be four dogs", element.size(), 4 );
+            }
+        });
     }
 }

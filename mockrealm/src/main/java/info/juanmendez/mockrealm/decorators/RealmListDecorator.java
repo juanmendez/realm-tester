@@ -24,7 +24,7 @@ public class RealmListDecorator {
 
         whenNew( RealmList.class ).withArguments(anyVararg()).thenAnswer(invocation -> {
 
-            RealmList<RealmModel> realmList = new RealmListStubbed<RealmModel>();
+            RealmList<RealmModel> realmList = create();
             Object[] args = invocation.getArguments();
 
             for (Object arg:args) {
@@ -33,8 +33,6 @@ public class RealmListDecorator {
 
             return realmList;
         });
-
-
     }
 
     public static RealmList<RealmModel> create(){

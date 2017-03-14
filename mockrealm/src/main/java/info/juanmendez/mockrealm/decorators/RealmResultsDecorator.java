@@ -3,14 +3,18 @@ package info.juanmendez.mockrealm.decorators;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.concurrent.Callable;
+
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.utils.QueryHolder;
+import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import rx.Observable;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -23,8 +27,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class RealmResultsDecorator {
 
-    public static RealmResults create(QueryHolder queryHolder, RealmResults realmResults ){
+    public static RealmResults create(QueryHolder queryHolder ){
 
+        RealmResults realmResults = queryHolder.getRealmResults();
         RealmList<RealmModel> results = queryHolder.getQueryList();
 
         doAnswer(positionInvokation -> {
@@ -75,6 +80,7 @@ public class RealmResultsDecorator {
 
         handleDeleteMethods( realmResults, results );
         handleMathMethods( realmResults, results );
+        handleAsyncMethods( queryHolder );
 
         return realmResults;
     }
@@ -171,5 +177,31 @@ public class RealmResultsDecorator {
                 return  null;
             }
         });
+    }
+
+    private static void handleAsyncMethods( QueryHolder queryHolder ){
+
+        RealmResults realmResults = queryHolder.getRealmResults();
+
+        //addChangeListener
+        doAnswer(invocation -> {
+            if( invocation.getArguments().length > 0 ){
+
+                RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
+                Observable.fromCallable(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+
+                        RealmResults realmResults = queryHolder.rewind();
+                        listener.onChange( realmResults );
+                        return null;
+                    }
+                }).subscribeOn(RealmDecorator.getTransactionScheduler())
+                        .observeOn( RealmDecorator.getResponseScheduler() )
+                        .subscribe(aVoid -> {});
+
+            }
+            return null;
+        }).when( realmResults ).addChangeListener( any(RealmChangeListener.class));
     }
 }

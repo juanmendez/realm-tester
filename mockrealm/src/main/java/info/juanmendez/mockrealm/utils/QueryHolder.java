@@ -42,7 +42,7 @@ public class QueryHolder {
 
         //level 0, we are going to start a realmList
         groupResults.add( RealmListDecorator.create() );
-        RealmResultsDecorator.create( this, realmResults );
+        RealmResultsDecorator.create( this );
     }
 
     public void onTopGroupBegin(RealmList<RealmModel> realmList ){
@@ -172,6 +172,9 @@ public class QueryHolder {
         return realmQuery;
     }
 
+    public RealmResults getRealmResults() {
+        return realmResults;
+    }
 
     public RealmResults rewind(){
         ArrayList<Query> queries = getQueries();
