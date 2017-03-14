@@ -1,5 +1,7 @@
 package info.juanmendez.mockrealm.utils;
 
+import org.powermock.api.mockito.PowerMockito;
+
 import java.util.ArrayList;
 
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
@@ -26,14 +28,29 @@ public class QueryHolder {
     private int groupLevel = 0;
     private Class clazz;
     private RealmQuery realmQuery;
+    private RealmResults realmResults;
 
     public QueryHolder(Class clazz){
         this.clazz = clazz;
         realmQuery = mock(RealmQuery.class);
+        setUpRealmResults();
+    }
+
+    private void setUpRealmResults(){
+        //beforehand we are going to take care of realmResults
+        realmResults = PowerMockito.mock( RealmResults.class );
+
+        //level 0, we are going to start a realmList
+        groupResults.add( RealmListDecorator.create() );
+        RealmResultsDecorator.create( this, realmResults );
     }
 
     public void onTopGroupBegin(RealmList<RealmModel> realmList ){
-        groupResults.add( realmList );
+
+        //we update the current list instead of assigning one.
+        groupResults.get(groupLevel).clear();
+        groupResults.get(groupLevel).addAll( realmList );
+
         onBeginGroupClause();
     }
 
@@ -48,7 +65,8 @@ public class QueryHolder {
 
     public void setQueryList( RealmList<RealmModel> queryList ){
         if( asAnd ){
-            groupResults.set( groupLevel, queryList );
+            groupResults.get( groupLevel ).clear();
+            groupResults.get( groupLevel ).addAll( queryList );
         }else{
 
             RealmList<RealmModel> currentGroupList = groupResults.get( groupLevel );
@@ -168,6 +186,6 @@ public class QueryHolder {
             }
         }
 
-        return RealmResultsDecorator.create(this);
+        return realmResults;
     }
 }

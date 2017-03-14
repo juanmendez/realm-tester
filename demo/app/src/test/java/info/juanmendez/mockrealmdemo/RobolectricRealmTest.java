@@ -17,6 +17,7 @@ import org.robolectric.shadows.ShadowLog;
 
 import info.juanmendez.mockrealm.MockRealm;
 import info.juanmendez.mockrealm.decorators.RealmDecorator;
+import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -60,8 +61,9 @@ public class RobolectricRealmTest {
     }
 
     @Test
-    public void shouldCreateADogInMainActivity(){
+    public void shouldAssertWhatsOnMainActivity(){
 
+        RealmStorage.clear();
         MainActivity activity = Robolectric.setupActivity( MainActivity.class );
 
         assertEquals( "same print", ((TextView)activity.findViewById(R.id.textView)).getText(), "Hello World!");

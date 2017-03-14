@@ -267,7 +267,6 @@ public class PowerMockRealmTest
         person.getDogs().add( dog );
 
         RealmResults<Person> people = realm.where(Person.class).contains("dogs.name", "Flores" ).findAll();
-
         assertEquals( "there is one person found with such dog", 1, people.size());
     }
 
@@ -556,5 +555,4 @@ public class PowerMockRealmTest
         dog.deleteFromRealm();
         person.deleteFromRealm();
     }
-
 }

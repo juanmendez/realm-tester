@@ -2,7 +2,6 @@ package info.juanmendez.mockrealm.decorators;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.models.Query;
@@ -17,17 +16,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by @juanmendezinfo on 2/15/2017.
  */
 public class RealmResultsDecorator {
-
-    public static RealmResults create( QueryHolder queryHolder){
-        return create(queryHolder, PowerMockito.mock( RealmResults.class ) );
-    }
 
     public static RealmResults create(QueryHolder queryHolder, RealmResults realmResults ){
 
@@ -38,9 +32,14 @@ public class RealmResultsDecorator {
             return results.get( position );
         }).when( realmResults).get(anyInt());
 
-        doReturn( results.size() ).when( realmResults ).size();
+        doAnswer(invocation -> {
+            return results.size();
+        }).when( realmResults ).size();
 
-        doReturn( results.iterator() ).when( realmResults ).iterator();
+        doAnswer(invocation -> {
+            return results.iterator();
+        }).when( realmResults ).iterator();
+
 
         doAnswer(new Answer<RealmObject>() {
             @Override
@@ -69,9 +68,6 @@ public class RealmResultsDecorator {
                 resultsQueryHolder.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
 
                 RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryHolder);
-
-                //TODO update queryMap
-                //RealmStorage.getQueryMap().put(realmQuery, resultsQueryHolder);
 
                 return realmQuery;
             }

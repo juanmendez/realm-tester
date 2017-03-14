@@ -21,7 +21,6 @@ import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
-import io.realm.RealmResults;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
@@ -72,7 +71,6 @@ public class RealmDecorator {
         when( Realm.deleteRealm( any(RealmConfiguration.class))).thenReturn( true );
 
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
-        HashMap<RealmResults<RealmModel>, QueryHolder> queryMap = RealmStorage.getQueryMap();
 
         when(Realm.getDefaultInstance()).thenReturn(realm);
 
@@ -140,8 +138,6 @@ public class RealmDecorator {
                 QueryHolder queryHolder = new QueryHolder(clazz);
 
                 RealmQuery realmQuery = RealmQueryDecorator.create(queryHolder);
-                //TODO, use it with realmResults next.. queryMap.put(realmQuery, queryHolder);
-
                 queryHolder.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
 
 

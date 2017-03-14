@@ -52,11 +52,12 @@ public class RealmQueryDecorator {
         RealmQuery realmQuery = queryHolder.getRealmQuery();
 
         when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
+            queryHolder.appendQuery( new Query(Compare.endTopGroup));
             return queryHolder.rewind();
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
-
+            queryHolder.appendQuery( new Query(Compare.endTopGroup));
             RealmResults<RealmModel> realmResults = queryHolder.rewind();
             return realmResults.get(0);
         });
@@ -89,6 +90,7 @@ public class RealmQueryDecorator {
         when( realmQuery.count() ).thenAnswer(new Answer<Integer>() {
             @Override
             public Integer answer(InvocationOnMock invocation) throws Throwable {
+                queryHolder.appendQuery( new Query(Compare.endTopGroup));
                 RealmResults<RealmModel> realmResults = queryHolder.rewind();
                 return realmResults.size();
             }
@@ -99,6 +101,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length >= 1 ){
+                    queryHolder.appendQuery( new Query(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -113,6 +116,7 @@ public class RealmQueryDecorator {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
+                    queryHolder.appendQuery( new Query(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -129,6 +133,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
+                    queryHolder.appendQuery( new Query(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -143,6 +148,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
+                    queryHolder.appendQuery( new Query(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -269,5 +275,4 @@ public class RealmQueryDecorator {
             return realmQuery;
         };
     }
-
 }

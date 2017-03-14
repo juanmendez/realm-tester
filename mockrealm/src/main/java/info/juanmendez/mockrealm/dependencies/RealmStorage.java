@@ -3,10 +3,8 @@ package info.juanmendez.mockrealm.dependencies;
 import java.util.HashMap;
 
 import info.juanmendez.mockrealm.models.ModelEmit;
-import info.juanmendez.mockrealm.utils.QueryHolder;
 import io.realm.RealmList;
 import io.realm.RealmModel;
-import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
 /**
@@ -15,16 +13,10 @@ import io.realm.exceptions.RealmException;
 public class RealmStorage {
 
     private static HashMap<Class, RealmList<RealmModel>> realmMap = new HashMap<>();
-    private static HashMap<RealmResults<RealmModel>, QueryHolder> queryMap = new HashMap<>();
 
     /*keeps collections keyed by a sub-class of RealmModel.*/
     public static HashMap<Class, RealmList<RealmModel>> getRealmMap() {
         return realmMap;
-    }
-
-    /*collections queried keyed by immediate class*/
-    public static HashMap<RealmResults<RealmModel>, QueryHolder> getQueryMap() {
-        return queryMap;
     }
 
     public static void removeModel( RealmModel realmModel ){
@@ -71,9 +63,7 @@ public class RealmStorage {
     }
 
     public static void clear(){
-
         RealmObservable.unsubscribe();
         realmMap.clear();
-        queryMap.clear();
     }
 }
