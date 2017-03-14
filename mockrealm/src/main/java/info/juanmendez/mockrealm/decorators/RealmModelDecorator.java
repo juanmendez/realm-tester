@@ -112,29 +112,27 @@ public class RealmModelDecorator {
 
     private static void handleDeleteActions( RealmObject realmObject ){
 
-        RealmModel modelDeleted = realmObject;
-
         //when deleting then also make all subscriptions be unsubscribed
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                RealmObservable.unsubcribe( modelDeleted );
+                RealmObservable.unsubcribe( realmObject );
 
-                Set<Field> fieldSet =  Whitebox.getAllInstanceFields(modelDeleted);
+                Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmObject);
 
                 for (Field field: fieldSet) {
 
                     if( field.getType() == RealmList.class ){
 
-                        RealmList list = (RealmList) Whitebox.getInternalState(modelDeleted, field.getName());
+                        RealmList list = (RealmList) Whitebox.getInternalState(realmObject, field.getName());
 
                         if( list != null )
                             list.clear();
                     }
                 }
 
-                RealmObservable.unsubcribe( modelDeleted );
-                RealmStorage.removeModel(modelDeleted);
+                RealmObservable.unsubcribe( realmObject );
+                RealmStorage.removeModel( realmObject );
                 return null;
             }
         }).when( (RealmObject) realmObject ).deleteFromRealm();
