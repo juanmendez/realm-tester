@@ -20,7 +20,7 @@ What has been done so far
 - delete reamModels in cascading mode
 - support also for deleting methods found in realmResults, realmModel, realmObject and realmLists
 
-What it's baking at this time
+Currently working on
 - support realmQuery.*Async() methods
 - realmResult.addEventListener()
 - realmResult.asObservable()
