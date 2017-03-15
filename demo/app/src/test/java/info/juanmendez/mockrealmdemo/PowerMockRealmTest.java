@@ -669,7 +669,5 @@ public class PowerMockRealmTest
 
         dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
         dog.deleteFromRealm();
-
-        realmObject.removeChangeListeners();
     }
 }
