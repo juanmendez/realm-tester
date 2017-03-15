@@ -15,12 +15,12 @@ What has been done so far
         - RealmFactory.setTransactionScheduler(Schedulers.computation())
         - RealmFactory.setResponseScheduler(AndroidSchedulers.mainThread())
 - Support or() for chaining queries
-- Grouping works, but needs more testing
+- Grouping
 - Querying against realmResults
-- delete reamModels in cascading mode, more testing required
-- support also for deleting methods found in realmResults, and realmLists, mroe testing required
+- delete reamModels in cascading mode
+- support also for deleting methods found in realmResults, realmModel, realmObject and realmLists
 
-What is coming in the next phase
+What it's baking at this time
 - support realmQuery.*Async() methods
 - realmResult.addEventListener()
 - realmResult.asObservable()

@@ -17,7 +17,7 @@ import java.util.Set;
 import info.juanmendez.mockrealm.MockRealm;
 import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
-import info.juanmendez.mockrealm.models.ModelEmit;
+import info.juanmendez.mockrealm.models.RealmEvent;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Case;
@@ -527,25 +527,25 @@ public class PowerMockRealmTest
 
         RealmObservable.add(
                 RealmObservable.asObservable()
-                .subscribe(modelEmit -> System.out.println( "onNext " + modelEmit.getState() ))
+                .subscribe(realmEvent -> System.out.println( "onNext " + realmEvent.getState() ))
         );
 
 
         //lets now find only people
         RealmObservable.add(
                 RealmObservable.asObservable()
-                        .filter(modelEmit -> {
-                            return modelEmit.getRealmModel() instanceof Person;
-                        }).subscribe(modelEmit -> {
-                    System.out.println( "nextPerson: " + modelEmit.getState() );
+                        .filter(realmEvent -> {
+                            return realmEvent.getRealmModel() instanceof Person;
+                        }).subscribe(realmEvent -> {
+                    System.out.println( "nextPerson: " + realmEvent.getState() );
                 })
         );
 
 
         RealmObservable.add(
                 RealmObservable.asObservable()
-                        .filter( modelEmit -> modelEmit.getState()== ModelEmit.REMOVED )
-                        .map(modelEmit -> modelEmit.getRealmModel() )
+                        .filter(realmEvent -> realmEvent.getState()== RealmEvent.MODEL_REMOVED)
+                        .map(realmEvent -> realmEvent.getRealmModel() )
                         .ofType( Dog.class )
                         .subscribe(realmModel -> System.out.println( "onNextDogRemoved-> " + realmModel.toString() ))
         );
@@ -558,7 +558,7 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void shouldAllAsync(){
+    public void shouldDoAllAsync(){
 
         RealmStorage.clear();
 

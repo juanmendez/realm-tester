@@ -9,7 +9,7 @@ import java.util.Set;
 
 import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
-import info.juanmendez.mockrealm.models.ModelEmit;
+import info.juanmendez.mockrealm.models.RealmEvent;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -72,8 +72,8 @@ public class RealmModelDecorator {
                 RealmObservable.add( realmModel,
 
                         RealmObservable.asObservable()
-                                .filter(modelEmit -> modelEmit.getState()== ModelEmit.REMOVED )
-                                .map(modelEmit -> modelEmit.getRealmModel())
+                                .filter(realmEvent -> realmEvent.getState()== RealmEvent.MODEL_REMOVED)
+                                .map(realmEvent -> realmEvent.getRealmModel())
                                 .ofType(fieldClass)
                                 .subscribe( o -> {
                                     Object variable = Whitebox.getInternalState(finalRealmModel,
@@ -93,8 +93,8 @@ public class RealmModelDecorator {
                 RealmModel finalRealmModel1 = realmModel;
 
                 RealmObservable.add( realmModel, RealmObservable.asObservable()
-                        .filter(modelEmit -> modelEmit.getState() == ModelEmit.REMOVED)
-                        .map(modelEmit -> modelEmit.getRealmModel())
+                        .filter(realmEvent -> realmEvent.getState() == RealmEvent.MODEL_REMOVED)
+                        .map(realmEvent -> realmEvent.getRealmModel())
                         .subscribe(o -> {
                             RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(finalRealmModel1, field.getName());
 

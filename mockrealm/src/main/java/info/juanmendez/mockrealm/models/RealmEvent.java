@@ -7,17 +7,21 @@ import io.realm.RealmModel;
  * www.juanmendez.info
  * contact@juanmendez.info
  *
- * Depicts the state of a realmModel if it's been added or removed
+ * It captures a change in realm
  */
 
-public class ModelEmit {
-    public static final String ADDED = "added";
-    public static final String REMOVED = "removed";
+public class RealmEvent {
+    public static final String MODEL_ADDED = "RealmModelAdded";
+    public static final String MODEL_REMOVED = "RealmModelRemoved";
 
     private String state;
     private RealmModel realmModel;
 
-    public ModelEmit(String state, RealmModel realmModel) {
+    public RealmEvent( String state ){
+        this.state = state;
+    }
+
+    public RealmEvent(String state, RealmModel realmModel) {
         this.state = state;
         this.realmModel = realmModel;
     }

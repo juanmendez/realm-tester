@@ -2,7 +2,7 @@ package info.juanmendez.mockrealm.dependencies;
 
 import java.util.HashMap;
 
-import info.juanmendez.mockrealm.models.ModelEmit;
+import info.juanmendez.mockrealm.models.RealmEvent;
 import rx.Observable;
 import rx.Subscription;
 import rx.subjects.BehaviorSubject;
@@ -14,20 +14,20 @@ import rx.subscriptions.CompositeSubscription;
  * contact@juanmendez.info
  *
  * Provides a subject which can be observed whenever realm is getting a realmModel added or removed
- * Elements emitted are of type ModelEmit. ModelEmit wraps the state and realmModel
+ * Elements emitted are of type RealmEvent. RealmEvent wraps the state and realmModel
  */
 
 public class RealmObservable {
 
-    private static BehaviorSubject<ModelEmit> realmModelObserver = BehaviorSubject.create();
+    private static BehaviorSubject<RealmEvent> realmModelObserver = BehaviorSubject.create();
     private static CompositeSubscription compositeSubscription = new CompositeSubscription();
     private static HashMap<Object, CompositeSubscription> mapSubscription = new HashMap<>();
 
-    public static Observable<ModelEmit> asObservable() {
+    public static Observable<RealmEvent> asObservable() {
         return realmModelObserver.asObservable();
     }
 
-    public static void onNext(ModelEmit realmModelState){
+    public static void onNext(RealmEvent realmModelState){
         realmModelObserver.onNext( realmModelState);
     }
 
