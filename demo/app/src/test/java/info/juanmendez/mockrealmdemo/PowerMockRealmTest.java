@@ -597,4 +597,79 @@ public class PowerMockRealmTest
             }
         });
     }
+
+    @Test
+    public void shouldGetFirstAsync(){
+
+        RealmStorage.clear();
+
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2012, 2, 1));
+
+
+        RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
+
+        assertNotNull( "realmObject exists", realmObject );
+
+        realmObject.addChangeListener((RealmChangeListener<Dog>) element -> {
+            if( element != null ){
+                assertNotNull( "First dog with age 2 " + element.getName(), element );
+            }
+        });
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Aaron Hernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
+        dog.deleteFromRealm();
+
+        realmObject.removeChangeListeners();
+    }
+
+
+    @Test
+    public void shouldGetObservable(){
+
+        RealmStorage.clear();
+
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2012, 2, 1));
+
+
+        RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
+
+        realmObject.asObservable().subscribe(realmObject1 -> {
+            assertNotNull( "realmObject exists", realmObject );
+        });
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Aaron Hernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
+        dog.deleteFromRealm();
+
+        realmObject.removeChangeListeners();
+    }
 }
