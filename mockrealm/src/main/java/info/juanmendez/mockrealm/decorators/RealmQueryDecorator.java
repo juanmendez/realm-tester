@@ -11,6 +11,7 @@ import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.utils.QueryHolder;
 import io.realm.Case;
 import io.realm.RealmModel;
+import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
@@ -23,6 +24,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyShort;
 import static org.mockito.Matchers.anyString;
+import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -67,12 +69,12 @@ public class RealmQueryDecorator {
             return realmResults.get(0);
         });
 
-        /*when( realmQuery.findFirstAsync() ).thenAnswer(invocation -> {
+        when( realmQuery.findFirstAsync() ).thenAnswer(invocation -> {
             queryHolder.appendQuery( new Query(Compare.endTopGroup));
             RealmObject realmObject = mock( RealmObject.class );
-
+            RealmModelDecorator.handleAsyncMethods( realmObject, queryHolder );
             return realmObject;
-        });*/
+        });
     }
 
     private static void handleGroupingQueries(QueryHolder queryHolder) {

@@ -13,7 +13,6 @@ import info.juanmendez.mockrealm.dependencies.RealmMatchers;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.utils.QueryHolder;
-import info.juanmendez.mockrealm.utils.RealmModelUtils;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
@@ -81,13 +80,7 @@ public class RealmDecorator {
                 realmMap.put(clazz, RealmListDecorator.create());
             }
 
-            RealmModel realmModel = RealmModelUtils.fromClass( clazz );
-
-            if( realmModel instanceof RealmObject ){
-
-                realmModel = RealmModelDecorator.mockRealmObject( realmModel );
-            }
-
+            RealmModel realmModel = RealmModelDecorator.create(clazz);
             RealmStorage.addModel( realmModel );
 
             return realmModel;

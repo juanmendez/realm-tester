@@ -4,15 +4,24 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.reflect.Whitebox;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.RealmEvent;
+import info.juanmendez.mockrealm.utils.QueryHolder;
+import info.juanmendez.mockrealm.utils.SubscriptionsUtil;
+import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
+import rx.Observable;
+import rx.subjects.PublishSubject;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
@@ -25,6 +34,8 @@ import static org.powermock.api.mockito.PowerMockito.spy;
  */
 
 public class RealmModelDecorator {
+
+    private static SubscriptionsUtil<RealmObject, RealmChangeListener> subscriptionsUtil = new SubscriptionsUtil<>();
 
     public static void prepare() throws Exception {
 
@@ -39,6 +50,30 @@ public class RealmModelDecorator {
         }).when( RealmObject.class, "deleteFromRealm", any( RealmModel.class ) );
     }
 
+    public static RealmModel create( Class clazz ) {
+        Constructor constructor = null;
+        RealmModel realmModel = null;
+
+        try {
+            constructor = clazz.getConstructor();
+            realmModel = (RealmModel) constructor.newInstance();
+        }  catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        if( realmModel instanceof RealmObject){
+            realmModel = RealmModelDecorator.mockRealmObject( realmModel );
+        }
+
+        return realmModel;
+    }
+
     public static RealmModel mockRealmObject(RealmModel realmModel ){
 
         if( realmModel instanceof RealmObject ){
@@ -49,6 +84,7 @@ public class RealmModelDecorator {
 
         if( realmModel instanceof RealmObject ){
             handleDeleteActions( (RealmObject) realmModel);
+            handleAsyncMethods( (RealmObject) realmModel);
         }
 
         return realmModel;
@@ -136,5 +172,114 @@ public class RealmModelDecorator {
                 return null;
             }
         }).when( (RealmObject) realmObject ).deleteFromRealm();
+    }
+
+    /**
+     * avoid doing anything in case realmObject is part of a realmResult
+     * @param realmObject
+     */
+    private static void handleAsyncMethods( RealmObject realmObject ){
+
+        doAnswer(invocation -> null).when( realmObject ).addChangeListener( any(RealmChangeListener.class));
+        doAnswer(invocation -> null).when( realmObject).removeChangeListener(any(RealmChangeListener.class));
+        doAnswer(invocation -> null).when( realmObject).removeChangeListeners();
+        doAnswer( invocation -> null).when( realmObject ).asObservable();
+    }
+
+    public static void handleAsyncMethods(RealmObject realmObject, QueryHolder queryHolder ){
+
+        doAnswer(invocation -> {
+
+            //execute query once associated
+            RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
+            Observable.fromCallable(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+
+                    RealmResults realmResults = queryHolder.rewind();
+
+                    if( !realmResults.isEmpty())
+                        listener.onChange( realmResults.get(0) );
+                    else
+                        listener.onChange( null );
+
+                    return null;
+                }
+            }).subscribeOn(RealmDecorator.getTransactionScheduler())
+                    .observeOn( RealmDecorator.getResponseScheduler() )
+                    .subscribe(aVoid -> {});
+
+
+            //run queryWrapper when RealmObservable emits an added/deleted model
+            subscriptionsUtil.add( realmObject,
+                                   listener,
+                    RealmObservable.asObservable()
+                            .map(realmEvent -> realmEvent.getRealmModel())
+                            .ofType(queryHolder.getClazz())
+                            .subscribe( o -> {
+                                RealmResults realmResults = queryHolder.rewind();
+
+                                if( !realmResults.isEmpty() )
+                                    listener.onChange( realmResults.get(0) );
+                                else
+                                    listener.onChange( null );
+                            })
+            );
+
+            return null;
+        }).when( realmObject ).addChangeListener(any(RealmChangeListener.class));
+
+
+        doAnswer(invocation -> {
+            PublishSubject subject = PublishSubject.create();
+
+            Observable.fromCallable(new Callable<RealmObject>() {
+                @Override
+                public RealmObject call() throws Exception {
+
+                    RealmResults<RealmObject> realmResults = queryHolder.rewind();
+
+                    if( !realmResults.isEmpty())
+                        return realmResults.get(0);
+                    else
+                        return null;
+                }
+            }).subscribeOn(RealmDecorator.getTransactionScheduler())
+                    .observeOn( RealmDecorator.getResponseScheduler() )
+                    .subscribe(realmObject1 -> {
+                        subject.onNext( realmObject1);
+                    });
+
+
+            RealmObservable.add(
+                    RealmObservable.asObservable()
+                            .map(realmEvent -> realmEvent.getRealmModel())
+                            .ofType(queryHolder.getClazz())
+                            .subscribe(o -> {
+
+                                RealmResults realmResults = queryHolder.rewind();
+
+                                if( !realmResults.isEmpty() )
+                                    subject.onNext( realmResults.get(0) );
+                                else
+                                    subject.onNext( null );
+                            })
+            );
+
+            return subject;
+        }).when( realmObject ).asObservable();
+
+
+        doAnswer(invocation -> {
+            RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
+            subscriptionsUtil.remove(listener);
+            return null;
+        }).when( realmObject ).removeChangeListener( any(RealmChangeListener.class));
+
+
+        doAnswer(invocation -> {
+            subscriptionsUtil.removeAll( realmObject );
+            return null;
+        }).when( realmObject ).removeChangeListeners();
     }
 }
