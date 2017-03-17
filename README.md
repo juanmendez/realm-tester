@@ -2,7 +2,7 @@
 
 This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito.
 
-(Wiki has a basic instructions how to import and use this library)[https://github.com/juanmendez/Mocking-Realm/wiki]
+[Wiki has a basic instructions how to import and use this library](https://github.com/juanmendez/Mocking-Realm/wiki)
 
 What has been done so far
 - Supporting Realm 2.3
