@@ -126,6 +126,12 @@ public class RealmDecorator {
                 QueryHolder queryHolder = new QueryHolder(clazz);
 
                 RealmQuery realmQuery = RealmQueryDecorator.create(queryHolder);
+
+                if( !realmMap.containsKey(clazz))
+                {
+                    realmMap.put(clazz, new RealmList<>());
+                }
+
                 queryHolder.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
 
 

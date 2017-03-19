@@ -38,6 +38,9 @@ public class RealmModelUtil {
      */
     public static String toString(Object realmModel){
 
+        if( realmModel == null )
+            return "";
+
         String jsonString = "";
         String q = "\"";
         String c = ",";

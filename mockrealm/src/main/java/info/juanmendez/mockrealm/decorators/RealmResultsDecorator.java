@@ -24,6 +24,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by @juanmendezinfo on 2/15/2017.
+ *
+ * TODO: separate whens by kind
  */
 public class RealmResultsDecorator {
 
@@ -40,6 +42,10 @@ public class RealmResultsDecorator {
         doAnswer(invocation -> {
             return results.size();
         }).when( realmResults ).size();
+
+        doAnswer(invocation -> {
+            return results.isEmpty();
+        }).when( realmResults ).isEmpty();
 
         doAnswer(invocation -> {
             return results.iterator();

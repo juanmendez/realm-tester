@@ -11,86 +11,98 @@ import rx.subscriptions.CompositeSubscription;
  * www.juanmendez.info
  * contact@juanmendez.info
  *
- * A wrapper has several items (wrapperToItems)
- * An item is associated with one wrapper (itemToWrapper)
- * The wrapper has a hold of a CompositeSubscription (wrapperComposite)
- * Each item added to the wrapperComposite has a subscription map associated. (itemSubscriptions)
+ * A subject has several observers (subjectToItems)
+ * An observer is associated with one subject (observerToSubject)
+ * The subject has a hold of a CompositeSubscription (subjectComposite)
+ * Each observer added to the subjectComposite has a subscription map associated. (observerSubscriptions)
  */
 
-public class SubscriptionsUtil<W,I> {
+public class SubscriptionsUtil<S,O> {
 
-    private HashMap<W, ArrayList<I>> wrapperToItems = new HashMap<W, ArrayList<I>>();
-    private HashMap<I,W> itemToWrapper = new HashMap<I, W>();
-    private HashMap<W, CompositeSubscription> wrapperComposite = new HashMap<>();
-    private HashMap<I, Subscription> itemSubscriptions = new HashMap<>();
+    private HashMap<S,ArrayList<O>> subjectToItems = new HashMap<S, ArrayList<O>>();
+    private HashMap<O,S> observerToSubject = new HashMap<O, S>();
+    private HashMap<S,CompositeSubscription> subjectComposite = new HashMap<>();
+    private HashMap<O,Subscription> observerSubscriptions = new HashMap<>();
 
-    private CompositeSubscription getWrapperComposite(W wrapper ){
+    private CompositeSubscription getSubjectComposite(S subject ){
 
-        if( !wrapperComposite.containsKey( wrapper ))
-            wrapperComposite.put( wrapper, new CompositeSubscription());
+        if( !subjectComposite.containsKey( subject ))
+            subjectComposite.put( subject, new CompositeSubscription());
 
-        return wrapperComposite.get( wrapper );
+        return subjectComposite.get( subject );
     }
 
-    //get all items associated with a wrapper
-    private ArrayList<I> getWrapperItems(W wrapper ){
+    //get all observers associated with a subject
+    private ArrayList<O> getSubjectObservers(S subject ){
 
-        if( !wrapperToItems.containsKey( wrapper) ){
-            wrapperToItems.put( wrapper, new ArrayList<I>());
+        if( !subjectToItems.containsKey( subject) ){
+            subjectToItems.put( subject, new ArrayList<O>());
         }
 
-        return wrapperToItems.get( wrapper );
+        return subjectToItems.get( subject );
     }
 
     /**
-     * add items' subscription to wrapperComposite, and also itemComposite
-     * also associate the item with its subscription (itemSubscriptions)
-     * @param wrapper
-     * @param item
+     * add observers' subscription to subjectComposite, and also observerComposite
+     * also associate the observer with its subscription (observerSubscriptions)
+     * @param subject
+     * @param observer
      * @param subscription
      */
-    public void add(W wrapper, I item, Subscription subscription ){
+    public void add(S subject, O observer, Subscription subscription ){
 
-        CompositeSubscription compositeSubscription = getWrapperComposite( wrapper );
+        add( subject, subscription);
+        observerSubscriptions.put( observer, subscription );
+        getSubjectObservers(subject).add( observer );
+        observerToSubject.put(observer, subject);
+    }
 
+    public void add(S subject, Subscription subscription ){
+
+        CompositeSubscription compositeSubscription = getSubjectComposite( subject );
         compositeSubscription.add( subscription );
-        itemSubscriptions.put( item, subscription );
-        getWrapperItems(wrapper).add( item );
-        itemToWrapper.put(item, wrapper);
     }
 
     /**
-     * when you remove the item from itemComposite, also remove association at itemsSubscription
-     * @param item
+     * when you remove the observer from observerComposite, also remove association at observersSubscription
+     * @param observer
      */
-    public void remove( I item ){
+    public void remove( O observer ){
 
-        if( itemToWrapper.containsKey( item ) && itemSubscriptions.containsKey( item ) ){
+        if( observerToSubject.containsKey( observer ) && observerSubscriptions.containsKey( observer ) ){
 
-            W wrapper = itemToWrapper.get(item);
-            CompositeSubscription compositeSubscription = getWrapperComposite( wrapper );
-            Subscription subscription = itemSubscriptions.get( item );
+            S subject = observerToSubject.get(observer);
+            CompositeSubscription compositeSubscription = getSubjectComposite( subject );
+            Subscription subscription = observerSubscriptions.get( observer );
             compositeSubscription.remove( subscription );
 
-            itemSubscriptions.remove(item);
-            getWrapperItems(wrapper).remove(item);
-            itemToWrapper.remove(item);
+            observerSubscriptions.remove(observer);
+            getSubjectObservers(subject).remove(observer);
+            observerToSubject.remove(observer);
         }
     }
 
-    public void removeAll( W wrapper ){
-        CompositeSubscription compositeSubscription = getWrapperComposite( wrapper );
-        ArrayList<I> items = getWrapperItems(wrapper);
+
+    public void remove(O observer, Subscription subscription ){
+
+        S subject = observerToSubject.get(observer);
+        CompositeSubscription compositeSubscription = getSubjectComposite( subject );
+        compositeSubscription.remove( subscription );
+    }
+
+    public void removeAll( S subject ){
+        CompositeSubscription compositeSubscription = getSubjectComposite( subject );
+        ArrayList<O> observers = getSubjectObservers(subject);
 
         compositeSubscription.clear();
-        wrapperComposite.remove( wrapper );
+        subjectComposite.remove( subject );
 
-        for (I item: items) {
-            itemSubscriptions.remove(item);
-            itemToWrapper.remove(item);
+        for (O observer: observers) {
+            observerSubscriptions.remove(observer);
+            observerToSubject.remove(observer);
         }
 
-        items.clear();
-        wrapperToItems.remove( wrapper );
+        observers.clear();
+        subjectToItems.remove( subject );
     }
 }

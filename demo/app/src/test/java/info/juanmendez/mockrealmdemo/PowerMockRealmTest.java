@@ -31,6 +31,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import rx.Observable;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -353,34 +354,41 @@ public class PowerMockRealmTest
     public void shouldDeleteRealmObject(){
         RealmStorage.clear();
 
-        realm.beginTransaction();
-        Dog dog = realm.createObject( Dog.class );
-        dog.setName("Max");
-        dog.setAge(1);
-        dog.setId(1);
-        dog.setBirthdate( new Date() );
-
-        Person person = realm.createObject( Person.class );
-        person.setFavoriteDog( dog );
-        person.setDogs( new RealmList<>(dog, dog, dog, dog ));
-        realm.commitTransaction();
-
-
-        Person person1 = realm.where( Person.class).findFirst();
-
-        person1.addChangeListener(new RealmChangeListener<RealmModel>() {
+        realm.where(Person.class).findFirstAsync().addChangeListener(new RealmChangeListener<RealmModel>() {
             @Override
             public void onChange(RealmModel element) {
-                System.out.println( element );
+
             }
         });
 
-        //assertEquals( "The only dog added has been removed", realm.where(Dog.class).count(), 0 );
-        /*assertNull( "Person's favorite dog is gone", person.getFavoriteDog() );*/
+        realm.beginTransaction();
+        Person person = realm.createObject( Person.class );
+        RealmList list = new RealmList();
+        Dog dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Max");
+        dog.setBirthdate( new Date(2011, 6, 10));
+        list.add( dog );
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Rex");
+        dog.setBirthdate( new Date(2016, 6, 10));
+        list.add(dog);
+        person.setDogs( list );
+        person.setFavoriteDog( dog );
+        realm.commitTransaction();
 
         realm.beginTransaction();
         dog.deleteFromRealm();
         realm.commitTransaction();
+
+        realm.beginTransaction();
+        realm.where(Dog.class).findFirst().deleteFromRealm();
+        realm.commitTransaction();
+
+        assertEquals( "There is one dog left", realm.where(Dog.class).count(), 0 );
+        assertNull( "Person's favorite dog is gone", person.getFavoriteDog() );
+        assertEquals( "There is also one dog in the list", person.getDogs().size(), 0 );
     }
 
     @Test

@@ -10,8 +10,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
+import info.juanmendez.mockrealm.models.RealmEvent;
 import info.juanmendez.mockrealm.models.TransactionEvent;
 import info.juanmendez.mockrealm.utils.QueryHolder;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
@@ -51,7 +53,8 @@ public class RealmModelDecorator {
         }).when( RealmObject.class, "deleteFromRealm", any( RealmModel.class ) );
     }
 
-    public static RealmModel create( Class clazz ) {
+    private static RealmModel createFromClass( Class clazz ){
+
         Constructor constructor = null;
         RealmModel realmModel = null;
 
@@ -68,6 +71,12 @@ public class RealmModelDecorator {
             e.printStackTrace();
         }
 
+        return  realmModel;
+    }
+
+    public static RealmModel create(Class clazz ) {
+        RealmModel realmModel = createFromClass( clazz );
+
         if( realmModel instanceof RealmObject){
             realmModel = RealmModelDecorator.mockRealmObject( realmModel );
         }
@@ -81,6 +90,8 @@ public class RealmModelDecorator {
             realmModel = spy( realmModel );
         }
 
+        handleDeleteEvents( realmModel);
+
         if( realmModel instanceof RealmObject ){
             handleDeleteActions( (RealmObject) realmModel);
             handleAsyncMethods( (RealmObject) realmModel);
@@ -89,6 +100,59 @@ public class RealmModelDecorator {
         return realmModel;
     }
 
+    private static void handleDeleteEvents( RealmModel realmModel ){
+
+        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
+        Class fieldClass;
+
+        /**
+         * There is one observable per each member observed either it's a realmModel or a realmResult
+         */
+        for (Field field: fieldSet) {
+
+            fieldClass = field.getType();
+
+            if( RealmModel.class.isAssignableFrom(fieldClass) ){
+
+                RealmModel finalRealmModel = realmModel;
+                RealmObservable.add( realmModel,
+
+                        RealmObservable.asObservable()
+                                .filter(realmEvent -> realmEvent.getState()== RealmEvent.MODEL_REMOVED)
+                                .map(realmEvent -> realmEvent.getRealmModel())
+                                .ofType(fieldClass)
+                                .subscribe( o -> {
+                                    Object variable = Whitebox.getInternalState(finalRealmModel,
+                                            field.getName());
+
+                                    if( variable != null && variable == o ){
+                                        Whitebox.setInternalState(finalRealmModel,
+                                                field.getName(), (Object[]) null);
+                                    }
+                                })
+                );
+            }
+            else if( fieldClass == RealmList.class ){
+
+                //RealmResults are not filtered
+                RealmModel finalRealmModel1 = realmModel;
+
+                RealmObservable.add( realmModel, RealmObservable.asObservable()
+                        .filter(realmEvent -> realmEvent.getState() == RealmEvent.MODEL_REMOVED)
+                        .map(realmEvent -> realmEvent.getRealmModel())
+                        .subscribe(o -> {
+                            RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(finalRealmModel1, field.getName());
+
+                            if( realmList != null ){
+                                while( realmList.contains( o ) ){
+                                    realmList.remove( o );
+                                }
+                            }
+                        })
+                );
+            }
+        }
+    }
 
     private static void handleDeleteActions( RealmObject realmObject ){
 
@@ -96,6 +160,7 @@ public class RealmModelDecorator {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
+                RealmObservable.unsubcribe( realmObject );
 
                 Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmObject);
 
@@ -110,6 +175,7 @@ public class RealmModelDecorator {
                     }
                 }
 
+                RealmObservable.unsubcribe( realmObject );
                 RealmStorage.removeModel( realmObject );
                 return null;
             }
@@ -134,9 +200,9 @@ public class RealmModelDecorator {
 
             //execute query once associated
             RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
-            Observable.fromCallable(new Callable<RealmResults>() {
+            Observable.fromCallable(new Callable<RealmResults<RealmModel>>() {
                 @Override
-                public RealmResults call() throws Exception {
+                public RealmResults<RealmModel> call() throws Exception {
 
                     return queryHolder.rewind();
                 }
@@ -209,11 +275,11 @@ public class RealmModelDecorator {
             PublishSubject subject = PublishSubject.create();
 
             //first time make a call!
-            Observable.fromCallable(new Callable<RealmObject>() {
+            Observable.fromCallable(new Callable<RealmModel>() {
                 @Override
-                public RealmObject call() throws Exception {
+                public RealmModel call() throws Exception {
 
-                    RealmResults<RealmObject> realmResults = queryHolder.rewind();
+                    RealmResults<RealmModel> realmResults = queryHolder.rewind();
 
                     if( !realmResults.isEmpty())
                         return realmResults.get(0);

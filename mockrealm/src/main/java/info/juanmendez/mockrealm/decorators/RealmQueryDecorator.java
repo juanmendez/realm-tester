@@ -24,7 +24,6 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyShort;
 import static org.mockito.Matchers.anyString;
-import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -66,12 +65,16 @@ public class RealmQueryDecorator {
         when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
             queryHolder.appendQuery( new Query(Compare.endTopGroup));
             RealmResults<RealmModel> realmResults = queryHolder.rewind();
-            return realmResults.get(0);
+
+            if( realmResults.isEmpty() )
+                return null;
+            else
+                return realmResults.get(0);
         });
 
         when( realmQuery.findFirstAsync() ).thenAnswer(invocation -> {
             queryHolder.appendQuery( new Query(Compare.endTopGroup));
-            RealmObject realmObject = mock( RealmObject.class );
+            RealmObject realmObject = (RealmObject) RealmModelDecorator.create( queryHolder.getClazz() );
             RealmModelDecorator.handleAsyncMethods( realmObject, queryHolder );
             return realmObject;
         });

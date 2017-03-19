@@ -176,7 +176,7 @@ public class QueryHolder {
         return realmResults;
     }
 
-    public RealmResults rewind(){
+    public RealmResults<RealmModel> rewind(){
         ArrayList<Query> queries = getQueries();
         RealmList<RealmModel> searchList;
 
