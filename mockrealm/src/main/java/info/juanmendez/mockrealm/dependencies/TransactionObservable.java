@@ -86,6 +86,10 @@ public class TransactionObservable {
     public static class KeyTransaction{
         String name;
 
+        public static KeyTransaction create( String name ){
+            return  new KeyTransaction(name);
+        }
+
         public KeyTransaction(String name){
             this.name = name;
         }

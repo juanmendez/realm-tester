@@ -28,6 +28,7 @@ import rx.subjects.PublishSubject;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
@@ -74,11 +75,13 @@ public class RealmModelDecorator {
         return  realmModel;
     }
 
-    public static RealmModel create(Class clazz ) {
+    public static RealmModel create(Class clazz, Boolean valid ) {
         RealmModel realmModel = createFromClass( clazz );
 
         if( realmModel instanceof RealmObject){
             realmModel = RealmModelDecorator.mockRealmObject( realmModel );
+            markAsValid( (RealmObject) realmModel, valid );
+
         }
 
         return realmModel;
@@ -118,30 +121,31 @@ public class RealmModelDecorator {
                 RealmObservable.add( realmModel,
 
                         RealmObservable.asObservable()
-                                .filter(realmEvent -> realmEvent.getState()== RealmEvent.MODEL_REMOVED)
-                                .map(realmEvent -> realmEvent.getRealmModel())
-                                .ofType(fieldClass)
-                                .subscribe( o -> {
-                                    Object variable = Whitebox.getInternalState(finalRealmModel,
-                                            field.getName());
+                        .filter(realmEvent -> realmEvent.getState()== RealmEvent.MODEL_REMOVED)
+                        .map(realmEvent -> realmEvent.getRealmModel())
+                        .ofType(fieldClass)
+                        .subscribe( o -> {
+                            Object variable = Whitebox.getInternalState(finalRealmModel,
+                                    field.getName());
 
-                                    if( variable != null && variable == o ){
-                                        Whitebox.setInternalState(finalRealmModel,
-                                                field.getName(), (Object[]) null);
-                                    }
-                                })
+                            if( variable != null && variable == o ){
+                                Whitebox.setInternalState(finalRealmModel,
+                                        field.getName(), (Object[]) null);
+                            }
+                        })
                 );
             }
             else if( fieldClass == RealmList.class ){
 
                 //RealmResults are not filtered
-                RealmModel finalRealmModel1 = realmModel;
 
-                RealmObservable.add( realmModel, RealmObservable.asObservable()
+                RealmObservable.add( realmModel,
+
+                        RealmObservable.asObservable()
                         .filter(realmEvent -> realmEvent.getState() == RealmEvent.MODEL_REMOVED)
                         .map(realmEvent -> realmEvent.getRealmModel())
                         .subscribe(o -> {
-                            RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(finalRealmModel1, field.getName());
+                            RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(realmModel, field.getName());
 
                             if( realmList != null ){
                                 while( realmList.contains( o ) ){
@@ -177,6 +181,9 @@ public class RealmModelDecorator {
 
                 RealmObservable.unsubcribe( realmObject );
                 RealmStorage.removeModel( realmObject );
+
+                //after deleting item, lets make it invalid
+                doReturn(false).when( realmObject ).isValid();
                 return null;
             }
         }).when( (RealmObject) realmObject ).deleteFromRealm();
@@ -322,5 +329,10 @@ public class RealmModelDecorator {
             return subject;
         }).when( realmObject ).asObservable();
 
+    }
+
+
+    public static void markAsValid( RealmObject realmObject, Boolean valid ){
+        doReturn( valid ).when( realmObject ).isValid();
     }
 }

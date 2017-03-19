@@ -383,7 +383,7 @@ public class PowerMockRealmTest
         realm.commitTransaction();
 
         realm.beginTransaction();
-        realm.where(Dog.class).findFirst().deleteFromRealm();
+        realm.where(Dog.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
 
         assertEquals( "There is one dog left", realm.where(Dog.class).count(), 0 );

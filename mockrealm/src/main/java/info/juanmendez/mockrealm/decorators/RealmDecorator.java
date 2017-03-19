@@ -81,7 +81,7 @@ public class RealmDecorator {
                 realmMap.put(clazz, RealmListDecorator.create());
             }
 
-            RealmModel realmModel = RealmModelDecorator.create(clazz);
+            RealmModel realmModel = RealmModelDecorator.create(clazz, true);
             RealmStorage.addModel( realmModel );
 
             return realmModel;
