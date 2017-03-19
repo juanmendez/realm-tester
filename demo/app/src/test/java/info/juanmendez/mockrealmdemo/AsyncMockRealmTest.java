@@ -26,12 +26,10 @@ import io.realm.RealmResults;
 public class AsyncMockRealmTest
 {
     Realm realm;
-    TransactionObservable to;
 
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
-        to = new TransactionObservable();
     }
 
     /**
@@ -39,7 +37,7 @@ public class AsyncMockRealmTest
     @Test(timeout = 6000)
     public void shouldBlockOtherTransactions(){
 
-        to.asObservable().subscribe(transactionEvent -> {
+        TransactionObservable.asObservable().subscribe(transactionEvent -> {
             System.out.println( transactionEvent.getState() + ", " + transactionEvent.getInitiator().toString() );
         });
 
@@ -51,12 +49,12 @@ public class AsyncMockRealmTest
         }).start();
 
         transaction = new Transaction("t2");
-        to.startTransaction(transaction);
-        to.endTransaction(transaction);
+        TransactionObservable.startTransaction(transaction);
+        TransactionObservable.endTransaction(transaction);
 
         transaction = new Transaction("t3");
-        to.startTransaction(transaction);
-        to.endTransaction(transaction);
+        TransactionObservable.startTransaction(transaction);
+        TransactionObservable.endTransaction(transaction);
 
         new Thread(() -> {
             Transaction t = new Transaction("_t4");
@@ -71,8 +69,8 @@ public class AsyncMockRealmTest
 
     public void executeWork( Object initiator, long mils ){
 
-        to.startTransaction(initiator,
-                to.asObservable()
+        TransactionObservable.startTransaction(initiator,
+                TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
                             return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == initiator;
                         })
@@ -85,7 +83,7 @@ public class AsyncMockRealmTest
                             }
 
                             System.out.println( "completed " + initiator.toString() );
-                            to.endTransaction(initiator);
+                            TransactionObservable.endTransaction(initiator);
                         })
         );
     }

@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.dependencies.RealmMatchers;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
+import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.utils.QueryHolder;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
@@ -43,7 +44,7 @@ public class RealmDecorator {
 
         Realm realm = mock(Realm.class );
         prepare(realm);
-        prepareTransactions(realm);
+        handleAsyncTransactions(realm);
         return  realm;
     }
 
@@ -133,7 +134,7 @@ public class RealmDecorator {
         });
     }
 
-    private static void prepareTransactions( Realm realm ){
+    private static void handleAsyncTransactions(Realm realm ){
 
         //call execute() in Realm.Transaction object received.
         doAnswer( new Answer<Void>() {
@@ -313,5 +314,21 @@ public class RealmDecorator {
                     }
                 }
         );
+    }
+
+    private static void handleSyncTransactions(Realm realm ){
+
+        TransactionObservable.KeyTransaction transaction = new TransactionObservable.KeyTransaction( realm.toString() );
+
+        doAnswer(invocation -> {
+            TransactionObservable.startTransaction(transaction);
+            return null;
+        }).when( realm ).beginTransaction();
+
+
+        doAnswer(invocation -> {
+            TransactionObservable.endTransaction(transaction);
+            return null;
+        }).when( realm ).commitTransaction();
     }
 }

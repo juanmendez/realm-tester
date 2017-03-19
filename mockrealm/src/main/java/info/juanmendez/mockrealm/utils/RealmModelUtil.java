@@ -8,6 +8,7 @@ import java.util.Set;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 
 /**
  * Created by Juan Mendez on 3/17/2017.
@@ -35,7 +36,7 @@ public class RealmModelUtil {
      * @param realmModel object to check variables and values
      * @return a json string
      */
-    public static String toString(RealmModel realmModel){
+    public static String toString(Object realmModel){
 
         String jsonString = "";
         String q = "\"";
@@ -53,6 +54,19 @@ public class RealmModelUtil {
 
             currentObject = Whitebox.getInternalState(realmModel, field.getName() );
 
+            if(RealmResults.class.isAssignableFrom(field.getType())){
+
+                RealmResults<RealmModel> list = (RealmResults) currentObject;
+
+                jsonString+= q + field.getName() + q + ":" + oB;
+                for (RealmModel rm: list) {
+                    jsonString += toString(rm)+c;
+                }
+
+                jsonString = jsonString.substring(0,jsonString.length()-1);
+                jsonString+= cB+c;
+            }
+            else
             if(RealmList.class.isAssignableFrom(field.getType())){
 
                 RealmList<RealmModel> list = (RealmList) currentObject;

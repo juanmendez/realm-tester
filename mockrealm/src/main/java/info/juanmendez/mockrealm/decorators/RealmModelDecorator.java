@@ -10,10 +10,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
-import info.juanmendez.mockrealm.models.RealmEvent;
+import info.juanmendez.mockrealm.dependencies.TransactionObservable;
+import info.juanmendez.mockrealm.models.TransactionEvent;
 import info.juanmendez.mockrealm.utils.QueryHolder;
+import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import info.juanmendez.mockrealm.utils.SubscriptionsUtil;
 import io.realm.RealmChangeListener;
 import io.realm.RealmList;
@@ -80,8 +81,6 @@ public class RealmModelDecorator {
             realmModel = spy( realmModel );
         }
 
-        handleDeleteEvents( realmModel);
-
         if( realmModel instanceof RealmObject ){
             handleDeleteActions( (RealmObject) realmModel);
             handleAsyncMethods( (RealmObject) realmModel);
@@ -90,61 +89,6 @@ public class RealmModelDecorator {
         return realmModel;
     }
 
-    private static void handleDeleteEvents( RealmModel realmModel ){
-
-        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
-        Class fieldClass;
-
-        /**
-         * There is one observable per each member observed either it's a realmModel or a realmResult
-         */
-        for (Field field: fieldSet) {
-
-            fieldClass = field.getType();
-
-            if( RealmModel.class.isAssignableFrom(fieldClass) ){
-
-                RealmModel finalRealmModel = realmModel;
-                RealmObservable.add( realmModel,
-
-                        RealmObservable.asObservable()
-                                .filter(realmEvent -> realmEvent.getState()== RealmEvent.MODEL_REMOVED)
-                                .map(realmEvent -> realmEvent.getRealmModel())
-                                .ofType(fieldClass)
-                                .subscribe( o -> {
-                                    Object variable = Whitebox.getInternalState(finalRealmModel,
-                                            field.getName());
-
-                                    if( variable != null && variable == o ){
-                                        Whitebox.setInternalState(finalRealmModel,
-                                                field.getName(),
-                                                (Object[]) null);
-                                    }
-                                })
-                );
-            }
-            else if( fieldClass == RealmList.class ){
-
-                //RealmResults are not filtered
-                RealmModel finalRealmModel1 = realmModel;
-
-                RealmObservable.add( realmModel, RealmObservable.asObservable()
-                        .filter(realmEvent -> realmEvent.getState() == RealmEvent.MODEL_REMOVED)
-                        .map(realmEvent -> realmEvent.getRealmModel())
-                        .subscribe(o -> {
-                            RealmList<RealmModel> realmList = (RealmList) Whitebox.getInternalState(finalRealmModel1, field.getName());
-
-                            if( realmList != null ){
-
-                                while( realmList.contains( o ) ){
-                                    realmList.remove( o );
-                                }
-                            }
-                        })
-                );
-            }
-        }
-    }
 
     private static void handleDeleteActions( RealmObject realmObject ){
 
@@ -152,7 +96,6 @@ public class RealmModelDecorator {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                RealmObservable.unsubcribe( realmObject );
 
                 Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmObject);
 
@@ -167,7 +110,6 @@ public class RealmModelDecorator {
                     }
                 }
 
-                RealmObservable.unsubcribe( realmObject );
                 RealmStorage.removeModel( realmObject );
                 return null;
             }
@@ -192,37 +134,57 @@ public class RealmModelDecorator {
 
             //execute query once associated
             RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
-            Observable.fromCallable(new Callable<Void>() {
+            Observable.fromCallable(new Callable<RealmResults>() {
                 @Override
-                public Void call() throws Exception {
+                public RealmResults call() throws Exception {
 
-                    RealmResults realmResults = queryHolder.rewind();
-
-                    if( !realmResults.isEmpty())
-                        listener.onChange( realmResults.get(0) );
-                    else
-                        listener.onChange( null );
-
-                    return null;
+                    return queryHolder.rewind();
                 }
             }).subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
-                    .subscribe(aVoid -> {});
+                    .subscribe(realmResults -> {
+
+                        if( !realmResults.isEmpty())
+                            listener.onChange( realmResults.get(0) );
+                        else
+                            listener.onChange( null );
+
+            });
 
 
-            //run queryWrapper when RealmObservable emits an added/deleted model
+            final String[] json = new String[2];
+
+            //whenever there is a transaction ending, we compare previous result with current one.
+            //we transform both results as json objects and just do a check if strings are not the same
             subscriptionsUtil.add( realmObject,
                                    listener,
-                    RealmObservable.asObservable()
-                            .map(realmEvent -> realmEvent.getRealmModel())
-                            .ofType(queryHolder.getClazz())
-                            .subscribe( o -> {
-                                RealmResults realmResults = queryHolder.rewind();
+                    TransactionObservable.asObservable()
+                            .subscribe( transactionEvent -> {
 
-                                if( !realmResults.isEmpty() )
-                                    listener.onChange( realmResults.get(0) );
-                                else
-                                    listener.onChange( null );
+                                if( transactionEvent.getState() == TransactionEvent.END_TRANSACTION ){
+
+                                    String initialJson = "", currrentJson = "";
+
+                                    RealmResults<RealmModel> realmResults = queryHolder.getRealmResults();
+
+                                    if( !realmResults.isEmpty() ){
+                                        initialJson = RealmModelUtil.toString( realmResults.get(0) );
+                                    }
+
+                                    realmResults = queryHolder.rewind();
+
+                                    if( !realmResults.isEmpty() ){
+                                        currrentJson = RealmModelUtil.toString( realmResults.get(0) );
+                                    }
+
+                                    if( !initialJson.equals( currrentJson )){
+
+                                        if( !realmResults.isEmpty() )
+                                            listener.onChange( realmResults.get(0) );
+                                        else
+                                            listener.onChange( null );
+                                    }
+                                }
                             })
             );
 
@@ -231,8 +193,22 @@ public class RealmModelDecorator {
 
 
         doAnswer(invocation -> {
+            RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
+            subscriptionsUtil.remove(listener);
+            return null;
+        }).when( realmObject ).removeChangeListener( any(RealmChangeListener.class));
+
+
+        doAnswer(invocation -> {
+            subscriptionsUtil.removeAll( realmObject );
+            return null;
+        }).when( realmObject ).removeChangeListeners();
+
+
+        doAnswer(invocation -> {
             PublishSubject subject = PublishSubject.create();
 
+            //first time make a call!
             Observable.fromCallable(new Callable<RealmObject>() {
                 @Override
                 public RealmObject call() throws Exception {
@@ -250,36 +226,35 @@ public class RealmModelDecorator {
                         subject.onNext( realmObject1);
                     });
 
+            TransactionObservable.asObservable().subscribe(transactionEvent -> {
 
-            RealmObservable.add(
-                    RealmObservable.asObservable()
-                            .map(realmEvent -> realmEvent.getRealmModel())
-                            .ofType(queryHolder.getClazz())
-                            .subscribe(o -> {
+                if( transactionEvent.getState() == TransactionEvent.END_TRANSACTION ){
+                    String initialJson = "", currrentJson = "";
 
-                                RealmResults realmResults = queryHolder.rewind();
+                    RealmResults<RealmModel> realmResults = queryHolder.getRealmResults();
 
-                                if( !realmResults.isEmpty() )
-                                    subject.onNext( realmResults.get(0) );
-                                else
-                                    subject.onNext( null );
-                            })
-            );
+                    if( !realmResults.isEmpty() ){
+                        initialJson = RealmModelUtil.toString( realmResults.get(0) );
+                    }
+
+                    realmResults = queryHolder.rewind();
+
+                    if( !realmResults.isEmpty() ){
+                        currrentJson = RealmModelUtil.toString( realmResults.get(0) );
+                    }
+
+                    if( !initialJson.equals( currrentJson )){
+
+                        if( !realmResults.isEmpty() )
+                            subject.onNext( realmResults.get(0) );
+                        else
+                            subject.onNext( null );
+                    }
+                }
+            });
 
             return subject;
         }).when( realmObject ).asObservable();
 
-
-        doAnswer(invocation -> {
-            RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
-            subscriptionsUtil.remove(listener);
-            return null;
-        }).when( realmObject ).removeChangeListener( any(RealmChangeListener.class));
-
-
-        doAnswer(invocation -> {
-            subscriptionsUtil.removeAll( realmObject );
-            return null;
-        }).when( realmObject ).removeChangeListeners();
     }
 }

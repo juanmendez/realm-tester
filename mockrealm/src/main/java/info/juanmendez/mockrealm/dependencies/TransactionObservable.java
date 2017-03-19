@@ -15,17 +15,18 @@ import rx.subjects.PublishSubject;
  *
  */
 public class TransactionObservable {
-    private  SubscriptionsUtil<TransactionObservable, Object> subscriptionsUtil = new SubscriptionsUtil();
-    private  PublishSubject<TransactionEvent> subject = PublishSubject.create();
-    private  ArrayList<Object> stackTransactions = new ArrayList<>();
+    private static TransactionObservable instance;
+    private  static SubscriptionsUtil<TransactionObservable, Object> subscriptionsUtil = new SubscriptionsUtil();
+    private  static PublishSubject<TransactionEvent> subject = PublishSubject.create();
+    private  static ArrayList<Object> stackTransactions = new ArrayList<>();
 
-    public TransactionObservable(){
-    }
+    public static void startTransaction( Object keyTransaction, Subscription subscription ){
 
+        if( instance == null ){
+            instance = new TransactionObservable();
+        }
 
-    public  void startTransaction( Object keyTransaction, Subscription subscription ){
-
-        subscriptionsUtil.add( this, keyTransaction, subscription );
+        subscriptionsUtil.add( instance, keyTransaction, subscription );
 
         if( stackTransactions.isEmpty() ){
             stackTransactions.add( keyTransaction );
@@ -40,7 +41,7 @@ public class TransactionObservable {
      * it is taken as a priority, and moved as first priority.
      * @param keyTransaction
      */
-    public void startTransaction( Object keyTransaction ){
+    public static void startTransaction( Object keyTransaction ){
         stackTransactions.add(0, keyTransaction );
         nextTransaction();
     }
@@ -51,7 +52,7 @@ public class TransactionObservable {
      * if initiator is the first element at stackTransactions.
      * @param keyTransaction
      */
-    public  void endTransaction( Object keyTransaction ){
+    public static void endTransaction( Object keyTransaction ){
 
         int keyIndex = stackTransactions.indexOf(keyTransaction);
 
@@ -71,14 +72,22 @@ public class TransactionObservable {
         }
     }
 
-    private  void nextTransaction(){
+    private static void nextTransaction(){
 
         if( !stackTransactions.isEmpty() ){
             subject.onNext( new TransactionEvent(TransactionEvent.START_TRANSACTION, stackTransactions.get(0) ));
         }
     }
 
-    public Observable<TransactionEvent> asObservable(){
+    public static Observable<TransactionEvent> asObservable(){
         return subject.asObservable();
+    }
+
+    public static class KeyTransaction{
+        String name;
+
+        public KeyTransaction(String name){
+            this.name = name;
+        }
     }
 }

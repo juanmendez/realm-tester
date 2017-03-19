@@ -2,7 +2,6 @@ package info.juanmendez.mockrealm.dependencies;
 
 import java.util.HashMap;
 
-import info.juanmendez.mockrealm.models.RealmEvent;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -30,7 +29,6 @@ public class RealmStorage {
 
                 if( realmMap.get(clazz) != null && realmMap.get(clazz).contains( realmModel ) ){
                     realmMap.get( clazz ).remove( realmModel );
-                    RealmObservable.onNext( new RealmEvent( RealmEvent.MODEL_REMOVED, realmModel ) );
                 }else{
                     throw new RealmException( "Instance of " + clazz.getName() + " cannot be deleted as it's not part of the realm database" );
                 }
@@ -52,7 +50,6 @@ public class RealmStorage {
 
                 if( !realmMap.get(clazz).contains( realmModel ) ){
                     realmMap.get(RealmModelUtil.getClass(realmModel) ).add( realmModel );
-                    RealmObservable.onNext( new RealmEvent( RealmEvent.MODEL_ADDED, realmModel ) );
                 }else{
                     throw new RealmException( "Instance of " + clazz.getName() + " cannot be added more than once" );
                 }

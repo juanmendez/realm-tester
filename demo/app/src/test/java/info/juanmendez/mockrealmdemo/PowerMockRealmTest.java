@@ -33,7 +33,6 @@ import rx.Observable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
@@ -354,6 +353,7 @@ public class PowerMockRealmTest
     public void shouldDeleteRealmObject(){
         RealmStorage.clear();
 
+        realm.beginTransaction();
         Dog dog = realm.createObject( Dog.class );
         dog.setName("Max");
         dog.setAge(1);
@@ -363,11 +363,24 @@ public class PowerMockRealmTest
         Person person = realm.createObject( Person.class );
         person.setFavoriteDog( dog );
         person.setDogs( new RealmList<>(dog, dog, dog, dog ));
+        realm.commitTransaction();
 
-        dog.deleteFromRealm();
+
+        Person person1 = realm.where( Person.class).findFirst();
+
+        person1.addChangeListener(new RealmChangeListener<RealmModel>() {
+            @Override
+            public void onChange(RealmModel element) {
+                System.out.println( element );
+            }
+        });
 
         //assertEquals( "The only dog added has been removed", realm.where(Dog.class).count(), 0 );
-        assertNull( "Person's favorite dog is gone", person.getFavoriteDog() );
+        /*assertNull( "Person's favorite dog is gone", person.getFavoriteDog() );*/
+
+        realm.beginTransaction();
+        dog.deleteFromRealm();
+        realm.commitTransaction();
     }
 
     @Test
