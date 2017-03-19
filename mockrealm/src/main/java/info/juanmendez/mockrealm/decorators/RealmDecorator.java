@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
-import info.juanmendez.mockrealm.dependencies.MockUtils;
 import info.juanmendez.mockrealm.dependencies.RealmMatchers;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.utils.QueryHolder;
+import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
@@ -98,7 +98,7 @@ public class RealmDecorator {
                         realmModel = RealmModelDecorator.mockRealmObject( (RealmObject) realmModel );
                     }
 
-                    Class clazz = MockUtils.getClass(realmModel);
+                    Class clazz = RealmModelUtil.getClass(realmModel);
                     HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
 
                     if( !realmMap.containsKey(clazz)){

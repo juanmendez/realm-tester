@@ -3,6 +3,7 @@ package info.juanmendez.mockrealmdemo.models;
 import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 
 /**
  * Created by musta on 2/10/2017.
@@ -13,6 +14,9 @@ public class Dog extends RealmObject{
     private String name;
     private int age;
     private Date birthdate;
+
+    @Ignore
+    private String nickname;
 
     public int getId() {
         return id;
@@ -44,5 +48,13 @@ public class Dog extends RealmObject{
 
     public void setBirthdate(Date birthdate) {
         this.birthdate = birthdate;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }
