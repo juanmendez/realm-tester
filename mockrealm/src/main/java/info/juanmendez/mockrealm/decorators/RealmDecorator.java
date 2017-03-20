@@ -197,7 +197,7 @@ public class RealmDecorator {
 
                         Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
 
-                        queueTransaction(() -> {
+                        return queueTransaction(() -> {
 
                             Observable.fromCallable(new Callable<Boolean>() {
                                 @Override
@@ -220,19 +220,6 @@ public class RealmDecorator {
 
                             return null;
                         });
-
-                        //TODO: fix this in future phase
-                        return new RealmAsyncTask() {
-                            @Override
-                            public void cancel() {
-
-                            }
-
-                            @Override
-                            public boolean isCancelled() {
-                                return false;
-                            }
-                        };
                     }
                 }
         );
@@ -244,7 +231,7 @@ public class RealmDecorator {
                     @Override
                     public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
 
-                        queueTransaction(() -> {
+                        return queueTransaction(() -> {
                             Observable.fromCallable(new Callable<Boolean>() {
                                 @Override
                                 public Boolean call() throws Exception {
@@ -276,21 +263,6 @@ public class RealmDecorator {
 
                             return null;
                         });
-
-
-
-                        //TODO: fix this in future phase
-                        return new RealmAsyncTask() {
-                            @Override
-                            public void cancel() {
-
-                            }
-
-                            @Override
-                            public boolean isCancelled() {
-                                return false;
-                            }
-                        };
                     }
                 }
         );
@@ -303,7 +275,7 @@ public class RealmDecorator {
                     public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
                         Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
 
-                        queueTransaction(() -> {
+                        return queueTransaction(() -> {
 
                             Observable.fromCallable(new Callable<Boolean>() {
                                 @Override
@@ -336,19 +308,6 @@ public class RealmDecorator {
 
                             return null;
                         });
-
-                        //TODO: fix this in future phase
-                        return new RealmAsyncTask() {
-                            @Override
-                            public void cancel() {
-
-                            }
-
-                            @Override
-                            public boolean isCancelled() {
-                                return false;
-                            }
-                        };
                     }
                 }
         );
@@ -370,7 +329,12 @@ public class RealmDecorator {
         }).when( realm ).commitTransaction();
     }
 
-    private static void queueTransaction(Func0 funk){
+    /**
+     * Parameter funk serves as a key to TransactionObservable.startRequest()
+     * @param funk code to execute when TransactionObservable allows it.
+     * @return RealmAsyncTask uses funk key to cancel transaction, or check if it has been canceled
+     */
+    private static RealmAsyncTask queueTransaction(Func0 funk){
 
         TransactionObservable.startRequest(funk,
                 TransactionObservable.asObservable()
@@ -382,5 +346,18 @@ public class RealmDecorator {
                         TransactionObservable.endRequest(funk);
                     })
         );
+
+
+        return new RealmAsyncTask() {
+            @Override
+            public void cancel() {
+                TransactionObservable.cancel(funk);
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return TransactionObservable.isCanceled( funk );
+            }
+        };
     }
 }
