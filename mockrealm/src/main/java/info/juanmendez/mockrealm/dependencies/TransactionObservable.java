@@ -30,7 +30,7 @@ public class TransactionObservable {
 
         if( stackTransactions.isEmpty() ){
             stackTransactions.add( keyTransaction );
-            nextTransaction();
+            next();
         }else{
             stackTransactions.add( keyTransaction );
         }
@@ -43,7 +43,7 @@ public class TransactionObservable {
      */
     public static void startRequest(Object keyTransaction ){
         stackTransactions.add(0, keyTransaction );
-        nextTransaction();
+        next();
     }
 
 
@@ -68,7 +68,7 @@ public class TransactionObservable {
             subscriptionsUtil.remove( keyTransaction );
 
             if( keyIndex == 0 ){
-                nextTransaction();
+                next();
             }
         }
     }
@@ -78,7 +78,7 @@ public class TransactionObservable {
      * only if it's not the current transaction which means is the first in the list.
      * @param keyTransaction
      */
-    public static void cancelTransaction( Object keyTransaction ){
+    public static void cancel(Object keyTransaction ){
         if( stackTransactions.indexOf(keyTransaction) > 0 ){
             stackTransactions.remove( keyTransaction );
         }
@@ -89,11 +89,11 @@ public class TransactionObservable {
      * @param keyTransaction
      * @return true if is not in stackTransactions
      */
-    public static Boolean isTransactionCanceled( Object keyTransaction ){
+    public static Boolean isCanceled(Object keyTransaction ){
         return stackTransactions.indexOf(keyTransaction) < 0;
     }
 
-    private static void nextTransaction(){
+    private static void next(){
 
         if( !stackTransactions.isEmpty() ){
             subject.onNext( new TransactionEvent(TransactionEvent.START_TRANSACTION, stackTransactions.get(0) ));
