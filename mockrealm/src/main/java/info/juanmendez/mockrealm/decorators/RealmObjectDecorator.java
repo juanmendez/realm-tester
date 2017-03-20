@@ -20,6 +20,7 @@ import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmException;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
@@ -122,10 +123,10 @@ public class RealmObjectDecorator {
      */
     public static void handleAsyncMethods( RealmObject realmObject ){
 
-        doAnswer(invocation -> null).when( realmObject ).addChangeListener( any(RealmChangeListener.class));
+        doAnswer(invocation -> {throw new RealmException("Synchronous realmModel cannot be reached with a changeListener");}).when( realmObject ).addChangeListener( any(RealmChangeListener.class));
         doAnswer(invocation -> null).when( realmObject).removeChangeListener(any(RealmChangeListener.class));
         doAnswer(invocation -> null).when( realmObject).removeChangeListeners();
-        doAnswer( invocation -> null).when( realmObject ).asObservable();
+        doAnswer( invocation ->{throw new RealmException("Synchronous realmModel cannot be reached with a changeListener");} ).when( realmObject ).asObservable();
     }
 
     public static void handleAsyncMethods(RealmObject realmObject, QueryHolder queryHolder ){

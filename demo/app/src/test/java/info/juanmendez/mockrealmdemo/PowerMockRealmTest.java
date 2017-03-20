@@ -642,9 +642,7 @@ public class PowerMockRealmTest
         assertNotNull( "realmObject exists", realmObject );
 
         realmObject.addChangeListener((RealmChangeListener<Dog>) element -> {
-            if( element != null ){
-                assertNotNull( "First dog with age 2 " + element.getName(), element );
-            }
+            assertNotNull( "First dog with age 2 " + element.getName(), element );
         });
 
         realm.beginTransaction();
@@ -658,6 +656,41 @@ public class PowerMockRealmTest
         realm.commitTransaction();
 
         realmObject.removeChangeListeners();
+    }
+
+    @Test
+    public void shouldUpdateListOnChanges(){
+        RealmStorage.clear();
+
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2012, 2, 1));
+
+
+        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
+
+        assertNotNull( "realmObject exists", results );
+
+        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
+            assertNotNull( "there are dogs" + dogs );
+        });
+
+        realm.beginTransaction();
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Aaron Hernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+        realm.commitTransaction();
+
+        results.removeChangeListeners();
     }
 
 

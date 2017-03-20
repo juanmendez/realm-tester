@@ -3,12 +3,12 @@ package info.juanmendez.mockrealm.utils;
 import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
+import java.util.AbstractList;
 import java.util.Set;
 
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.RealmResults;
 
 /**
  * Created by Juan Mendez on 3/17/2017.
@@ -49,52 +49,43 @@ public class RealmModelUtil {
         String oB = "[";
         String cB = "]";
 
-        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
-        jsonString += oP;
-        Object currentObject;
 
-        for (Field field: fieldSet) {
+        if( realmModel instanceof AbstractList ){
+            jsonString += oB;
+            for( RealmModel m: (AbstractList<RealmModel>)realmModel ){
+                jsonString += toString(m)+c;
+            }
 
-            currentObject = Whitebox.getInternalState(realmModel, field.getName() );
+            jsonString = jsonString.substring(0,jsonString.length()-1);
+            jsonString+= cB;
+        }
+        else{
+            Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
+            jsonString += oP;
+            Object currentObject;
 
-            if(RealmResults.class.isAssignableFrom(field.getType())){
+            for (Field field: fieldSet) {
 
-                RealmResults<RealmModel> list = (RealmResults) currentObject;
+                currentObject = Whitebox.getInternalState(realmModel, field.getName() );
 
-                jsonString+= q + field.getName() + q + ":" + oB;
-                for (RealmModel rm: list) {
-                    jsonString += toString(rm)+c;
+                if(AbstractList.class.isAssignableFrom(field.getType())){
+                    jsonString+= q + field.getName() + q + ":" + toString(currentObject) + c;
                 }
-
-                jsonString = jsonString.substring(0,jsonString.length()-1);
-                jsonString+= cB+c;
-            }
-            else
-            if(RealmList.class.isAssignableFrom(field.getType())){
-
-                RealmList<RealmModel> list = (RealmList) currentObject;
-
-                jsonString+= q + field.getName() + q + ":" + oB;
-                for (RealmModel rm: list) {
-                    jsonString += toString(rm)+c;
+                else
+                if(RealmModel.class.isAssignableFrom(field.getType())){
+                    jsonString+= q + field.getName() + q + ":" + toString( (RealmModel) currentObject ) + c;
                 }
+                else
+                if (currentObject != null)
+                {
+                    jsonString+= q + field.getName() + q + ":" + q +  currentObject.toString() + q + c;
+                }
+            }
 
-                jsonString = jsonString.substring(0,jsonString.length()-1);
-                jsonString+= cB+c;
-            }
-            else
-            if(RealmModel.class.isAssignableFrom(field.getType())){
-                jsonString+= q + field.getName() + q + ":" + toString( (RealmModel) currentObject ) + c;
-            }
-            else
-            if (currentObject != null)
-            {
-                jsonString+= q + field.getName() + q + ":" + q +  currentObject.toString() + q + c;
-            }
+            jsonString = jsonString.substring(0,jsonString.length()-1);
+            jsonString += cP;
         }
 
-        jsonString = jsonString.substring(0,jsonString.length()-1);
-        jsonString += cP;
 
         return jsonString;
     }
