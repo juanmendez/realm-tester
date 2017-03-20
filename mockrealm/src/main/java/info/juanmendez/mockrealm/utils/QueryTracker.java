@@ -19,7 +19,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 /**
  * Created by @juanmendezinfo on 2/19/2017.
  */
-public class QueryHolder {
+public class QueryTracker {
 
     private ArrayList<Query> queries = new ArrayList<>();
 
@@ -30,7 +30,7 @@ public class QueryHolder {
     private RealmQuery realmQuery;
     private RealmResults realmResults;
 
-    public QueryHolder(Class clazz){
+    public QueryTracker(Class clazz){
         this.clazz = clazz;
         realmQuery = mock(RealmQuery.class);
         setUpRealmResults();
@@ -133,8 +133,8 @@ public class QueryHolder {
     }
 
     @Override
-    public QueryHolder clone(){
-        return new QueryHolder( this.clazz );
+    public QueryTracker clone(){
+        return new QueryTracker( this.clazz );
     }
 
     private Boolean executeGroupQuery(Query query ){

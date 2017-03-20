@@ -7,7 +7,7 @@ import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.models.TransactionEvent;
-import info.juanmendez.mockrealm.utils.QueryHolder;
+import info.juanmendez.mockrealm.utils.QueryTracker;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import info.juanmendez.mockrealm.utils.SubscriptionsUtil;
 import io.realm.RealmChangeListener;
@@ -32,20 +32,20 @@ public class RealmResultsDecorator {
 
     private static SubscriptionsUtil<RealmResults, RealmChangeListener> subscriptionsUtil = new SubscriptionsUtil<>();
 
-    public static RealmResults create(QueryHolder queryHolder ){
+    public static RealmResults create(QueryTracker queryTracker ){
 
-        RealmResults realmResults = queryHolder.getRealmResults();
-        RealmList<RealmModel> results = queryHolder.getQueryList();
+        RealmResults realmResults = queryTracker.getRealmResults();
+        RealmList<RealmModel> results = queryTracker.getQueryList();
 
         doAnswer(new Answer<RealmQuery>() {
 
             @Override
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                QueryHolder resultsQueryHolder = queryHolder.clone();
-                resultsQueryHolder.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
+                QueryTracker resultsQueryTracker = queryTracker.clone();
+                resultsQueryTracker.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
 
-                RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryHolder);
+                RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryTracker);
 
                 return realmQuery;
             }
@@ -54,7 +54,7 @@ public class RealmResultsDecorator {
         handleBasicActions( realmResults, results );
         handleDeleteMethods( realmResults, results );
         handleMathMethods( realmResults, results );
-        handleAsyncMethods( queryHolder );
+        handleAsyncMethods( queryTracker );
 
         return realmResults;
     }
@@ -193,15 +193,15 @@ public class RealmResultsDecorator {
         });
     }
 
-    private static void handleAsyncMethods( QueryHolder queryHolder ){
+    private static void handleAsyncMethods( QueryTracker queryTracker){
 
-        RealmResults realmResults = queryHolder.getRealmResults();
+        RealmResults realmResults = queryTracker.getRealmResults();
 
         doAnswer(invocation -> {
 
             //execute query once associated
             RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
-            Observable.fromCallable(() -> queryHolder.rewind())
+            Observable.fromCallable(() -> queryTracker.rewind())
                     .subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
                     .subscribe(results -> {
@@ -222,10 +222,10 @@ public class RealmResultsDecorator {
 
                                     String initialJson = "", currrentJson = "";
 
-                                    RealmResults<RealmModel> results = queryHolder.getRealmResults();
+                                    RealmResults<RealmModel> results = queryTracker.getRealmResults();
                                     initialJson = RealmModelUtil.toString( results );
 
-                                    results = queryHolder.rewind();
+                                    results = queryTracker.rewind();
                                     currrentJson = RealmModelUtil.toString( results );
 
                                     if( !initialJson.equals( currrentJson )){
@@ -256,7 +256,7 @@ public class RealmResultsDecorator {
             PublishSubject<RealmResults> subject = PublishSubject.create();
 
             //first time make a call!
-            Observable.fromCallable(() -> queryHolder.rewind())
+            Observable.fromCallable(() -> queryTracker.rewind())
                     .subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
                     .subscribe(results -> {
@@ -268,11 +268,11 @@ public class RealmResultsDecorator {
                 if( transactionEvent.getState() == TransactionEvent.END_TRANSACTION ){
                     String initialJson = "", currrentJson = "";
 
-                    RealmResults<RealmModel> results = queryHolder.getRealmResults();
+                    RealmResults<RealmModel> results = queryTracker.getRealmResults();
 
                     initialJson = RealmModelUtil.toString( results );
 
-                    results = queryHolder.rewind();
+                    results = queryTracker.rewind();
                     currrentJson = RealmModelUtil.toString( results );
 
                     if( !initialJson.equals( currrentJson )){
