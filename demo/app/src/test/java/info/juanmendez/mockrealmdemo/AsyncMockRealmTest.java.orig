@@ -67,12 +67,12 @@ public class AsyncMockRealmTest
         }).start();
     }
 
-    public void executeWork( Object initiator, long mils ){
+    public void executeWork( Object target, long mils ){
 
-        TransactionObservable.startRequest(initiator,
+        TransactionObservable.startRequest(target,
                 TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
-                            return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == initiator;
+                            return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == target;
                         })
                         .subscribe(o -> {
 
@@ -82,8 +82,8 @@ public class AsyncMockRealmTest
                                 e.printStackTrace();
                             }
 
-                            System.out.println( "completed " + initiator.toString() );
-                            TransactionObservable.endRequest(initiator);
+                            System.out.println( "completed " + target.toString() );
+                            TransactionObservable.endRequest(target);
                         })
         );
     }

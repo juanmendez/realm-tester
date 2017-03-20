@@ -339,7 +339,7 @@ public class RealmDecorator {
         TransactionObservable.startRequest(funk,
                 TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
-                            return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == funk;
+                            return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getTarget() == funk;
                     })
                     .subscribe(o -> {
                         funk.call();

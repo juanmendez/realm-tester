@@ -38,7 +38,7 @@ public class AsyncMockRealmTest
     public void shouldBlockOtherTransactions(){
 
         TransactionObservable.asObservable().subscribe(transactionEvent -> {
-            System.out.println( transactionEvent.getState() + ", " + transactionEvent.getInitiator().toString() );
+            System.out.println( transactionEvent.getState() + ", " + transactionEvent.getTarget().toString() );
         });
 
         Transaction transaction;
@@ -72,7 +72,7 @@ public class AsyncMockRealmTest
         TransactionObservable.startRequest(initiator,
                 TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
-                            return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == initiator;
+                            return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getTarget() == initiator;
                         })
                         .subscribe(o -> {
 

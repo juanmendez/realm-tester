@@ -15,18 +15,18 @@ public class TransactionEvent {
 
 
     private String state;
-    private Object initiator;
+    private Object target;
 
-    public TransactionEvent(String state, Object initiator) {
+    public TransactionEvent(String state, Object target) {
         this.state = state;
-        this.initiator = initiator;
+        this.target = target;
     }
 
     public String getState() {
         return state;
     }
 
-    public Object getInitiator() {
-        return initiator;
+    public Object getTarget() {
+        return target;
     }
 }
