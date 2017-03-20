@@ -639,10 +639,9 @@ public class PowerMockRealmTest
 
         RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
 
-        assertNotNull( "realmObject exists", realmObject );
-
+        final int[] calls = {0};
         realmObject.addChangeListener((RealmChangeListener<Dog>) element -> {
-            assertNotNull( "First dog with age 2 " + element.getName(), element );
+            calls[0]++;
         });
 
         realm.beginTransaction();
@@ -656,14 +655,23 @@ public class PowerMockRealmTest
         realm.commitTransaction();
 
         realmObject.removeChangeListeners();
+        assertEquals( "changeListener invoked twice", calls[0], 2);
     }
 
     @Test
-    public void shouldUpdateListOnChanges(){
+    public void shouldShowChangesFromRealmResults(){
         RealmStorage.clear();
 
-        Dog dog;
+        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
+        assertNotNull( "realmObject exists", results );
 
+        final int[] calls = {0};
+        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
+           calls[0]++;
+        });
+
+        Dog dog;
+        realm.beginTransaction();
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Hernan Fernandez");
@@ -673,15 +681,9 @@ public class PowerMockRealmTest
         dog.setAge(5);
         dog.setName("Pedro Flores");
         dog.setBirthdate( new Date(2012, 2, 1));
+        realm.commitTransaction();
 
-
-        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
-
-        assertNotNull( "realmObject exists", results );
-
-        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
-            assertNotNull( "there are dogs" + dogs );
-        });
+        results.removeChangeListeners();
 
         realm.beginTransaction();
         dog = realm.createObject(Dog.class);
@@ -690,7 +692,7 @@ public class PowerMockRealmTest
         dog.setBirthdate( new Date(2015, 6, 10));
         realm.commitTransaction();
 
-        results.removeChangeListeners();
+        assertEquals( "changeListener invoked twice", calls[0], 2);
     }
 
 

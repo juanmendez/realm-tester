@@ -359,27 +359,27 @@ public class RealmDecorator {
         TransactionObservable.KeyTransaction transaction = new TransactionObservable.KeyTransaction( realm.toString() );
 
         doAnswer(invocation -> {
-            TransactionObservable.startTransaction(transaction);
+            TransactionObservable.startRequest(transaction);
             return null;
         }).when( realm ).beginTransaction();
 
 
         doAnswer(invocation -> {
-            TransactionObservable.endTransaction(transaction);
+            TransactionObservable.endRequest(transaction);
             return null;
         }).when( realm ).commitTransaction();
     }
 
     private static void queueTransaction(Func0 funk){
 
-        TransactionObservable.startTransaction(funk,
+        TransactionObservable.startRequest(funk,
                 TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
                             return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == funk;
                     })
                     .subscribe(o -> {
                         funk.call();
-                        TransactionObservable.endTransaction(funk);
+                        TransactionObservable.endRequest(funk);
                     })
         );
     }

@@ -49,12 +49,12 @@ public class AsyncMockRealmTest
         }).start();
 
         transaction = new Transaction("t2");
-        TransactionObservable.startTransaction(transaction);
-        TransactionObservable.endTransaction(transaction);
+        TransactionObservable.startRequest(transaction);
+        TransactionObservable.endRequest(transaction);
 
         transaction = new Transaction("t3");
-        TransactionObservable.startTransaction(transaction);
-        TransactionObservable.endTransaction(transaction);
+        TransactionObservable.startRequest(transaction);
+        TransactionObservable.endRequest(transaction);
 
         new Thread(() -> {
             Transaction t = new Transaction("_t4");
@@ -69,7 +69,7 @@ public class AsyncMockRealmTest
 
     public void executeWork( Object initiator, long mils ){
 
-        TransactionObservable.startTransaction(initiator,
+        TransactionObservable.startRequest(initiator,
                 TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
                             return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == initiator;
@@ -83,7 +83,7 @@ public class AsyncMockRealmTest
                             }
 
                             System.out.println( "completed " + initiator.toString() );
-                            TransactionObservable.endTransaction(initiator);
+                            TransactionObservable.endRequest(initiator);
                         })
         );
     }
