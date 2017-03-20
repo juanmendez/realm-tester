@@ -20,7 +20,7 @@ public class TransactionObservable {
     private  static PublishSubject<TransactionEvent> subject = PublishSubject.create();
     private  static ArrayList<Object> stackTransactions = new ArrayList<>();
 
-    public static void startTransaction( Object keyTransaction, Subscription subscription ){
+    public static void startRequest(Object keyTransaction, Subscription subscription ){
 
         if( instance == null ){
             instance = new TransactionObservable();
@@ -38,10 +38,10 @@ public class TransactionObservable {
 
     /**
      * this is a transaction which happens in the main thread,
-     * it is taken as a priority, and moved as first priority.
+     * it is taken as a priority, and moved as first transaction
      * @param keyTransaction
      */
-    public static void startTransaction( Object keyTransaction ){
+    public static void startRequest(Object keyTransaction ){
         stackTransactions.add(0, keyTransaction );
         nextTransaction();
     }
@@ -52,10 +52,11 @@ public class TransactionObservable {
      * if initiator is the first element at stackTransactions.
      * @param keyTransaction
      */
-    public static void endTransaction( Object keyTransaction ){
+    public static void endRequest(Object keyTransaction ){
 
         int keyIndex = stackTransactions.indexOf(keyTransaction);
 
+        //notify when transaction ends only if it's the first on the list
         if( keyIndex >= 0 && !stackTransactions.isEmpty() ){
 
             stackTransactions.remove(keyIndex);
@@ -72,6 +73,26 @@ public class TransactionObservable {
         }
     }
 
+    /**
+     * canceling transaction simply means removing it from stackTransactions
+     * only if it's not the current transaction which means is the first in the list.
+     * @param keyTransaction
+     */
+    public static void cancelTransaction( Object keyTransaction ){
+        if( stackTransactions.indexOf(keyTransaction) > 0 ){
+            stackTransactions.remove( keyTransaction );
+        }
+    }
+
+    /**
+     * check if transaction has been canceled
+     * @param keyTransaction
+     * @return true if is not in stackTransactions
+     */
+    public static Boolean isTransactionCanceled( Object keyTransaction ){
+        return stackTransactions.indexOf(keyTransaction) < 0;
+    }
+
     private static void nextTransaction(){
 
         if( !stackTransactions.isEmpty() ){
@@ -83,6 +104,10 @@ public class TransactionObservable {
         return subject.asObservable();
     }
 
+    /**
+     * An instance of KeyTransaction pairs with each transaction. As a key it then notifies the next transaction, and
+     *  is used again to request ending transaction, or canceling.
+     */
     public static class KeyTransaction{
         String name;
 

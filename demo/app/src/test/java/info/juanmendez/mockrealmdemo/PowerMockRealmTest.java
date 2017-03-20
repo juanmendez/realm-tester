@@ -639,12 +639,9 @@ public class PowerMockRealmTest
 
         RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
 
-        assertNotNull( "realmObject exists", realmObject );
-
+        final int[] calls = {0};
         realmObject.addChangeListener((RealmChangeListener<Dog>) element -> {
-            if( element != null ){
-                assertNotNull( "First dog with age 2 " + element.getName(), element );
-            }
+            calls[0]++;
         });
 
         realm.beginTransaction();
@@ -658,6 +655,44 @@ public class PowerMockRealmTest
         realm.commitTransaction();
 
         realmObject.removeChangeListeners();
+        assertEquals( "changeListener invoked twice", calls[0], 2);
+    }
+
+    @Test
+    public void shouldShowChangesFromRealmResults(){
+        RealmStorage.clear();
+
+        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
+        assertNotNull( "realmObject exists", results );
+
+        final int[] calls = {0};
+        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
+           calls[0]++;
+        });
+
+        Dog dog;
+        realm.beginTransaction();
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2012, 2, 1));
+        realm.commitTransaction();
+
+        results.removeChangeListeners();
+
+        realm.beginTransaction();
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Aaron Hernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+        realm.commitTransaction();
+
+        assertEquals( "changeListener invoked twice", calls[0], 2);
     }
 
 

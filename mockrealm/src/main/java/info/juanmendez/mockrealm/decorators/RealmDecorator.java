@@ -13,7 +13,7 @@ import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.models.TransactionEvent;
-import info.juanmendez.mockrealm.utils.QueryHolder;
+import info.juanmendez.mockrealm.utils.QueryTracker;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import io.realm.Realm;
 import io.realm.RealmAsyncTask;
@@ -125,16 +125,16 @@ public class RealmDecorator {
 
                 //clear list being queried
                 Class clazz = (Class) invocationOnMock.getArguments()[0];
-                QueryHolder queryHolder = new QueryHolder(clazz);
+                QueryTracker queryTracker = new QueryTracker(clazz);
 
-                RealmQuery realmQuery = RealmQueryDecorator.create(queryHolder);
+                RealmQuery realmQuery = RealmQueryDecorator.create(queryTracker);
 
                 if( !realmMap.containsKey(clazz))
                 {
                     realmMap.put(clazz, new RealmList<>());
                 }
 
-                queryHolder.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
+                queryTracker.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
 
 
                 return realmQuery;
@@ -359,27 +359,27 @@ public class RealmDecorator {
         TransactionObservable.KeyTransaction transaction = new TransactionObservable.KeyTransaction( realm.toString() );
 
         doAnswer(invocation -> {
-            TransactionObservable.startTransaction(transaction);
+            TransactionObservable.startRequest(transaction);
             return null;
         }).when( realm ).beginTransaction();
 
 
         doAnswer(invocation -> {
-            TransactionObservable.endTransaction(transaction);
+            TransactionObservable.endRequest(transaction);
             return null;
         }).when( realm ).commitTransaction();
     }
 
     private static void queueTransaction(Func0 funk){
 
-        TransactionObservable.startTransaction(funk,
+        TransactionObservable.startRequest(funk,
                 TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
                             return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getInitiator() == funk;
                     })
                     .subscribe(o -> {
                         funk.call();
-                        TransactionObservable.endTransaction(funk);
+                        TransactionObservable.endRequest(funk);
                     })
         );
     }

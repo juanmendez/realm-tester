@@ -12,7 +12,7 @@ import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.TransactionEvent;
-import info.juanmendez.mockrealm.utils.QueryHolder;
+import info.juanmendez.mockrealm.utils.QueryTracker;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import info.juanmendez.mockrealm.utils.SubscriptionsUtil;
 import io.realm.RealmChangeListener;
@@ -20,6 +20,7 @@ import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmException;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
@@ -122,13 +123,13 @@ public class RealmObjectDecorator {
      */
     public static void handleAsyncMethods( RealmObject realmObject ){
 
-        doAnswer(invocation -> null).when( realmObject ).addChangeListener( any(RealmChangeListener.class));
+        doAnswer(invocation -> {throw new RealmException("Synchronous realmModel cannot be reached with a changeListener");}).when( realmObject ).addChangeListener( any(RealmChangeListener.class));
         doAnswer(invocation -> null).when( realmObject).removeChangeListener(any(RealmChangeListener.class));
         doAnswer(invocation -> null).when( realmObject).removeChangeListeners();
-        doAnswer( invocation -> null).when( realmObject ).asObservable();
+        doAnswer( invocation ->{throw new RealmException("Synchronous realmModel cannot be reached with a changeListener");} ).when( realmObject ).asObservable();
     }
 
-    public static void handleAsyncMethods(RealmObject realmObject, QueryHolder queryHolder ){
+    public static void handleAsyncMethods(RealmObject realmObject, QueryTracker queryTracker ){
 
         doAnswer(invocation -> {
 
@@ -138,7 +139,7 @@ public class RealmObjectDecorator {
                 @Override
                 public RealmResults<RealmModel> call() throws Exception {
 
-                    return queryHolder.rewind();
+                    return queryTracker.rewind();
                 }
             }).subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
@@ -162,13 +163,13 @@ public class RealmObjectDecorator {
 
                                     String initialJson = "", currrentJson = "";
 
-                                    RealmResults<RealmModel> realmResults = queryHolder.getRealmResults();
+                                    RealmResults<RealmModel> realmResults = queryTracker.getRealmResults();
 
                                     if( !realmResults.isEmpty() ){
                                         initialJson = RealmModelUtil.toString( realmResults.get(0) );
                                     }
 
-                                    realmResults = queryHolder.rewind();
+                                    realmResults = queryTracker.rewind();
 
                                     if( !realmResults.isEmpty() ){
                                         currrentJson = RealmModelUtil.toString( realmResults.get(0) );
@@ -210,7 +211,7 @@ public class RealmObjectDecorator {
                 @Override
                 public RealmModel call() throws Exception {
 
-                    RealmResults<RealmModel> realmResults = queryHolder.rewind();
+                    RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
                     if( !realmResults.isEmpty())
                         return realmResults.get(0);
@@ -228,13 +229,13 @@ public class RealmObjectDecorator {
                 if( transactionEvent.getState() == TransactionEvent.END_TRANSACTION ){
                     String initialJson = "", currrentJson = "";
 
-                    RealmResults<RealmModel> realmResults = queryHolder.getRealmResults();
+                    RealmResults<RealmModel> realmResults = queryTracker.getRealmResults();
 
                     if( !realmResults.isEmpty() ){
                         initialJson = RealmModelUtil.toString( realmResults.get(0) );
                     }
 
-                    realmResults = queryHolder.rewind();
+                    realmResults = queryTracker.rewind();
 
                     if( !realmResults.isEmpty() ){
                         currrentJson = RealmModelUtil.toString( realmResults.get(0) );
