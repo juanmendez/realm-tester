@@ -695,14 +695,16 @@ public class PowerMockRealmTest
         assertEquals( "changeListener invoked twice", calls[0], 2);
     }
 
-
     @Test
     public void shouldGetObservable(){
 
         RealmStorage.clear();
 
+
+
         Dog dog;
 
+        realm.beginTransaction();
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Hernan Fernandez");
@@ -714,18 +716,22 @@ public class PowerMockRealmTest
         dog.setBirthdate( new Date(2012, 2, 1));
 
 
-        RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
-
-        realmObject.asObservable().subscribe(realmObject1 -> {
-            assertNotNull( "realmObject exists", realmObject );
-        });
-
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Aaron Hernandez");
         dog.setBirthdate( new Date(2015, 6, 10));
+        realm.commitTransaction();
 
+        RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
+
+        realmObject.asObservable().subscribe(realmObject1 -> {
+            System.out.println( "realmObject " + realmObject1.toString() );
+            assertNotNull( "realmObject exists", realmObject );
+        });
+
+        realm.beginTransaction();
         dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
         dog.deleteFromRealm();
+        realm.commitTransaction();
     }
 }

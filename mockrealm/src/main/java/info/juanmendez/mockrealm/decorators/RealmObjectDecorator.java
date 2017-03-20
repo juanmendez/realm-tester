@@ -204,7 +204,7 @@ public class RealmObjectDecorator {
 
 
         doAnswer(invocation -> {
-            PublishSubject subject = PublishSubject.create();
+            PublishSubject<RealmModel> subject = PublishSubject.create();
 
             //first time make a call!
             Observable.fromCallable(new Callable<RealmModel>() {
@@ -220,8 +220,8 @@ public class RealmObjectDecorator {
                 }
             }).subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
-                    .subscribe(realmObject1 -> {
-                        subject.onNext( realmObject1);
+                    .subscribe(realmModel -> {
+                        subject.onNext( realmModel);
                     });
 
             TransactionObservable.asObservable().subscribe(transactionEvent -> {
@@ -251,7 +251,7 @@ public class RealmObjectDecorator {
                 }
             });
 
-            return subject;
+            return subject.asObservable();
         }).when( realmObject ).asObservable();
 
     }
