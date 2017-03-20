@@ -197,7 +197,7 @@ public class PowerMockRealmTest
        */
 
 
-        realm.executeTransactionAsync( realm1 -> {
+        /*realm.executeTransactionAsync( realm1 -> {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(1);
             dog.setName("Max");
@@ -216,10 +216,10 @@ public class PowerMockRealmTest
             dog.setBirthdate( new Date(2011, 6, 10));
         });
 
-        assertEquals( "There are two items found after async transactions", realm.where(Dog.class).findAll().size(), 2 );
+        assertEquals( "There are two items found after async transactions", realm.where(Dog.class).findAll().size(), 2 );*/
 
         realm.executeTransactionAsync( realm1 -> {
-            throw new  RuntimeException("Making a big deal because there are no more dogs to add" );
+           throw new  RuntimeException("Making a big deal because there are no more dogs to add" );
         }, () ->{
             System.out.println( "transaction was succesful!" );
         }, error -> {

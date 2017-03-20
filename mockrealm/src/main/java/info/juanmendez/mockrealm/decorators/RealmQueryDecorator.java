@@ -75,7 +75,7 @@ public class RealmQueryDecorator {
         when( realmQuery.findFirstAsync() ).thenAnswer(invocation -> {
             queryHolder.appendQuery( new Query(Compare.endTopGroup));
             RealmObject realmObject = (RealmObject) RealmModelDecorator.create( queryHolder.getClazz(), false );
-            RealmModelDecorator.handleAsyncMethods( realmObject, queryHolder );
+            RealmObjectDecorator.handleAsyncMethods( realmObject, queryHolder );
             return realmObject;
         });
     }

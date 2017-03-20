@@ -29,8 +29,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by @juanmendezinfo on 2/15/2017.
- *
- * TODO: separate whens by kind
  */
 public class RealmResultsDecorator {
 
@@ -40,42 +38,6 @@ public class RealmResultsDecorator {
 
         RealmResults realmResults = queryHolder.getRealmResults();
         RealmList<RealmModel> results = queryHolder.getQueryList();
-
-        doAnswer(positionInvokation -> {
-            int position = (int) positionInvokation.getArguments()[0];
-            return results.get( position );
-        }).when( realmResults).get(anyInt());
-
-        doAnswer(invocation -> {
-            return results.size();
-        }).when( realmResults ).size();
-
-        doAnswer(invocation -> {
-            return results.isEmpty();
-        }).when( realmResults ).isEmpty();
-
-        doAnswer(invocation -> {
-            return results.iterator();
-        }).when( realmResults ).iterator();
-
-
-        doAnswer(new Answer<RealmObject>() {
-            @Override
-            public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
-                int index = (int) invocationOnMock.getArguments()[0];
-                RealmObject value = (RealmObject) invocationOnMock.getArguments()[0];
-                results.set(index, value);
-                return value;
-            }
-        }).when( realmResults ).set(anyInt(), any(RealmObject.class) );
-
-        doAnswer(new Answer<RealmModel>() {
-            @Override
-            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
-                int index = (int) invocationOnMock.getArguments()[0];
-                return results.get(index);
-            }
-        }).when( realmResults ).listIterator(anyInt());
 
         doAnswer(new Answer<RealmQuery>() {
 
@@ -91,11 +53,52 @@ public class RealmResultsDecorator {
             }
         }).when(realmResults).where();
 
+        handleBasicActions( realmResults, results );
         handleDeleteMethods( realmResults, results );
         handleMathMethods( realmResults, results );
         handleAsyncMethods( queryHolder );
 
         return realmResults;
+    }
+
+    private static void handleBasicActions( RealmResults realmResults, RealmList<RealmModel> list){
+
+        doAnswer(positionInvokation -> {
+            int position = (int) positionInvokation.getArguments()[0];
+            return list.get( position );
+        }).when( realmResults).get(anyInt());
+
+        doAnswer(invocation -> {
+            return list.size();
+        }).when( realmResults ).size();
+
+        doAnswer(invocation -> {
+            return list.isEmpty();
+        }).when( realmResults ).isEmpty();
+
+        doAnswer(invocation -> {
+            return list.iterator();
+        }).when( realmResults ).iterator();
+
+
+        doAnswer(new Answer<RealmObject>() {
+            @Override
+            public RealmObject answer(InvocationOnMock invocationOnMock) throws Throwable {
+                int index = (int) invocationOnMock.getArguments()[0];
+                RealmObject value = (RealmObject) invocationOnMock.getArguments()[0];
+                list.set(index, value);
+                return value;
+            }
+        }).when( realmResults ).set(anyInt(), any(RealmObject.class) );
+
+        doAnswer(new Answer<RealmModel>() {
+            @Override
+            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
+                int index = (int) invocationOnMock.getArguments()[0];
+                return list.get(index);
+            }
+        }).when( realmResults ).listIterator(anyInt());
+
     }
 
     private static void handleDeleteMethods( RealmResults realmResults, RealmList<RealmModel> list ){
@@ -294,7 +297,5 @@ public class RealmResultsDecorator {
 
             return subject;
         }).when( realmResults ).asObservable();
-
-
     }
 }
