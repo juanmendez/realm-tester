@@ -4,6 +4,7 @@ import info.juanmendez.mockrealm.decorators.RealmConfigurationDecorator;
 import info.juanmendez.mockrealm.decorators.RealmDecorator;
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import info.juanmendez.mockrealm.decorators.RealmModelDecorator;
+import info.juanmendez.mockrealm.decorators.RealmObjectDecorator;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
@@ -28,6 +29,7 @@ public class MockRealm {
 
         RealmListDecorator.prepare();
         RealmModelDecorator.prepare();
+        RealmObjectDecorator.prepare();
         RealmDecorator.prepare();
         RealmConfigurationDecorator.prepare();
     }

@@ -2,21 +2,21 @@ package info.juanmendez.mockrealmdemo.models;
 
 import java.util.Date;
 
-import io.realm.RealmObject;
-import io.realm.annotations.Ignore;
+import io.realm.RealmModel;
+import io.realm.annotations.RealmClass;
 
 /**
- * Created by musta on 2/10/2017.
+ * Created by Juan Mendez on 3/19/2017.
+ * www.juanmendez.info
+ * contact@juanmendez.info
  */
 
-public class Dog extends RealmObject{
+@RealmClass
+public class Cat implements RealmModel{
     private int id;
     private String name;
     private int age;
     private Date birthdate;
-
-    @Ignore
-    private String nickname;
 
     public int getId() {
         return id;
@@ -48,13 +48,5 @@ public class Dog extends RealmObject{
 
     public void setBirthdate(Date birthdate) {
         this.birthdate = birthdate;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
     }
 }

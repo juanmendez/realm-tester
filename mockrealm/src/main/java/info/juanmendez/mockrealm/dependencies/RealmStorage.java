@@ -3,6 +3,7 @@ package info.juanmendez.mockrealm.dependencies;
 import java.util.HashMap;
 
 import info.juanmendez.mockrealm.models.RealmEvent;
+import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.exceptions.RealmException;
@@ -23,7 +24,7 @@ public class RealmStorage {
 
         if( realmModel != null ){
 
-            Class clazz = MockUtils.getClass(realmModel);
+            Class clazz = RealmModelUtil.getClass(realmModel);
 
             if( RealmModel.class.isAssignableFrom(clazz) ){
 
@@ -45,12 +46,12 @@ public class RealmStorage {
 
         if( realmModel != null ){
 
-            Class clazz = MockUtils.getClass(realmModel);
+            Class clazz = RealmModelUtil.getClass(realmModel);
 
             if( RealmModel.class.isAssignableFrom(clazz) ){
 
                 if( !realmMap.get(clazz).contains( realmModel ) ){
-                    realmMap.get(MockUtils.getClass(realmModel) ).add( realmModel );
+                    realmMap.get(RealmModelUtil.getClass(realmModel) ).add( realmModel );
                     RealmObservable.onNext( new RealmEvent( RealmEvent.MODEL_ADDED, realmModel ) );
                 }else{
                     throw new RealmException( "Instance of " + clazz.getName() + " cannot be added more than once" );

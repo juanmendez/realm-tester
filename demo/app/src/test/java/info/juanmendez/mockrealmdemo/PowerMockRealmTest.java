@@ -31,9 +31,9 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import rx.Observable;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
@@ -197,7 +197,7 @@ public class PowerMockRealmTest
        */
 
 
-        realm.executeTransactionAsync( realm1 -> {
+        /*realm.executeTransactionAsync( realm1 -> {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(1);
             dog.setName("Max");
@@ -216,10 +216,10 @@ public class PowerMockRealmTest
             dog.setBirthdate( new Date(2011, 6, 10));
         });
 
-        assertEquals( "There are two items found after async transactions", realm.where(Dog.class).findAll().size(), 2 );
+        assertEquals( "There are two items found after async transactions", realm.where(Dog.class).findAll().size(), 2 );*/
 
         realm.executeTransactionAsync( realm1 -> {
-            throw new  RuntimeException("Making a big deal because there are no more dogs to add" );
+           throw new  RuntimeException("Making a big deal because there are no more dogs to add" );
         }, () ->{
             System.out.println( "transaction was succesful!" );
         }, error -> {
@@ -354,20 +354,41 @@ public class PowerMockRealmTest
     public void shouldDeleteRealmObject(){
         RealmStorage.clear();
 
-        Dog dog = realm.createObject( Dog.class );
-        dog.setName("Max");
-        dog.setAge(1);
-        dog.setId(1);
-        dog.setBirthdate( new Date() );
+        realm.where(Person.class).findFirstAsync().addChangeListener(new RealmChangeListener<RealmModel>() {
+            @Override
+            public void onChange(RealmModel element) {
 
+            }
+        });
+
+        realm.beginTransaction();
         Person person = realm.createObject( Person.class );
+        RealmList list = new RealmList();
+        Dog dog = realm.createObject(Dog.class);
+        dog.setAge(1);
+        dog.setName("Max");
+        dog.setBirthdate( new Date(2011, 6, 10));
+        list.add( dog );
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Rex");
+        dog.setBirthdate( new Date(2016, 6, 10));
+        list.add(dog);
+        person.setDogs( list );
         person.setFavoriteDog( dog );
-        person.setDogs( new RealmList<>(dog, dog, dog, dog ));
+        realm.commitTransaction();
 
+        realm.beginTransaction();
         dog.deleteFromRealm();
+        realm.commitTransaction();
 
-        //assertEquals( "The only dog added has been removed", realm.where(Dog.class).count(), 0 );
+        realm.beginTransaction();
+        realm.where(Dog.class).findAll().deleteAllFromRealm();
+        realm.commitTransaction();
+
+        assertEquals( "There is one dog left", realm.where(Dog.class).count(), 0 );
         assertNull( "Person's favorite dog is gone", person.getFavoriteDog() );
+        assertEquals( "There is also one dog in the list", person.getDogs().size(), 0 );
     }
 
     @Test

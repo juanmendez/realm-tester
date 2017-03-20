@@ -10,14 +10,4 @@ import io.realm.RealmObject;
  */
 public class MockUtils {
 
-    public static Class getClass( Object object ){
-
-        Class clazz = object.getClass();
-
-        if( object instanceof RealmObject || object instanceof RealmList ){
-            return clazz.getSuperclass();
-        }
-
-        return clazz;
-    }
 }

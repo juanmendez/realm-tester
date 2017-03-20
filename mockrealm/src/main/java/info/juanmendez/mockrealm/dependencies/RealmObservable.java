@@ -1,12 +1,10 @@
 package info.juanmendez.mockrealm.dependencies;
 
-import java.util.HashMap;
-
 import info.juanmendez.mockrealm.models.RealmEvent;
+import info.juanmendez.mockrealm.utils.SubscriptionsUtil;
 import rx.Observable;
 import rx.Subscription;
 import rx.subjects.BehaviorSubject;
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * Created by Juan Mendez on 3/10/2017.
@@ -20,8 +18,9 @@ import rx.subscriptions.CompositeSubscription;
 public class RealmObservable {
 
     private static BehaviorSubject<RealmEvent> realmModelObserver = BehaviorSubject.create();
-    private static CompositeSubscription compositeSubscription = new CompositeSubscription();
-    private static HashMap<Object, CompositeSubscription> mapSubscription = new HashMap<>();
+    private static TransactionObservable to = new TransactionObservable();
+    private  static SubscriptionsUtil<TransactionObservable, Object> subscriptionsUtil = new SubscriptionsUtil();
+
 
     public static Observable<RealmEvent> asObservable() {
         return realmModelObserver.asObservable();
@@ -32,38 +31,26 @@ public class RealmObservable {
     }
 
     public static void add(Subscription subscription ){
-        compositeSubscription.add( subscription );
+        subscriptionsUtil.add(to, subscription );
     }
 
-    public static void add( Object object, Subscription subscription ){
-
-       if( !mapSubscription.containsKey( object ) ){
-           mapSubscription.put( object, new CompositeSubscription() );
-       }
-       mapSubscription.get(object).add(subscription);
+    public static void add( Object observer, Subscription subscription ){
+        subscriptionsUtil.add(to, observer, subscription );
     }
 
     public static void remove( Subscription subscription ){
-        compositeSubscription.remove( subscription );
+        subscriptionsUtil.remove(to, subscription );
     }
 
-    public static void remove( Object object, Subscription subscription ){
-        mapSubscription.get(object).remove(subscription);
+    public static void remove( Object observer, Subscription subscription ){
+        subscriptionsUtil.remove(observer, subscription);
     }
 
     public static void unsubscribe(){
-
-        for (HashMap.Entry<Object, CompositeSubscription> entry : mapSubscription.entrySet()) {
-            mapSubscription.get( entry.getKey() ).unsubscribe();
-        }
-        mapSubscription.clear();
-        compositeSubscription.unsubscribe();
+        subscriptionsUtil.removeAll(to);
     }
 
-    public static void unsubcribe( Object object ){
-        if( mapSubscription.containsKey( object )  ){
-            mapSubscription.get( object ).unsubscribe();
-            mapSubscription.remove( object );
-        }
+    public static void unsubcribe( Object observer ){
+        subscriptionsUtil.remove( observer );
     }
 }

@@ -8,7 +8,6 @@ import java.util.Date;
 
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import info.juanmendez.mockrealm.dependencies.Compare;
-import info.juanmendez.mockrealm.dependencies.MockUtils;
 import io.realm.Case;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -40,7 +39,7 @@ public class QuerySearch {
         this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
 
         this.needle = arguments[1];
-        this.clazz = MockUtils.getClass(needle);
+        this.clazz = RealmModelUtil.getClass(needle);
 
         int argsLen = arguments.length;
 
@@ -88,7 +87,7 @@ public class QuerySearch {
         try {
             value = Whitebox.getInternalState(realmModel, types.get(level));
         } catch (Exception e) {
-            throw (new RealmException(MockUtils.getClass(realmModel).getName() + " doesn't have the attribute " + types.get(level)));
+            throw (new RealmException(RealmModelUtil.getClass(realmModel).getName() + " doesn't have the attribute " + types.get(level)));
         }
 
         if (value != null) {
