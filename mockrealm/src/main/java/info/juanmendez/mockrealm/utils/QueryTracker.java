@@ -45,22 +45,13 @@ public class QueryTracker {
         RealmResultsDecorator.create( this );
     }
 
-    public void onTopGroupBegin(RealmList<RealmModel> realmList ){
+    private void onTopGroupBegin(RealmList<RealmModel> realmList ){
 
         //we update the current list instead of assigning one.
         groupResults.get(groupLevel).clear();
         groupResults.get(groupLevel).addAll( realmList );
 
         onBeginGroupClause();
-    }
-
-    public RealmList<RealmModel> getQueryList(){
-
-        if( !asAnd){
-            return groupResults.get(groupLevel-1);
-        }
-
-        return groupResults.get(groupLevel);
     }
 
     public void setQueryList( RealmList<RealmModel> queryList ){
@@ -82,11 +73,11 @@ public class QueryTracker {
         this.asAnd = true;
     }
 
-    public void onOrClause() {
+    private void onOrClause() {
         this.asAnd = false;
     }
 
-    public void onBeginGroupClause(){
+    private void onBeginGroupClause(){
 
         RealmList<RealmModel> previousGroupList = groupResults.get( groupLevel );
 
@@ -97,7 +88,7 @@ public class QueryTracker {
         groupResults.add( nextGroupList );
     }
 
-    public void onCloseGroupClause(){
+    private void onCloseGroupClause(){
 
         RealmList<RealmModel> currentGroupList = groupResults.get( groupLevel );
         groupResults.remove( groupLevel );
@@ -112,29 +103,12 @@ public class QueryTracker {
         groupResults.get(groupLevel).addAll( currentGroupList );
     }
 
-    public void onTopGroupClose(){
+    private void onTopGroupClose(){
         onCloseGroupClause();
 
         if( groupLevel > 0 ){
             throw( new RealmException("Required to close all groups. Current group level is " + groupLevel ));
         }
-    }
-
-    public Class getClazz() {
-        return clazz;
-    }
-
-    public void appendQuery( Query query ){
-        queries.add( query );
-    }
-
-    public ArrayList<Query> getQueries(){
-        return queries;
-    }
-
-    @Override
-    public QueryTracker clone(){
-        return new QueryTracker( this.clazz );
     }
 
     private Boolean executeGroupQuery(Query query ){
@@ -166,6 +140,32 @@ public class QueryTracker {
         }
 
         return used;
+    }
+
+    public Class getClazz() {
+        return clazz;
+    }
+
+    public void appendQuery( Query query ){
+        queries.add( query );
+    }
+
+    public RealmList<RealmModel> getQueryList(){
+
+        if( !asAnd){
+            return groupResults.get(groupLevel-1);
+        }
+
+        return groupResults.get(groupLevel);
+    }
+
+    public ArrayList<Query> getQueries(){
+        return queries;
+    }
+
+    @Override
+    public QueryTracker clone(){
+        return new QueryTracker( this.clazz );
     }
 
     public RealmQuery getRealmQuery() {
