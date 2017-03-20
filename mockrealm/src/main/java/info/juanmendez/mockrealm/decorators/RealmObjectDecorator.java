@@ -151,9 +151,6 @@ public class RealmObjectDecorator {
 
                     });
 
-
-            final String[] json = new String[2];
-
             //whenever there is a transaction ending, we compare previous result with current one.
             //we transform both results as json objects and just do a check if strings are not the same
             subscriptionsUtil.add( realmObject,
@@ -263,7 +260,8 @@ public class RealmObjectDecorator {
         if( realmModel instanceof RealmObject ){
             doReturn( valid ).when( (RealmObject) realmModel ).isValid();
         }
-        else{
+        else {
+
             try {
                 doReturn( valid ).when( RealmObject.class, "isValid", realmModel );
             } catch (Exception e) {

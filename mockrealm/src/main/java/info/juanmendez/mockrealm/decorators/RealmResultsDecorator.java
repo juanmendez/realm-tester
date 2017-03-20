@@ -3,8 +3,6 @@ package info.juanmendez.mockrealm.decorators;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.concurrent.Callable;
-
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.Query;
@@ -203,13 +201,8 @@ public class RealmResultsDecorator {
 
             //execute query once associated
             RealmChangeListener listener = (RealmChangeListener) invocation.getArguments()[0];
-            Observable.fromCallable(new Callable<RealmResults<RealmModel>>() {
-                @Override
-                public RealmResults<RealmModel> call() throws Exception {
-
-                    return queryHolder.rewind();
-                }
-            }).subscribeOn(RealmDecorator.getTransactionScheduler())
+            Observable.fromCallable(() -> queryHolder.rewind())
+                    .subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
                     .subscribe(results -> {
                         listener.onChange( results );
@@ -236,7 +229,6 @@ public class RealmResultsDecorator {
                                     currrentJson = RealmModelUtil.toString( results );
 
                                     if( !initialJson.equals( currrentJson )){
-
                                         listener.onChange( results );
                                     }
                                 }
@@ -264,14 +256,8 @@ public class RealmResultsDecorator {
             PublishSubject<RealmResults> subject = PublishSubject.create();
 
             //first time make a call!
-            Observable.fromCallable(new Callable<RealmResults<RealmModel>>() {
-                @Override
-                public RealmResults<RealmModel> call() throws Exception {
-
-                    return queryHolder.rewind();
-
-                }
-            }).subscribeOn(RealmDecorator.getTransactionScheduler())
+            Observable.fromCallable(() -> queryHolder.rewind())
+                    .subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
                     .subscribe(results -> {
                         subject.onNext( results );

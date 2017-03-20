@@ -647,6 +647,7 @@ public class PowerMockRealmTest
             }
         });
 
+        realm.beginTransaction();
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Aaron Hernandez");
@@ -654,6 +655,7 @@ public class PowerMockRealmTest
 
         dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
         dog.deleteFromRealm();
+        realm.commitTransaction();
 
         realmObject.removeChangeListeners();
     }

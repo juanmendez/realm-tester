@@ -46,6 +46,7 @@ public class RealmDecorator {
         Realm realm = mock(Realm.class );
         prepare(realm);
         handleAsyncTransactions(realm);
+        handleSyncTransactions(realm);
         return  realm;
     }
 
