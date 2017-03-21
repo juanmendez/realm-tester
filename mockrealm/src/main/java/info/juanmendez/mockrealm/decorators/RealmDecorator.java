@@ -50,14 +50,6 @@ public class RealmDecorator {
         return  realm;
     }
 
-    public static void setTransactionScheduler(Scheduler observerScheduler) {
-        RealmDecorator.observerScheduler = observerScheduler;
-    }
-
-    public static void setResponseScheduler(Scheduler subscriberScheduler) {
-        RealmDecorator.subscriberScheduler = subscriberScheduler;
-    }
-
     public static Scheduler getTransactionScheduler() {
         return observerScheduler;
     }
