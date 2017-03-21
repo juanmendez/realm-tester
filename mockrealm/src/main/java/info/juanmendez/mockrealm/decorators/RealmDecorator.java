@@ -176,8 +176,8 @@ public class RealmDecorator {
                                 return null;
                             }
                         })
-                        .subscribeOn(observerScheduler)
-                        .observeOn( subscriberScheduler ).subscribe(aVoid -> {});
+                        .subscribeOn(getTransactionScheduler())
+                        .observeOn( getResponseScheduler() ).subscribe(aVoid -> {});
 
                         return  null;
                     });
@@ -209,8 +209,8 @@ public class RealmDecorator {
                                     return false;
                                 }
                             })
-                            .subscribeOn(observerScheduler)
-                            .observeOn( subscriberScheduler )
+                            .subscribeOn(getTransactionScheduler())
+                            .observeOn( getResponseScheduler() )
                             .subscribe(aBoolean -> {
                                 if(  aBoolean && invocation.getArguments().length >=2 ){
                                     Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];

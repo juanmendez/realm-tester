@@ -3,15 +3,21 @@ package info.juanmendez.mockrealmdemo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.util.Date;
 
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
+
+    Realm realm;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,10 +25,14 @@ public class MainActivity extends AppCompatActivity {
 
         //configurations throw errors.
         Realm.init(this);
-        Realm realm = Realm.getDefaultInstance();
+        realm = Realm.getDefaultInstance();
 
         setContentView(R.layout.activity_main);
+        textView = (TextView) findViewById(R.id.textView);
+        shouldShowChangesFromRealmResultsWithAsyncTransactions();
+    }
 
+    void shouldQueryChain(){
         realm.executeTransactionAsync(thisRealm -> {
             Dog dog = thisRealm.createObject( Dog.class );
             dog.setName("Max");
@@ -37,5 +47,47 @@ public class MainActivity extends AppCompatActivity {
         }, error -> {
             Log.e( "MainActivity", "There was an error completing transaction" + error.getMessage() );
         });
+    }
+
+    void shouldShowChangesFromRealmResultsWithAsyncTransactions(){
+
+        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
+
+        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
+            Log.i("MainActivity", "There are " + dogs.size() + " at " + Thread.currentThread().getName() );
+        });
+
+        realm.executeTransactionAsync( realm1 -> {
+
+            System.out.println( "executeTransactionAsync thread" + Thread.currentThread().getName() );
+            Dog dog;
+            dog = realm1.createObject(Dog.class);
+            dog.setAge(2);
+            dog.setName("Hernan Fernandez");
+            dog.setBirthdate( new Date(2015, 6, 10));
+
+            dog = realm1.createObject(Dog.class);
+            dog.setAge(5);
+            dog.setName("Pedro Flores");
+            dog.setBirthdate( new Date(2012, 2, 1));
+        });
+
+        realm.executeTransactionAsync( realm1 -> {
+
+            System.out.println( "executeTransactionAsync thread" + Thread.currentThread().getName() );
+            Dog dog;
+            dog = realm1.createObject(Dog.class);
+            dog.setAge(2);
+            dog.setName("Aaron Hernandez");
+            dog.setBirthdate( new Date(2015, 6, 10));
+
+            realm1.where(Dog.class).findFirst().deleteFromRealm();
+        });
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        realm.close();
     }
 }

@@ -1,7 +1,5 @@
 package info.juanmendez.mockrealmdemo;
 
-import android.widget.TextView;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,9 +14,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.decorators.RealmDecorator;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
-import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
@@ -26,10 +22,6 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by Juan Mendez on 2/21/2017.
@@ -55,8 +47,8 @@ public class RobolectricRealmTest {
     public void before() throws Exception {
 
         MockRealm.prepare();
-        RealmDecorator.setTransactionScheduler(Schedulers.computation());
-        RealmDecorator.setResponseScheduler(AndroidSchedulers.mainThread() );
+        //RealmDecorator.setTransactionScheduler(Schedulers.computation());
+        //RealmDecorator.setResponseScheduler(AndroidSchedulers.mainThread() );
         realm = Realm.getDefaultInstance();
     }
 
@@ -65,8 +57,5 @@ public class RobolectricRealmTest {
 
         RealmStorage.clear();
         MainActivity activity = Robolectric.setupActivity( MainActivity.class );
-
-        assertEquals( "same print", ((TextView)activity.findViewById(R.id.textView)).getText(), "Hello World!");
-        assertEquals( "There is one person found", realm.where( Person.class ).count(), 1 );
     }
 }

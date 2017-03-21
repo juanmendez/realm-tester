@@ -208,6 +208,9 @@ public class RealmObjectDecorator {
         doAnswer(invocation -> {
             BehaviorSubject<RealmModel> subject = BehaviorSubject.create();
 
+            subject.subscribeOn(RealmDecorator.getTransactionScheduler())
+                    .observeOn( RealmDecorator.getResponseScheduler() );
+
             //first time make a call!
             Observable.fromCallable(new Callable<RealmModel>() {
                 @Override
@@ -226,7 +229,8 @@ public class RealmObjectDecorator {
                         subject.onNext( realmModel);
                     });
 
-            TransactionObservable.asObservable().subscribe(transactionEvent -> {
+            TransactionObservable.asObservable()
+                    .subscribe(transactionEvent -> {
 
                 if( transactionEvent.getState() == TransactionEvent.END_TRANSACTION ){
                     String initialJson = "", currrentJson = "";

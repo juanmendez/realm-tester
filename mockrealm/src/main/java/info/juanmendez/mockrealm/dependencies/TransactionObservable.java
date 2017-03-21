@@ -18,6 +18,7 @@ public class TransactionObservable {
     private static TransactionObservable instance;
     private  static SubscriptionsUtil<TransactionObservable, Object> subscriptionsUtil = new SubscriptionsUtil();
     private  static PublishSubject<TransactionEvent> subject = PublishSubject.create();
+
     private  static ArrayList<Object> stackTransactions = new ArrayList<>();
 
     public static void startRequest(Object keyTransaction, Subscription subscription ){
