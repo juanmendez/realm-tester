@@ -38,6 +38,10 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class RealmDecorator {
 
+    /**
+     * Only stick to Schedulers.immediate() for now. I tried others but they don't seem to work well
+     * in Robolectric
+     */
     private static Scheduler observerScheduler = Schedulers.immediate();
     private static Scheduler subscriberScheduler = Schedulers.immediate();
 

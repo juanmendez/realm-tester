@@ -1,7 +1,5 @@
 package info.juanmendez.mockrealmdemo;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,9 +13,7 @@ import java.util.Date;
 import java.util.Set;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.dependencies.RealmObservable;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
-import info.juanmendez.mockrealm.models.RealmEvent;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Case;
@@ -41,7 +37,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "android.*"})
 @PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class })
-public class PowerMockRealmTest
+public class QueryTests
 {
     Realm realm;
 
@@ -171,63 +167,6 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void shouldQuerySynchronousTransaction(){
-        RealmStorage.clear();
-
-        realm.executeTransaction(realm1 -> {
-            Dog dog = realm.createObject(Dog.class);
-            dog.setAge(1);
-            dog.setName("Max");
-            dog.setBirthdate( new Date(2011, 6, 10));
-        });
-
-        assertEquals( "Synchronous added first item", realm.where(Dog.class).findFirst().getName(), "Max" );
-    }
-
-    @Test
-    public void shouldQueryAsyncTransactionOnSuccessAndError(){
-
-        RealmStorage.clear();
-
-        /*
-           when testing just with PowerMockito we use main thread as schedulers.
-           if you are using Robolectric then use instead:
-            RealmDecorator.setTransactionScheduler(Schedulers.computation());
-            RealmDecorator.setResponseScheduler(AndroidSchedulers.mainThread());
-       */
-
-
-        realm.executeTransactionAsync( realm1 -> {
-            Dog dog = realm.createObject(Dog.class);
-            dog.setAge(1);
-            dog.setName("Max");
-            dog.setBirthdate( new Date(2011, 6, 10));
-
-        }, () ->{
-            System.out.println( "this dog made was succesfully saved!");
-        });
-
-
-
-        realm.executeTransactionAsync( realm1 -> {
-            Dog dog = realm.createObject(Dog.class);
-            dog.setAge(1);
-            dog.setName("Max");
-            dog.setBirthdate( new Date(2011, 6, 10));
-        });
-
-        assertEquals( "There are two items found after async transactions", realm.where(Dog.class).findAll().size(), 2 );
-
-        realm.executeTransactionAsync( realm1 -> {
-           throw new  RuntimeException("Making a big deal because there are no more dogs to add" );
-        }, () ->{
-            System.out.println( "transaction was succesful!" );
-        }, error -> {
-            System.err.println( "transaction didn't go well: " + error.getMessage() );
-        });
-    }
-
-    @Test
     public void shouldDoLinkingQueries(){
         RealmStorage.clear();
 
@@ -270,7 +209,6 @@ public class PowerMockRealmTest
         RealmResults<Person> people = realm.where(Person.class).contains("dogs.name", "Flores" ).findAll();
         assertEquals( "there is one person found with such dog", 1, people.size());
     }
-
 
     @Test
     public void shouldQueryByOr(){
@@ -481,7 +419,6 @@ public class PowerMockRealmTest
         assertEquals( "There are two dogs with those names", dogs.size(), 2 );
     }
 
-
     @Test
     public void shouldDoMax(){
 
@@ -516,338 +453,5 @@ public class PowerMockRealmTest
         assertEquals( "max age is ", 6, realm.where(Dog.class).max("age").intValue());
         assertEquals( "min age is ", 1, realm.where(Dog.class).min("age").intValue());
         assertEquals( "average age is ", Double.valueOf((float) 3.5), Double.valueOf(realm.where(Dog.class).average("age")) );
-    }
-
-
-    @Test
-    public void shouldCreateADogInMainActivity(){
-        RealmStorage.clear();
-
-        realm.executeTransactionAsync(realm1 -> {
-            Dog dog = realm1.createObject( Dog.class );
-            dog.setName("Max");
-            dog.setAge(1);
-            dog.setId(1);
-            dog.setBirthdate( new Date() );
-
-            Person person = realm1.createObject( Person.class );
-            person.setDogs( new RealmList<>(dog));
-        }, () -> {
-            System.out.println( "MainActivity. Number of dogs: " + realm.where(Person.class).findFirst().getClass().getSuperclass() );
-        }, error -> {
-            System.err.println( "MainActivity. There was an error completing transaction" + error.getMessage() );
-        });
-
-        Assert.assertEquals( "MainActivity entered one dog!", realm.where(Dog.class).count(), 1 );
-        Assert.assertEquals( "MainActivity entered one person!", realm.where(Person.class).count(), 1 );
-    }
-
-    @Test
-    public void shouldModelObservableWork(){
-        RealmStorage.clear();
-
-        RealmObservable.add(
-                RealmObservable.asObservable()
-                .subscribe(realmEvent -> System.out.println( "onNext " + realmEvent.getState() ))
-        );
-
-
-        //lets now find only people
-        RealmObservable.add(
-                RealmObservable.asObservable()
-                        .filter(realmEvent -> {
-                            return realmEvent.getRealmModel() instanceof Person;
-                        }).subscribe(realmEvent -> {
-                    System.out.println( "nextPerson: " + realmEvent.getState() );
-                })
-        );
-
-
-        RealmObservable.add(
-                RealmObservable.asObservable()
-                        .filter(realmEvent -> realmEvent.getState()== RealmEvent.MODEL_REMOVED)
-                        .map(realmEvent -> realmEvent.getRealmModel() )
-                        .ofType( Dog.class )
-                        .subscribe(realmModel -> System.out.println( "onNextDogRemoved-> " + realmModel.toString() ))
-        );
-
-
-        Person person = realm.createObject(Person.class);
-        Dog dog = realm.createObject( Dog.class );
-        dog.deleteFromRealm();
-        person.deleteFromRealm();
-    }
-
-    @Test
-    public void shouldDoAllAsync(){
-
-        RealmStorage.clear();
-
-        Dog dog;
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(6);
-        dog.setName("Idalgo Mendez");
-        dog.setBirthdate( new Date(2010, 6, 9));
-
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(1);
-        dog.setName("Fido Fernandez");
-        dog.setBirthdate( new Date(2016, 6, 10));
-
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Hernan Fernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(5);
-        dog.setName("Pedro Flores");
-        dog.setBirthdate( new Date(2012, 2, 1));
-
-
-        RealmResults realmResults = realm.where( Dog.class ).findAllAsync();
-
-
-        realmResults.addChangeListener(new RealmChangeListener<RealmResults>() {
-            @Override
-            public void onChange(RealmResults element) {
-                assertEquals("there should be four dogs", element.size(), 4 );
-            }
-        });
-    }
-
-    @Test
-    public void shouldGetFirstAsync(){
-
-        RealmStorage.clear();
-
-        Dog dog;
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Hernan Fernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(5);
-        dog.setName("Pedro Flores");
-        dog.setBirthdate( new Date(2012, 2, 1));
-
-
-        RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
-
-        final int[] calls = {0};
-        realmObject.addChangeListener((RealmChangeListener<Dog>) element -> {
-            calls[0]++;
-        });
-
-        realm.beginTransaction();
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Aaron Hernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-
-        dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
-        dog.deleteFromRealm();
-        realm.commitTransaction();
-
-        realmObject.removeChangeListeners();
-        assertEquals( "changeListener invoked twice", calls[0], 2);
-    }
-
-    @Test
-    public void shouldShowChangesFromRealmResults(){
-        RealmStorage.clear();
-
-        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
-        assertNotNull( "realmObject exists", results );
-
-        final int[] calls = {0};
-        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
-           calls[0]++;
-        });
-
-        Dog dog;
-        realm.beginTransaction();
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Hernan Fernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(5);
-        dog.setName("Pedro Flores");
-        dog.setBirthdate( new Date(2012, 2, 1));
-        realm.commitTransaction();
-
-        results.removeChangeListeners();
-
-        realm.beginTransaction();
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Aaron Hernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-        realm.commitTransaction();
-
-        assertEquals( "changeListener invoked twice", calls[0], 2);
-    }
-
-    @Test
-    public void shouldShowChangesFromRealmResultsWithSyncTransactions(){
-        RealmStorage.clear();
-
-        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
-        assertNotNull( "realmObject exists", results );
-
-        final int[] calls = {0};
-        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
-            calls[0]++;
-        });
-
-        realm.executeTransaction( realm1 -> {
-
-            Dog dog;
-            dog = realm1.createObject(Dog.class);
-            dog.setAge(2);
-            dog.setName("Hernan Fernandez");
-            dog.setBirthdate( new Date(2015, 6, 10));
-
-            dog = realm1.createObject(Dog.class);
-            dog.setAge(5);
-            dog.setName("Pedro Flores");
-            dog.setBirthdate( new Date(2012, 2, 1));
-        });
-
-        realm.executeTransaction( realm1 -> {
-
-            Dog dog;
-            dog = realm1.createObject(Dog.class);
-            dog.setAge(2);
-            dog.setName("Aaron Hernandez");
-            dog.setBirthdate( new Date(2015, 6, 10));
-
-            realm1.where(Dog.class).findFirst().deleteFromRealm();
-        });
-
-        assertEquals( "changeListener invoked twice", calls[0], 3);
-    }
-
-    @Test
-    public void shouldShowChangesFromRealmResultsWithAsyncTransactions(){
-        RealmStorage.clear();
-
-        RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
-        assertNotNull( "realmObject exists", results );
-
-        final int[] calls = {0};
-        results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
-            calls[0]++;
-        });
-
-        realm.executeTransactionAsync( realm1 -> {
-
-            Dog dog;
-            dog = realm1.createObject(Dog.class);
-            dog.setAge(2);
-            dog.setName("Hernan Fernandez");
-            dog.setBirthdate( new Date(2015, 6, 10));
-
-            dog = realm1.createObject(Dog.class);
-            dog.setAge(5);
-            dog.setName("Pedro Flores");
-            dog.setBirthdate( new Date(2012, 2, 1));
-        });
-
-        realm.executeTransactionAsync( realm1 -> {
-
-            Dog dog;
-            dog = realm1.createObject(Dog.class);
-            dog.setAge(2);
-            dog.setName("Aaron Hernandez");
-            dog.setBirthdate( new Date(2015, 6, 10));
-
-            realm1.where(Dog.class).findFirst().deleteFromRealm();
-        });
-
-        assertEquals( "changeListener invoked twice", calls[0], 3);
-    }
-
-    @Test
-    public void shouldBeRealmObjectAsObservable(){
-
-        RealmStorage.clear();
-
-        Dog asyncDog = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
-
-        asyncDog.<Dog>asObservable().subscribe(thisDog -> {
-            System.out.println( "realmObject " + thisDog.toString() );
-        });
-
-        Dog dog;
-
-        realm.beginTransaction();
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Hernan Fernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(5);
-        dog.setName("Pedro Flores");
-        dog.setBirthdate( new Date(2012, 2, 1));
-
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Aaron Hernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-        realm.commitTransaction();
-
-
-        realm.beginTransaction();
-        dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
-        dog.deleteFromRealm();
-        realm.commitTransaction();
-    }
-
-    @Test
-    public void shouldBeRealmResultsAsObservable(){
-
-        RealmStorage.clear();
-
-        RealmResults<Dog> asyncDog = realm.where( Dog.class ).equalTo("age", 2 ).findAllAsync();
-
-        asyncDog.<RealmResults<Dog>>asObservable().subscribe(theseDogs -> {
-            System.out.println( "realmObject " + theseDogs );
-        });
-
-        Dog dog;
-
-        realm.beginTransaction();
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Hernan Fernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(5);
-        dog.setName("Pedro Flores");
-        dog.setBirthdate( new Date(2012, 2, 1));
-
-
-        dog = realm.createObject(Dog.class);
-        dog.setAge(2);
-        dog.setName("Aaron Hernandez");
-        dog.setBirthdate( new Date(2015, 6, 10));
-        realm.commitTransaction();
-
-
-        realm.beginTransaction();
-        dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
-        dog.deleteFromRealm();
-        realm.commitTransaction();
     }
 }

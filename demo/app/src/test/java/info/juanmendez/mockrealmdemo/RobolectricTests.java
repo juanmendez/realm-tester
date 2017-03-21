@@ -33,7 +33,7 @@ import io.realm.internal.RealmCore;
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @SuppressStaticInitializationFor("io.realm.internal.Util")
 @PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmCore.class, RealmObject.class })
-public class RobolectricRealmTest {
+public class RobolectricTests {
 
     @Rule
     public PowerMockRule rule = new PowerMockRule();
@@ -47,8 +47,6 @@ public class RobolectricRealmTest {
     public void before() throws Exception {
 
         MockRealm.prepare();
-        //RealmDecorator.setTransactionScheduler(Schedulers.computation());
-        //RealmDecorator.setResponseScheduler(AndroidSchedulers.mainThread() );
         realm = Realm.getDefaultInstance();
     }
 
