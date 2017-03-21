@@ -26,7 +26,6 @@ import rx.subjects.BehaviorSubject;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 /**
  * Created by Juan Mendez on 3/19/2017.
@@ -86,8 +85,8 @@ public class RealmObjectDecorator {
                 RealmStorage.removeModel( realmObject );
 
                 //after deleting item, lets make it invalid
-                markAsValid( realmObject, false );
-                markAsLoaded( realmObject, false );
+                RealmModelDecorator.setValid( realmObject, false );
+                RealmModelDecorator.setLoaded( realmObject, false );
                 return null;
             }
         }).when( (RealmObject) realmObject ).deleteFromRealm();
@@ -115,8 +114,8 @@ public class RealmObjectDecorator {
         RealmStorage.removeModel( realmModel );
 
         //after deleting item, lets make it invalid
-        markAsValid( realmModel, false );
-        markAsLoaded( realmModel, false );
+        RealmModelDecorator.setValid( realmModel, false );
+        RealmModelDecorator.setLoaded( realmModel, false );
     }
 
     /**
@@ -262,33 +261,4 @@ public class RealmObjectDecorator {
 
     }
 
-    public static void markAsValid(RealmModel realmModel, Boolean flag ){
-
-        if( realmModel instanceof RealmObject ){
-            doReturn( flag ).when( (RealmObject) realmModel ).isValid();
-        }
-        else {
-
-            try {
-                doReturn( flag ).when( RealmObject.class, "isValid", realmModel );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static void markAsLoaded(RealmModel realmModel, Boolean flag ){
-
-        if( realmModel instanceof RealmObject ){
-            doReturn( flag ).when( ((RealmObject) realmModel) ).isLoaded();
-        }
-        else {
-
-            try {
-                doReturn( flag ).when( RealmObject.class, "isLoaded", realmModel );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

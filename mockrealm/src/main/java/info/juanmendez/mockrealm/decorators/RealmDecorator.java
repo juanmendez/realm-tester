@@ -94,7 +94,7 @@ public class RealmDecorator {
                     RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
 
                     if( realmModel instanceof RealmObject ){
-                        realmModel = RealmModelDecorator.mockRealmObject( (RealmObject) realmModel );
+                        realmModel = RealmModelDecorator.decorate( (RealmObject) realmModel );
                     }
 
                     Class clazz = RealmModelUtil.getClass(realmModel);

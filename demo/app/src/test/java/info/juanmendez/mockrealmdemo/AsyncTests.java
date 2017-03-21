@@ -245,7 +245,7 @@ public class AsyncTests
     }
 
     @Test
-    public void shouldShowChangesFromRealmResultsWithSyncTransactions(){
+    public void shouldChangeListenerWorkWithExecuteTransactions(){
         RealmStorage.clear();
 
         RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
@@ -281,11 +281,11 @@ public class AsyncTests
             realm1.where(Dog.class).findFirst().deleteFromRealm();
         });
 
-        assertEquals( "changeListener invoked twice", calls[0], 3);
+        assertEquals( "changeListener invoked twice", calls[0], 2);
     }
 
     @Test
-    public void shouldShowChangesFromRealmResultsWithAsyncTransactions(){
+    public void shouldChangeListenerWorkWithExecuteTransactions2(){
         RealmStorage.clear();
 
         RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
@@ -321,6 +321,6 @@ public class AsyncTests
             realm1.where(Dog.class).findFirst().deleteFromRealm();
         });
 
-        assertEquals( "changeListener invoked twice", calls[0], 3);
+        assertEquals( "changeListener invoked twice", calls[0], 2);
     }
 }
