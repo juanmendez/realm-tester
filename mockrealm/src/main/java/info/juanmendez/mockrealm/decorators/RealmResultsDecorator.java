@@ -17,7 +17,7 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import rx.Observable;
-import rx.subjects.PublishSubject;
+import rx.subjects.BehaviorSubject;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -253,7 +253,7 @@ public class RealmResultsDecorator {
 
 
         doAnswer(invocation -> {
-            PublishSubject<RealmResults> subject = PublishSubject.create();
+            BehaviorSubject<RealmResults> subject = BehaviorSubject.create();
 
             //first time make a call!
             Observable.fromCallable(() -> queryTracker.rewind())

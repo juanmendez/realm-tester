@@ -55,6 +55,7 @@ public class RealmModelDecorator {
         }
 
         RealmObjectDecorator.markAsValid( realmModel, valid );
+        RealmObjectDecorator.markAsLoaded( realmModel, valid );
         return realmModel;
     }
 

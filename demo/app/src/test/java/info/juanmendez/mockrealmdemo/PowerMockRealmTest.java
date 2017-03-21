@@ -696,11 +696,15 @@ public class PowerMockRealmTest
     }
 
     @Test
-    public void shouldGetObservable(){
+    public void shouldBeRealmObjectAsObservable(){
 
         RealmStorage.clear();
 
+        Dog asyncDog = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
 
+        asyncDog.<Dog>asObservable().subscribe(thisDog -> {
+            System.out.println( "realmObject " + thisDog.toString() );
+        });
 
         Dog dog;
 
@@ -722,12 +726,44 @@ public class PowerMockRealmTest
         dog.setBirthdate( new Date(2015, 6, 10));
         realm.commitTransaction();
 
-        RealmObject realmObject = realm.where( Dog.class ).equalTo("age", 2 ).findFirstAsync();
 
-        realmObject.asObservable().subscribe(realmObject1 -> {
-            System.out.println( "realmObject " + realmObject1.toString() );
-            assertNotNull( "realmObject exists", realmObject );
+        realm.beginTransaction();
+        dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();
+        dog.deleteFromRealm();
+        realm.commitTransaction();
+    }
+
+    @Test
+    public void shouldBeRealmResultsAsObservable(){
+
+        RealmStorage.clear();
+
+        RealmResults<Dog> asyncDog = realm.where( Dog.class ).equalTo("age", 2 ).findAllAsync();
+
+        asyncDog.<RealmResults<Dog>>asObservable().subscribe(theseDogs -> {
+            System.out.println( "realmObject " + theseDogs );
         });
+
+        Dog dog;
+
+        realm.beginTransaction();
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan Fernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Pedro Flores");
+        dog.setBirthdate( new Date(2012, 2, 1));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Aaron Hernandez");
+        dog.setBirthdate( new Date(2015, 6, 10));
+        realm.commitTransaction();
+
 
         realm.beginTransaction();
         dog = realm.where( Dog.class ).equalTo("name", "Hernan Fernandez").findFirst();

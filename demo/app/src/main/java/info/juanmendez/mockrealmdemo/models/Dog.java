@@ -57,4 +57,9 @@ public class Dog extends RealmObject{
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    @Override
+    public String toString() {
+        return "dog: " + getName();
+    }
 }

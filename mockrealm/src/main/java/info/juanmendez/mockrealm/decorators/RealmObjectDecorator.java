@@ -22,7 +22,7 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 import rx.Observable;
-import rx.subjects.PublishSubject;
+import rx.subjects.BehaviorSubject;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
@@ -87,6 +87,7 @@ public class RealmObjectDecorator {
 
                 //after deleting item, lets make it invalid
                 markAsValid( realmObject, false );
+                markAsLoaded( realmObject, false );
                 return null;
             }
         }).when( (RealmObject) realmObject ).deleteFromRealm();
@@ -115,6 +116,7 @@ public class RealmObjectDecorator {
 
         //after deleting item, lets make it invalid
         markAsValid( realmModel, false );
+        markAsLoaded( realmModel, false );
     }
 
     /**
@@ -204,7 +206,7 @@ public class RealmObjectDecorator {
 
 
         doAnswer(invocation -> {
-            PublishSubject<RealmModel> subject = PublishSubject.create();
+            BehaviorSubject<RealmModel> subject = BehaviorSubject.create();
 
             //first time make a call!
             Observable.fromCallable(new Callable<RealmModel>() {
@@ -216,7 +218,7 @@ public class RealmObjectDecorator {
                     if( !realmResults.isEmpty())
                         return realmResults.get(0);
                     else
-                        return null;
+                        return realmObject;
                 }
             }).subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
@@ -246,7 +248,7 @@ public class RealmObjectDecorator {
                         if( !realmResults.isEmpty() )
                             subject.onNext( realmResults.get(0) );
                         else
-                            subject.onNext( null );
+                            subject.onNext( realmObject );
                     }
                 }
             });
@@ -256,15 +258,30 @@ public class RealmObjectDecorator {
 
     }
 
-    public static void markAsValid( RealmModel realmModel, Boolean valid ){
+    public static void markAsValid(RealmModel realmModel, Boolean flag ){
 
         if( realmModel instanceof RealmObject ){
-            doReturn( valid ).when( (RealmObject) realmModel ).isValid();
+            doReturn( flag ).when( (RealmObject) realmModel ).isValid();
         }
         else {
 
             try {
-                doReturn( valid ).when( RealmObject.class, "isValid", realmModel );
+                doReturn( flag ).when( RealmObject.class, "isValid", realmModel );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void markAsLoaded(RealmModel realmModel, Boolean flag ){
+
+        if( realmModel instanceof RealmObject ){
+            doReturn( flag ).when( ((RealmObject) realmModel) ).isLoaded();
+        }
+        else {
+
+            try {
+                doReturn( flag ).when( RealmObject.class, "isLoaded", realmModel );
             } catch (Exception e) {
                 e.printStackTrace();
             }
