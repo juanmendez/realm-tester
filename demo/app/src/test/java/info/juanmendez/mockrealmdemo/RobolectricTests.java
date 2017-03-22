@@ -1,7 +1,5 @@
 package info.juanmendez.mockrealmdemo;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +23,8 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
 
+import static junit.framework.Assert.assertEquals;
+
 /**
  * Created by Juan Mendez on 2/21/2017.
  * www.juanmendez.info
@@ -34,7 +34,8 @@ import io.realm.internal.RealmCore;
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @SuppressStaticInitializationFor("io.realm.internal.Util")
-@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmCore.class, RealmObject.class })
+@PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class,
+                 RealmList.class, RealmCore.class, RealmObject.class, RealmDependencies.class })
 public class RobolectricTests {
 
     @Rule
@@ -52,6 +53,10 @@ public class RobolectricTests {
         realm = Realm.getDefaultInstance();
     }
 
+    /**
+     * RealmDependencies is added as part of @PrepareForTest in this way
+     * realm configuration is mocked!
+     */
     @Test
     public void shouldAssertWhatsOnMainActivity(){
 
@@ -59,6 +64,6 @@ public class RobolectricTests {
         MainActivity activity = Robolectric.setupActivity( MainActivity.class );
         activity.shouldShowChangesFromRealmResultsWithAsyncTransactions();
 
-        Assert.assertEquals( "The current message is ", "There are 3 dogs", activity.textView.getText() );
+        assertEquals( "The current message is ", "There are 3 dogs", activity.textView.getText() );
     }
 }

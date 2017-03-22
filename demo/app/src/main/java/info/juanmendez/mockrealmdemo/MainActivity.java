@@ -23,8 +23,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //configurations throw errors.
-        Realm.init(this);
+        /**
+         * Configurations must be part of a non-Android component class.
+         * And such dependency must be declared at @PrepareForTest eg. RobolectricTests
+         */
+        RealmDependencies.createConfig();
         realm = Realm.getDefaultInstance();
 
         setContentView(R.layout.activity_main);

@@ -48,11 +48,6 @@ public class QueryTests
     }
 
     @Test
-    public void shouldBeSameRealm(){
-        assertEquals("is the same?", realm, Realm.getDefaultInstance());
-    }
-
-    @Test
     public void shouldCreateObject(){
         RealmStorage.clear();
         assertNotNull( realm.createObject(Dog.class));

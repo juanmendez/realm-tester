@@ -72,6 +72,18 @@ public class RealmDecorator {
 
         when(Realm.getDefaultInstance()).thenReturn(realm);
 
+        when( Realm.deleteRealm(any(RealmConfiguration.class))).thenAnswer(invocation -> {
+            RealmStorage.clear();
+            return null;
+        });
+
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                return null;
+            }
+        }).when(Realm.class, "setDefaultConfiguration", any() );
+
         when( realm.createObject( Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmModel.class)) ) ).thenAnswer(invocation -> {
             Class clazz = (Class) invocation.getArguments()[0];
 
