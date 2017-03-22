@@ -52,7 +52,7 @@ public class RealmModelUtil {
 
         if( realmModel instanceof AbstractList ){
 
-            if( !((AbstractList<RealmModel>)realmModel).isEmpty()  ){
+            if( ((AbstractList<RealmModel>)realmModel).isEmpty()  ){
                 return Ob+Cb;
             }
 

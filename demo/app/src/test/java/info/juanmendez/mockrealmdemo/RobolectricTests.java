@@ -1,5 +1,7 @@
 package info.juanmendez.mockrealmdemo;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,5 +57,8 @@ public class RobolectricTests {
 
         RealmStorage.clear();
         MainActivity activity = Robolectric.setupActivity( MainActivity.class );
+        activity.shouldShowChangesFromRealmResultsWithAsyncTransactions();
+
+        Assert.assertEquals( "The current message is ", "There are 3 dogs", activity.textView.getText() );
     }
 }

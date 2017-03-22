@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
-        shouldShowChangesFromRealmResultsWithAsyncTransactions();
     }
 
     void shouldQueryChain(){
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
 
         results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
-            Log.i("MainActivity", "There are " + dogs.size() + " at " + Thread.currentThread().getName() );
+            textView.setText( "There are " + dogs.size() + " dogs" );
         });
 
         realm.executeTransactionAsync( realm1 -> {
@@ -80,8 +79,6 @@ public class MainActivity extends AppCompatActivity {
             dog.setAge(2);
             dog.setName("Aaron Hernandez");
             dog.setBirthdate( new Date(2015, 6, 10));
-
-            realm1.where(Dog.class).findFirst().deleteFromRealm();
         });
     }
 
