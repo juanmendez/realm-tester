@@ -261,4 +261,7 @@ public class RealmObjectDecorator {
 
     }
 
+    public static void removeSubscriptions(){
+        subscriptionsUtil.removeAll();
+    }
 }

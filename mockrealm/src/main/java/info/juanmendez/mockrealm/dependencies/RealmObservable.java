@@ -46,8 +46,8 @@ public class RealmObservable {
         subscriptionsUtil.remove(observer, subscription);
     }
 
-    public static void unsubscribe(){
-        subscriptionsUtil.removeAll(to);
+    public static void removeSubscriptions(){
+        subscriptionsUtil.removeAll();
     }
 
     public static void unsubcribe( Object observer ){

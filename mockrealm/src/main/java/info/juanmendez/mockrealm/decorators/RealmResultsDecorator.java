@@ -288,4 +288,8 @@ public class RealmResultsDecorator {
             return subject;
         }).when( realmResults ).asObservable();
     }
+
+    public static void removeSubscriptions(){
+        subscriptionsUtil.removeAll();
+    }
 }

@@ -2,6 +2,8 @@ package info.juanmendez.mockrealm.dependencies;
 
 import java.util.HashMap;
 
+import info.juanmendez.mockrealm.decorators.RealmObjectDecorator;
+import info.juanmendez.mockrealm.decorators.RealmResultsDecorator;
 import info.juanmendez.mockrealm.models.RealmEvent;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import io.realm.RealmList;
@@ -64,7 +66,10 @@ public class RealmStorage {
     }
 
     public static void clear(){
-        RealmObservable.unsubscribe();
+        RealmObservable.removeSubscriptions();
+        TransactionObservable.removeSubscriptions();
+        RealmObjectDecorator.removeSubscriptions();
+        RealmResultsDecorator.removeSubscriptions();
         realmMap.clear();
     }
 }
