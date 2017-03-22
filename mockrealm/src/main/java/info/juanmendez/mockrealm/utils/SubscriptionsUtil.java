@@ -2,6 +2,8 @@ package info.juanmendez.mockrealm.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -11,7 +13,7 @@ import rx.subscriptions.CompositeSubscription;
  * www.juanmendez.info
  * contact@juanmendez.info
  *
- * A subject has several observers (subjectToItems)
+ * A subject has several observers (subjectToObservers)
  * An observer is associated with one subject (observerToSubject)
  * The subject has a hold of a CompositeSubscription (subjectComposite)
  * Each observer added to the subjectComposite has a subscription map associated. (observerSubscriptions)
@@ -19,7 +21,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class SubscriptionsUtil<S,O> {
 
-    private HashMap<S,ArrayList<O>> subjectToItems = new HashMap<S, ArrayList<O>>();
+    private HashMap<S,ArrayList<O>> subjectToObservers = new HashMap<S, ArrayList<O>>();
     private HashMap<O,S> observerToSubject = new HashMap<O, S>();
     private HashMap<S,CompositeSubscription> subjectComposite = new HashMap<>();
     private HashMap<O,Subscription> observerSubscriptions = new HashMap<>();
@@ -35,11 +37,11 @@ public class SubscriptionsUtil<S,O> {
     //get all observers associated with a subject
     private ArrayList<O> getSubjectObservers(S subject ){
 
-        if( !subjectToItems.containsKey( subject) ){
-            subjectToItems.put( subject, new ArrayList<O>());
+        if( !subjectToObservers.containsKey( subject) ){
+            subjectToObservers.put( subject, new ArrayList<O>());
         }
 
-        return subjectToItems.get( subject );
+        return subjectToObservers.get( subject );
     }
 
     /**
@@ -103,6 +105,15 @@ public class SubscriptionsUtil<S,O> {
         }
 
         observers.clear();
-        subjectToItems.remove( subject );
+        subjectToObservers.remove( subject );
+    }
+
+    public void removeAll(){
+
+        subjectToObservers.size();
+        for(Iterator<Map.Entry<S, ArrayList<O>>> it = subjectToObservers.entrySet().iterator(); it.hasNext(); ){
+            removeAll( it.next().getKey() );
+        }
+        subjectToObservers.size();
     }
 }

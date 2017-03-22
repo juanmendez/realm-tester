@@ -18,6 +18,13 @@ import io.realm.RealmObject;
 
 public class RealmModelUtil {
 
+    private static final String Q = "\"";
+    private static final String C = ",";
+    private static final String Op = "{";
+    private static final String Cp = "}";
+    private static final String Ob = "[";
+    private static final String Cb = "]";
+
     public static Class getClass( Object object ){
 
         Class clazz = object.getClass();
@@ -42,26 +49,24 @@ public class RealmModelUtil {
             return "";
 
         String jsonString = "";
-        String q = "\"";
-        String c = ",";
-        String oP = "{";
-        String cP = "}";
-        String oB = "[";
-        String cB = "]";
-
 
         if( realmModel instanceof AbstractList ){
-            jsonString += oB;
+
+            if( !((AbstractList<RealmModel>)realmModel).isEmpty()  ){
+                return Ob+Cb;
+            }
+
+            jsonString += Ob;
             for( RealmModel m: (AbstractList<RealmModel>)realmModel ){
-                jsonString += toString(m)+c;
+                jsonString += toString(m)+C;
             }
 
             jsonString = jsonString.substring(0,jsonString.length()-1);
-            jsonString+= cB;
+            jsonString+= Cb;
         }
         else{
             Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
-            jsonString += oP;
+            jsonString += Op;
             Object currentObject;
 
             for (Field field: fieldSet) {
@@ -69,21 +74,21 @@ public class RealmModelUtil {
                 currentObject = Whitebox.getInternalState(realmModel, field.getName() );
 
                 if(AbstractList.class.isAssignableFrom(field.getType())){
-                    jsonString+= q + field.getName() + q + ":" + toString(currentObject) + c;
+                    jsonString+= Q + field.getName() + Q + ":" + toString(currentObject) + C;
                 }
                 else
                 if(RealmModel.class.isAssignableFrom(field.getType())){
-                    jsonString+= q + field.getName() + q + ":" + toString( (RealmModel) currentObject ) + c;
+                    jsonString+= Q + field.getName() + Q + ":" + toString( (RealmModel) currentObject ) + C;
                 }
                 else
                 if (currentObject != null)
                 {
-                    jsonString+= q + field.getName() + q + ":" + q +  currentObject.toString() + q + c;
+                    jsonString+= Q + field.getName() + Q + ":" + Q +  currentObject.toString() + Q + C;
                 }
             }
 
             jsonString = jsonString.substring(0,jsonString.length()-1);
-            jsonString += cP;
+            jsonString += Cp;
         }
 
 

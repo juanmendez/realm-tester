@@ -18,6 +18,7 @@ public class TransactionObservable {
     private static TransactionObservable instance;
     private  static SubscriptionsUtil<TransactionObservable, Object> subscriptionsUtil = new SubscriptionsUtil();
     private  static PublishSubject<TransactionEvent> subject = PublishSubject.create();
+
     private  static ArrayList<Object> stackTransactions = new ArrayList<>();
 
     public static void startRequest(Object keyTransaction, Subscription subscription ){
@@ -81,6 +82,7 @@ public class TransactionObservable {
     public static void cancel(Object keyTransaction ){
         if( stackTransactions.indexOf(keyTransaction) > 0 ){
             stackTransactions.remove( keyTransaction );
+            subscriptionsUtil.remove( keyTransaction );
         }
     }
 
@@ -102,6 +104,11 @@ public class TransactionObservable {
 
     public static Observable<TransactionEvent> asObservable(){
         return subject.asObservable();
+    }
+
+
+    public static void removeSubscriptions(){
+        subscriptionsUtil.removeAll();
     }
 
     /**

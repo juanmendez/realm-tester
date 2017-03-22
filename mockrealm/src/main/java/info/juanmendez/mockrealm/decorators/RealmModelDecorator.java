@@ -13,6 +13,7 @@ import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
@@ -51,20 +52,21 @@ public class RealmModelDecorator {
         RealmModel realmModel = createFromClass( clazz );
 
         if( realmModel instanceof RealmObject){
-            realmModel = RealmModelDecorator.mockRealmObject( realmModel );
+            realmModel = RealmModelDecorator.decorate( realmModel );
         }
 
-        RealmObjectDecorator.markAsValid( realmModel, valid );
+        setValid( realmModel, valid );
+        setLoaded( realmModel, valid );
         return realmModel;
     }
 
-    public static RealmModel mockRealmObject(RealmModel realmModel ){
+    public static RealmModel decorate(RealmModel realmModel ){
 
         if( realmModel instanceof RealmObject ){
             realmModel = spy( realmModel );
         }
 
-        handleDeleteEvents( realmModel);
+        startDeleteObservers( realmModel);
 
         if( realmModel instanceof RealmObject ){
             RealmObjectDecorator.handleDeleteActions( (RealmObject) realmModel);
@@ -74,7 +76,12 @@ public class RealmModelDecorator {
         return realmModel;
     }
 
-    private static void handleDeleteEvents( RealmModel realmModel ){
+    /**
+     * Through RealmObservable be notified of changes, and see if any other realmModel deleted
+     * is referenced by this realmModel and remove such reference.
+     * @param realmModel
+     */
+    private static void startDeleteObservers(RealmModel realmModel ){
 
         Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
         Class fieldClass;
@@ -125,6 +132,46 @@ public class RealmModelDecorator {
                             }
                         })
                 );
+            }
+        }
+    }
+
+    /**
+     * mark either realmModel or realmObject as valid or not
+     * @param realmModel
+     * @param flag
+     */
+    public static void setValid(RealmModel realmModel, Boolean flag ){
+
+        if( realmModel instanceof RealmObject ){
+            doReturn( flag ).when( (RealmObject) realmModel ).isValid();
+        }
+        else {
+
+            try {
+                doReturn( flag ).when( RealmObject.class, "isValid", realmModel );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * mark either realmModel or realmObject as loaded or not
+     * @param realmModel
+     * @param flag
+     */
+    public static void setLoaded(RealmModel realmModel, Boolean flag ){
+
+        if( realmModel instanceof RealmObject ){
+            doReturn( flag ).when( ((RealmObject) realmModel) ).isLoaded();
+        }
+        else {
+
+            try {
+                doReturn( flag ).when( RealmObject.class, "isLoaded", realmModel );
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

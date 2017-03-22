@@ -17,7 +17,7 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import rx.Observable;
-import rx.subjects.PublishSubject;
+import rx.subjects.BehaviorSubject;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -253,7 +253,10 @@ public class RealmResultsDecorator {
 
 
         doAnswer(invocation -> {
-            PublishSubject<RealmResults> subject = PublishSubject.create();
+            BehaviorSubject<RealmResults> subject = BehaviorSubject.create();
+
+            subject.subscribeOn(RealmDecorator.getTransactionScheduler())
+                    .observeOn( RealmDecorator.getResponseScheduler() );
 
             //first time make a call!
             Observable.fromCallable(() -> queryTracker.rewind())
@@ -263,7 +266,8 @@ public class RealmResultsDecorator {
                         subject.onNext( results );
                     });
 
-            TransactionObservable.asObservable().subscribe(transactionEvent -> {
+            TransactionObservable.asObservable()
+                    .subscribe(transactionEvent -> {
 
                 if( transactionEvent.getState() == TransactionEvent.END_TRANSACTION ){
                     String initialJson = "", currrentJson = "";
@@ -283,5 +287,9 @@ public class RealmResultsDecorator {
 
             return subject;
         }).when( realmResults ).asObservable();
+    }
+
+    public static void removeSubscriptions(){
+        subscriptionsUtil.removeAll();
     }
 }

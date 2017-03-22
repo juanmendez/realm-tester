@@ -38,6 +38,10 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 public class RealmDecorator {
 
+    /**
+     * Only stick to Schedulers.immediate() for now. I tried others but they don't seem to work well
+     * in Robolectric
+     */
     private static Scheduler observerScheduler = Schedulers.immediate();
     private static Scheduler subscriberScheduler = Schedulers.immediate();
 
@@ -48,14 +52,6 @@ public class RealmDecorator {
         handleAsyncTransactions(realm);
         handleSyncTransactions(realm);
         return  realm;
-    }
-
-    public static void setTransactionScheduler(Scheduler observerScheduler) {
-        RealmDecorator.observerScheduler = observerScheduler;
-    }
-
-    public static void setResponseScheduler(Scheduler subscriberScheduler) {
-        RealmDecorator.subscriberScheduler = subscriberScheduler;
     }
 
     public static Scheduler getTransactionScheduler() {
@@ -98,7 +94,7 @@ public class RealmDecorator {
                     RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
 
                     if( realmModel instanceof RealmObject ){
-                        realmModel = RealmModelDecorator.mockRealmObject( (RealmObject) realmModel );
+                        realmModel = RealmModelDecorator.decorate( (RealmObject) realmModel );
                     }
 
                     Class clazz = RealmModelUtil.getClass(realmModel);
@@ -176,8 +172,8 @@ public class RealmDecorator {
                                 return null;
                             }
                         })
-                        .subscribeOn(observerScheduler)
-                        .observeOn( subscriberScheduler ).subscribe(aVoid -> {});
+                        .subscribeOn(getTransactionScheduler())
+                        .observeOn( getResponseScheduler() ).subscribe(aVoid -> {});
 
                         return  null;
                     });
@@ -209,8 +205,8 @@ public class RealmDecorator {
                                     return false;
                                 }
                             })
-                            .subscribeOn(observerScheduler)
-                            .observeOn( subscriberScheduler )
+                            .subscribeOn(getTransactionScheduler())
+                            .observeOn( getResponseScheduler() )
                             .subscribe(aBoolean -> {
                                 if(  aBoolean && invocation.getArguments().length >=2 ){
                                     Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];

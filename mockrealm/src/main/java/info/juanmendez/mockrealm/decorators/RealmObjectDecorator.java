@@ -22,11 +22,10 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 import rx.Observable;
-import rx.subjects.PublishSubject;
+import rx.subjects.BehaviorSubject;
 
 import static org.mockito.Matchers.any;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
-import static org.powermock.api.mockito.PowerMockito.doReturn;
 
 /**
  * Created by Juan Mendez on 3/19/2017.
@@ -86,7 +85,8 @@ public class RealmObjectDecorator {
                 RealmStorage.removeModel( realmObject );
 
                 //after deleting item, lets make it invalid
-                markAsValid( realmObject, false );
+                RealmModelDecorator.setValid( realmObject, false );
+                RealmModelDecorator.setLoaded( realmObject, false );
                 return null;
             }
         }).when( (RealmObject) realmObject ).deleteFromRealm();
@@ -114,7 +114,8 @@ public class RealmObjectDecorator {
         RealmStorage.removeModel( realmModel );
 
         //after deleting item, lets make it invalid
-        markAsValid( realmModel, false );
+        RealmModelDecorator.setValid( realmModel, false );
+        RealmModelDecorator.setLoaded( realmModel, false );
     }
 
     /**
@@ -204,7 +205,10 @@ public class RealmObjectDecorator {
 
 
         doAnswer(invocation -> {
-            PublishSubject subject = PublishSubject.create();
+            BehaviorSubject<RealmModel> subject = BehaviorSubject.create();
+
+            subject.subscribeOn(RealmDecorator.getTransactionScheduler())
+                    .observeOn( RealmDecorator.getResponseScheduler() );
 
             //first time make a call!
             Observable.fromCallable(new Callable<RealmModel>() {
@@ -216,15 +220,16 @@ public class RealmObjectDecorator {
                     if( !realmResults.isEmpty())
                         return realmResults.get(0);
                     else
-                        return null;
+                        return realmObject;
                 }
             }).subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn( RealmDecorator.getResponseScheduler() )
-                    .subscribe(realmObject1 -> {
-                        subject.onNext( realmObject1);
+                    .subscribe(realmModel -> {
+                        subject.onNext( realmModel);
                     });
 
-            TransactionObservable.asObservable().subscribe(transactionEvent -> {
+            TransactionObservable.asObservable()
+                    .subscribe(transactionEvent -> {
 
                 if( transactionEvent.getState() == TransactionEvent.END_TRANSACTION ){
                     String initialJson = "", currrentJson = "";
@@ -246,28 +251,17 @@ public class RealmObjectDecorator {
                         if( !realmResults.isEmpty() )
                             subject.onNext( realmResults.get(0) );
                         else
-                            subject.onNext( null );
+                            subject.onNext( realmObject );
                     }
                 }
             });
 
-            return subject;
+            return subject.asObservable();
         }).when( realmObject ).asObservable();
 
     }
 
-    public static void markAsValid( RealmModel realmModel, Boolean valid ){
-
-        if( realmModel instanceof RealmObject ){
-            doReturn( valid ).when( (RealmObject) realmModel ).isValid();
-        }
-        else {
-
-            try {
-                doReturn( valid ).when( RealmObject.class, "isValid", realmModel );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    public static void removeSubscriptions(){
+        subscriptionsUtil.removeAll();
     }
 }
