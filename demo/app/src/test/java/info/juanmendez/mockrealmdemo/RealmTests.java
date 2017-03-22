@@ -8,7 +8,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.decorators.RealmConfigurationDecorator;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
@@ -17,7 +16,6 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Juan Mendez on 3/22/2017.
@@ -27,10 +25,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "android.*"})
-@PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class, RealmConfigurationDecorator.class })
+@PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class })
 public class RealmTests {
-
-    Realm realm;
 
     @Before
     public void before() throws Exception {
@@ -58,6 +54,6 @@ public class RealmTests {
 
     @Test
     public void shouldBeSameRealm(){
-        assertEquals("is the same?", realm, Realm.getDefaultInstance());
+        assertNotNull("is the same?", Realm.getDefaultInstance());
     }
 }
