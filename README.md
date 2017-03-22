@@ -10,6 +10,7 @@ What has been done so far
 - Works with Mockito 1.10.19
 - Works with PowerMockito 1.6.4
 - Have Realm.getDefaultInstance()
+- If desired, do realm configurations in a dependency class rather than an Android component see [wiki](https://github.com/juanmendez/Mocking-Realm/wiki/How-to-initialize-Realm-when-testing).
 - Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
 - Chaining queries
 - Asynchronous and synchronous transactions with RxJava
