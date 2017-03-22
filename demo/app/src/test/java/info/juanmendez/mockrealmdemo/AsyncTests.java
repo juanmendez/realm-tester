@@ -281,7 +281,7 @@ public class AsyncTests
             realm1.where(Dog.class).findFirst().deleteFromRealm();
         });
 
-        assertEquals( "changeListener invoked twice", calls[0], 2);
+        assertEquals( "changeListener invoked twice", calls[0], 3);
     }
 
     @Test
@@ -321,6 +321,6 @@ public class AsyncTests
             realm1.where(Dog.class).findFirst().deleteFromRealm();
         });
 
-        assertEquals( "changeListener invoked twice", calls[0], 2);
+        assertEquals( "changeListener invoked twice", calls[0], 3);
     }
 }
