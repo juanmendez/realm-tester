@@ -11,7 +11,7 @@ What has been done so far
 - Works with PowerMockito 1.6.4
 - Have Realm.getDefaultInstance()
 - If desired, do realm configurations in a dependency class rather than an Android component see [wiki](https://github.com/juanmendez/Mocking-Realm/wiki/How-to-initialize-Realm-when-testing).
-- Query based on a limited number of RealmQuery methods such as equalsTo, greaterThan, lessThan, contains, endsWith
+- Querying works for around 70% of all methods, more to come in the next phase.
 - Chaining queries
 - Asynchronous and synchronous transactions with RxJava
     - Schedulers for testing use Schedulers.immediate()
@@ -21,8 +21,8 @@ What has been done so far
 - delete reamModels in cascading mode
 - support also for deleting methods found in realmResults, realmModel, realmObject and realmLists
 - support realmQuery.*Async() methods
-- realmResult.addEventListener()
-- realmResult.asObservable()
+- realmResults.addChangeListener(), realmObject.addChangeListener()
+- realmResults.asObservable(),realmObject.asObservable()
 
 What is coming next
 - A chart with what's being covered and what is not from RealmModel, RealmObject, RealmQuery, RealmResults, and RealmList
