@@ -1,10 +1,7 @@
 package info.juanmendez.mockrealm.decorators;
 
-import android.content.Context;
-
 import java.io.File;
 
-import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmMigration;
 import io.realm.rx.RxObservableFactory;
@@ -50,15 +47,5 @@ public class RealmConfigurationDecorator {
         doReturn(mockedBuilder).when( mockedBuilder ).modules(any(), anyVararg());
         doReturn(mockedBuilder).when( mockedBuilder ).rxFactory(any(RxObservableFactory.class));
         doReturn(mockedBuilder).when( mockedBuilder ).assetFile(anyString());
-    }
-
-    public static RealmConfiguration builder(){
-
-        Realm.init(mock(Context.class));
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-                .name("mocking.realm")
-                .build();
-
-        return  realmConfiguration;
     }
 }
