@@ -461,54 +461,46 @@ public class QueryTests
         dog.setAge(6);
         dog.setName("Idalgo");
         dog.setBirthdate( new Date(2016, 6, 9));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(6);
         dog.setName("Fido");
         dog.setBirthdate( new Date(2016, 6, 9));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Hernan");
         dog.setBirthdate( new Date(2015, 6, 10));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(5);
         dog.setName("Hernan");
         dog.setBirthdate( new Date(2012, 2, 1));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Chibi");
         dog.setBirthdate( new Date(2015, 2, 1));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(3);
         dog.setName("Andromeda");
         dog.setBirthdate( new Date(2014, 2, 1));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(12);
         dog.setName("Baxter");
         dog.setBirthdate( new Date(2005, 2, 1));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(10);
         dog.setName("Beethoven");
         dog.setBirthdate( new Date(2007, 2, 1));
-        realm.copyToRealm( dog );
 
-        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name", "birthdate");
+        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name");
         assertEquals("there are 7 dogs with distinct names", dogs.size(), 7 );
 
-        dogs = realm.where(Dog.class).findAll().distinct("name").distinct("birthdate");
-        assertEquals("out of the first 7 dogs, there are 6 whose birthdays are unique", dogs.size(), 6 );
+        dogs = realm.where(Dog.class).findAll().distinct("birthdate");
+        assertEquals("out of the first 6 dogs, there are 6 whose birthdays are unique", dogs.size(), 7 );
     }
 }

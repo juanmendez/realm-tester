@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
-        shouldDoDistinctIn_realmResults();
     }
 
     void shouldQueryChain(){
@@ -129,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         dog.setAge(12);
         dog.setName("Baxter");
         dog.setBirthdate( new Date(2005, 2, 1));
-        realm.copyToRealm( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(10);

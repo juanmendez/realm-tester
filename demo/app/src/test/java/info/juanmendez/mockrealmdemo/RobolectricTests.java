@@ -74,7 +74,7 @@ public class RobolectricTests {
         RealmStorage.clear();
         activity.shouldDoDistinctIn_realmResults();
 
-        assertEquals( "There are 6 dogs ", "We found " + 7 + " with distinct names, and birthdays!", activity.textView.getText() );
+        assertEquals( "There are 6 dogs ", "We found " + 6 + " with distinct names, and birthdays!", activity.textView.getText() );
 
     }
 }
