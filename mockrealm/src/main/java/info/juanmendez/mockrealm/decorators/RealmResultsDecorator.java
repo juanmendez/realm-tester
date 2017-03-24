@@ -306,18 +306,19 @@ public class RealmResultsDecorator {
     }
 
     private static RealmResults<RealmModel> invocateDistinct(QueryTracker queryTracker, Object[] arguments ){
-        RealmList realmList = queryTracker.getQueryList();
+
         QueryTracker resultsQueryTracker = queryTracker.clone();
-        resultsQueryTracker.appendQuery(new Query(Compare.startTopGroup, new Object[]{realmList}));
+        resultsQueryTracker.appendQuery(new Query(Compare.startTopGroup, new Object[]{resultsQueryTracker.getParentRealmList()}));
         resultsQueryTracker.appendQuery(new Query(Compare.endTopGroup));
 
-        String field;
+        String fieldName;
         arguments = new Object[]{arguments[0]};
 
         for (Object argument: arguments ) {
-            field = (String) argument;
-            System.out.println( "#mocking-realm: ensure '" + queryTracker.getClazz().getSimpleName() + "." + field + "' has @index annotation" );
-            resultsQueryTracker.appendQuery(new Query(Compare.distinct, field, new String[]{field}));
+            fieldName = (String) argument;
+
+            System.out.println( "#mocking-realm: ensure '" + queryTracker.getClazz().getSimpleName() + "." + fieldName + "' has @index annotation" );
+            resultsQueryTracker.appendQuery(new Query(Compare.distinct, fieldName, new String[]{fieldName}));
         }
 
         return resultsQueryTracker.rewind();

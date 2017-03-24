@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
+        shouldDoDistinctIn_realmResults();
     }
 
     void shouldQueryChain(){
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         dog.setBirthdate( new Date(2007, 2, 1));
         realm.commitTransaction();
 
-        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name").distinct("birthdate");
+        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name").distinct("age");
         textView.setText("We found " + dogs.size() + " with distinct names, and birthdays!" );
     }
 

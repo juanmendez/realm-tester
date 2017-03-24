@@ -30,6 +30,11 @@ public class QueryTracker {
     private RealmQuery realmQuery;
     private RealmResults realmResults;
 
+    /**
+     * cloned object preserves realmList, check clone method
+     */
+    private RealmList<RealmModel> parentRealmList;
+
     public QueryTracker(Class clazz){
         this.clazz = clazz;
         realmQuery = mock(RealmQuery.class);
@@ -165,7 +170,15 @@ public class QueryTracker {
 
     @Override
     public QueryTracker clone(){
-        return new QueryTracker( this.clazz );
+        QueryTracker cloned = new QueryTracker( this.clazz );
+
+        if( parentRealmList != null ){
+            cloned.parentRealmList = parentRealmList;
+        }else{
+            cloned.parentRealmList = getQueryList();
+        }
+
+        return cloned;
     }
 
     public RealmQuery getRealmQuery() {
@@ -174,6 +187,10 @@ public class QueryTracker {
 
     public RealmResults getRealmResults() {
         return realmResults;
+    }
+
+    public RealmList<RealmModel> getParentRealmList() {
+        return parentRealmList;
     }
 
     public RealmResults<RealmModel> rewind(){
