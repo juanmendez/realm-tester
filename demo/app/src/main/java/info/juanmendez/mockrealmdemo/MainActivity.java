@@ -29,13 +29,12 @@ public class MainActivity extends AppCompatActivity {
          */
         RealmDependencies.createConfig(this);
 
-
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
-        shouldDoDistinct();
     }
 
     void shouldQueryChain(){
+        realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(thisRealm -> {
             Dog dog = thisRealm.createObject( Dog.class );
             dog.setName("Max");
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     void shouldShowChangesFromRealmResultsWithAsyncTransactions(){
 
+        realm = Realm.getDefaultInstance();
         RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
 
         results.addChangeListener((RealmChangeListener<RealmResults<Dog>>) dogs -> {
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void shouldDoDistinct(){
+    public void shouldDoDistinctIn_realmResults(){
 
         //lets do this first with realmList
         realm = Realm.getDefaultInstance();
@@ -136,9 +136,8 @@ public class MainActivity extends AppCompatActivity {
         dog.setBirthdate( new Date(2007, 2, 1));
         realm.commitTransaction();
 
-        RealmResults<Dog> dogs = realm.where(Dog.class).distinct("name", "birthdate");
-
-
+        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name").distinct("birthdate");
+        textView.setText("We found " + dogs.size() + " with distinct names, and birthdays!" );
     }
 
     @Override

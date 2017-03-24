@@ -58,7 +58,6 @@ public class QuerySearch {
             needles = new ArrayList<>(Arrays.asList((Object[]) needle));
         }
         else if( condition == Compare.distinct ) {
-            System.out.println( "MockingRealm: ensure " + ((String) arguments[0]) + " has @index annotation" );
             distinctNeedles = new ArrayList<>();
         }
 

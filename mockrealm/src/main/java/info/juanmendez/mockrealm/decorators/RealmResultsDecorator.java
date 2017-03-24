@@ -300,6 +300,7 @@ public class RealmResultsDecorator {
         }).when(realmResults).distinct( anyString() );
 
         doAnswer(invocation -> {
+            System.out.println( "#mocking-realm: " + "There seems to be a bug, as in Realm only the first argument is doing all the distincts" );
             return invocateDistinct( queryTracker, invocation.getArguments() );
         }).when(realmResults).distinct( anyString(), anyVararg());
     }
@@ -311,12 +312,11 @@ public class RealmResultsDecorator {
         resultsQueryTracker.appendQuery(new Query(Compare.endTopGroup));
 
         String field;
-
-        System.out.println( "MockingRealm: " + "There seems to be a bug, as in Realm only the first argument is doing all the distincts" );
         arguments = new Object[]{arguments[0]};
 
         for (Object argument: arguments ) {
             field = (String) argument;
+            System.out.println( "#mocking-realm: ensure '" + queryTracker.getClazz().getSimpleName() + "." + field + "' has @index annotation" );
             resultsQueryTracker.appendQuery(new Query(Compare.distinct, field, new String[]{field}));
         }
 

@@ -40,7 +40,9 @@ public class RobolectricTests {
 
     @Rule
     public PowerMockRule rule = new PowerMockRule();
-    public Realm realm;
+
+    Realm realm;
+    MainActivity activity;
 
     static{
         ShadowLog.stream = System.out;
@@ -51,6 +53,7 @@ public class RobolectricTests {
 
         MockRealm.prepare();
         realm = Realm.getDefaultInstance();
+        activity = Robolectric.setupActivity( MainActivity.class );
     }
 
     /**
@@ -61,9 +64,17 @@ public class RobolectricTests {
     public void shouldAssertWhatsOnMainActivity(){
 
         RealmStorage.clear();
-        MainActivity activity = Robolectric.setupActivity( MainActivity.class );
         activity.shouldShowChangesFromRealmResultsWithAsyncTransactions();
 
         assertEquals( "The current message is ", "There are 3 dogs", activity.textView.getText() );
+    }
+
+    @Test
+    public void shouldEnsureDistinctinRealmResults(){
+        RealmStorage.clear();
+        activity.shouldDoDistinctIn_realmResults();
+
+        assertEquals( "There are 6 dogs ", "We found " + 6 + " with distinct names, and birthdays!", activity.textView.getText() );
+
     }
 }
