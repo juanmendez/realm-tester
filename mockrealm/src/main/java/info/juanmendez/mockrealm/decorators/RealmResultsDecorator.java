@@ -22,6 +22,7 @@ import rx.subjects.BehaviorSubject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyVararg;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -35,7 +36,7 @@ public class RealmResultsDecorator {
     public static RealmResults create(QueryTracker queryTracker ){
 
         RealmResults realmResults = queryTracker.getRealmResults();
-        RealmList<RealmModel> results = queryTracker.getQueryList();
+        RealmList<RealmModel> realmList = queryTracker.getQueryList();
 
         doAnswer(new Answer<RealmQuery>() {
 
@@ -43,7 +44,7 @@ public class RealmResultsDecorator {
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
                 QueryTracker resultsQueryTracker = queryTracker.clone();
-                resultsQueryTracker.appendQuery( new Query(Compare.startTopGroup, new Object[]{results}));
+                resultsQueryTracker.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmList}));
 
                 RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryTracker);
 
@@ -51,10 +52,11 @@ public class RealmResultsDecorator {
             }
         }).when(realmResults).where();
 
-        handleBasicActions( realmResults, results );
-        handleDeleteMethods( realmResults, results );
-        handleMathMethods( realmResults, results );
+        handleBasicActions( realmResults, realmList );
+        handleDeleteMethods( realmResults, realmList );
+        handleMathMethods( realmResults, realmList );
         handleAsyncMethods( queryTracker );
+        handleDistinct( queryTracker );
 
         return realmResults;
     }
@@ -287,6 +289,38 @@ public class RealmResultsDecorator {
 
             return subject;
         }).when( realmResults ).asObservable();
+    }
+
+    private static void handleDistinct( QueryTracker queryTracker ) {
+
+        RealmResults realmResults = queryTracker.getRealmResults();
+
+        doAnswer(invocation -> {
+            return invocateDistinct( queryTracker, invocation.getArguments() );
+        }).when(realmResults).distinct( anyString() );
+
+        doAnswer(invocation -> {
+            return invocateDistinct( queryTracker, invocation.getArguments() );
+        }).when(realmResults).distinct( anyString(), anyVararg());
+    }
+
+    private static RealmResults<RealmModel> invocateDistinct(QueryTracker queryTracker, Object[] arguments ){
+        RealmList realmList = queryTracker.getQueryList();
+        QueryTracker resultsQueryTracker = queryTracker.clone();
+        resultsQueryTracker.appendQuery(new Query(Compare.startTopGroup, new Object[]{realmList}));
+        resultsQueryTracker.appendQuery(new Query(Compare.endTopGroup));
+
+        String field;
+
+        System.out.println( "MockingRealm: " + "There seems to be a bug, as in Realm only the first argument is doing all the distincts" );
+        arguments = new Object[]{arguments[0]};
+
+        for (Object argument: arguments ) {
+            field = (String) argument;
+            resultsQueryTracker.appendQuery(new Query(Compare.distinct, field, new String[]{field}));
+        }
+
+        return resultsQueryTracker.rewind();
     }
 
     public static void removeSubscriptions(){

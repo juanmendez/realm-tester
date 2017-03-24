@@ -22,4 +22,10 @@ public class Compare{
     public static final String endGroup = "endGroup";
     public static final String startTopGroup = "startTopGroup";
     public static final String endTopGroup = "endTopGroup";
+
+
+    public static final String findAll = "findAll";
+    public static final String findFirst = "findFirst";
+    public static final String distinct = "distinct";
+    public static final String async = "async";
 }

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
+import io.realm.annotations.Index;
 
 /**
  * Created by musta on 2/10/2017.
@@ -11,8 +12,14 @@ import io.realm.annotations.Ignore;
 
 public class Dog extends RealmObject{
     private int id;
+
+    @Index
     private String name;
+
+    @Index
     private int age;
+
+    @Index
     private Date birthdate;
 
     @Ignore

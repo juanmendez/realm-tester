@@ -183,7 +183,6 @@ public class QueryTracker {
         for ( Query query: queries ){
 
             if( !executeGroupQuery( query ) ){
-
                 searchList = new QuerySearch().search( query.getCondition(), query.getArgs(), getQueryList()  );
                 setQueryList( searchList );
             }

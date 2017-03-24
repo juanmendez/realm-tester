@@ -449,4 +449,67 @@ public class QueryTests
         assertEquals( "min age is ", 1, realm.where(Dog.class).min("age").intValue());
         assertEquals( "average age is ", Double.valueOf((float) 3.5), Double.valueOf(realm.where(Dog.class).average("age")) );
     }
+
+    @Test
+    public void shouldDoDistinct(){
+        RealmStorage.clear();
+
+        //lets do this first with realmList
+        Dog dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Idalgo");
+        dog.setBirthdate( new Date(2016, 6, 9));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Fido");
+        dog.setBirthdate( new Date(2016, 6, 9));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan");
+        dog.setBirthdate( new Date(2015, 6, 10));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Hernan");
+        dog.setBirthdate( new Date(2012, 2, 1));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Chibi");
+        dog.setBirthdate( new Date(2015, 2, 1));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(3);
+        dog.setName("Andromeda");
+        dog.setBirthdate( new Date(2014, 2, 1));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(12);
+        dog.setName("Baxter");
+        dog.setBirthdate( new Date(2005, 2, 1));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(10);
+        dog.setName("Beethoven");
+        dog.setBirthdate( new Date(2007, 2, 1));
+        realm.copyToRealm( dog );
+
+        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name", "birthdate");
+
+        for( Dog _dog: dogs ){
+            System.out.println( "dog: " + _dog.getName() + " " + _dog.getBirthdate() );
+        }
+
+    }
 }

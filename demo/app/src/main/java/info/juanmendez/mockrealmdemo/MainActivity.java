@@ -27,11 +27,12 @@ public class MainActivity extends AppCompatActivity {
          * Configurations must be part of a non-Android component class.
          * And such dependency must be declared at @PrepareForTest eg. RobolectricTests
          */
-        RealmDependencies.createConfig();
-        realm = Realm.getDefaultInstance();
+        RealmDependencies.createConfig(this);
+
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
+        shouldDoDistinct();
     }
 
     void shouldQueryChain(){
@@ -85,9 +86,66 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void shouldDoDistinct(){
+
+        //lets do this first with realmList
+        realm = Realm.getDefaultInstance();
+
+        realm.beginTransaction();
+        Dog dog;
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Idalgo");
+        dog.setBirthdate( new Date(2016, 6, 9));
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Fido");
+        dog.setBirthdate( new Date(2016, 6, 9));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan");
+        dog.setBirthdate( new Date(2015, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(5);
+        dog.setName("Hernan");
+        dog.setBirthdate( new Date(2012, 2, 1));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Chibi");
+        dog.setBirthdate( new Date(2015, 2, 1));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(3);
+        dog.setName("Andromeda");
+        dog.setBirthdate( new Date(2014, 2, 1));
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(12);
+        dog.setName("Baxter");
+        dog.setBirthdate( new Date(2005, 2, 1));
+        realm.copyToRealm( dog );
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(10);
+        dog.setName("Beethoven");
+        dog.setBirthdate( new Date(2007, 2, 1));
+        realm.commitTransaction();
+
+        RealmResults<Dog> dogs = realm.where(Dog.class).distinct("name", "birthdate");
+
+
+    }
+
     @Override
     protected void onPause(){
         super.onPause();
-        realm.close();
+
+        if( realm != null )
+            realm.close();
     }
 }

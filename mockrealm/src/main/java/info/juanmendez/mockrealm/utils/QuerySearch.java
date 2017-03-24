@@ -25,6 +25,7 @@ public class QuerySearch {
     Object[] arguments;
     Object needle;
     ArrayList<Object> needles;
+    ArrayList<Object> distinctNeedles;
 
     Class clazz;
     Case casing = Case.SENSITIVE;
@@ -38,22 +39,28 @@ public class QuerySearch {
         this.arguments = arguments;
         this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
 
-        this.needle = arguments[1];
-        this.clazz = RealmModelUtil.getClass(needle);
-
         int argsLen = arguments.length;
 
-        if ((clazz == String.class || clazz == String[].class) && argsLen >= 3) {
-            casing = (Case) arguments[2];
+        if( argsLen >= 2){
+            this.needle = arguments[1];
+            this.clazz = RealmModelUtil.getClass(needle);
+
+            if ((clazz == String.class || clazz == String[].class) && argsLen >= 3) {
+                casing = (Case) arguments[2];
+            }
         }
 
         if (condition == Compare.between) {
             this.left = arguments[1];
             this.right = arguments[2];
-        } else if (condition == Compare.in) {
+        }
+        else if (condition == Compare.in) {
             needles = new ArrayList<>(Arrays.asList((Object[]) needle));
         }
-
+        else if( condition == Compare.distinct ) {
+            System.out.println( "MockingRealm: ensure " + ((String) arguments[0]) + " has @index annotation" );
+            distinctNeedles = new ArrayList<>();
+        }
 
         if (casing == Case.INSENSITIVE) {
 
@@ -65,7 +72,6 @@ public class QuerySearch {
             } else {
                 this.needle = ((String) needle).toLowerCase();
             }
-
         }
 
         RealmList<RealmModel> queriedList = RealmListDecorator.create();
@@ -128,6 +134,20 @@ public class QuerySearch {
                 } else if (casing == Case.INSENSITIVE) {
                     return !needle.equals(((String) value).toLowerCase());
                 } else if (!needle.equals(value)) {
+                    return true;
+                }
+            } else if (condition == Compare.distinct ) {
+
+                if (clazz == Date.class) {
+
+                    long time = ((Date)value).getTime();
+                    if( !distinctNeedles.contains(time) ){
+                        distinctNeedles.add( time );
+                        return true;
+                    }
+
+                } else if( !distinctNeedles.contains(value)){
+                    distinctNeedles.add( value );
                     return true;
                 }
             } else if (condition == Compare.less) {

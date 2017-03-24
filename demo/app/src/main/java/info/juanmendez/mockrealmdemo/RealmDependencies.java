@@ -1,5 +1,7 @@
 package info.juanmendez.mockrealmdemo;
 
+import android.content.Context;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -11,7 +13,8 @@ import io.realm.RealmConfiguration;
 
 public class RealmDependencies {
 
-    public  static void createConfig(){
+    public  static void createConfig(Context context){
+        Realm.init( context );
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
                 .name("realmconfiguration.realm")
                 .build();

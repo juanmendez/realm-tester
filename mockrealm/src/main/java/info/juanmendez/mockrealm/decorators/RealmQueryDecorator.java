@@ -52,7 +52,7 @@ public class RealmQueryDecorator {
     private static void handleCollectionMethods(QueryTracker queryTracker) {
         RealmQuery realmQuery = queryTracker.getRealmQuery();
 
-        when( realmQuery.findAll() ).thenAnswer(invocationOnMock ->{
+        when( realmQuery.findAll() ).thenAnswer(invocation ->{
             queryTracker.appendQuery( new Query(Compare.endTopGroup));
             return queryTracker.rewind();
         });
@@ -62,7 +62,7 @@ public class RealmQueryDecorator {
             return queryTracker.getRealmResults();
         });
 
-        when( realmQuery.findFirst()).thenAnswer(invocationOnMock -> {
+        when( realmQuery.findFirst()).thenAnswer(invocation -> {
             queryTracker.appendQuery( new Query(Compare.endTopGroup));
             RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
@@ -268,7 +268,7 @@ public class RealmQueryDecorator {
      * @return the same args.realmQuery
      */
 
-    private static Answer<RealmQuery> createComparison(QueryTracker queryTracker, String condition ){
+    public static Answer<RealmQuery> createComparison(QueryTracker queryTracker, String condition ){
 
         RealmQuery realmQuery = queryTracker.getRealmQuery();
         
