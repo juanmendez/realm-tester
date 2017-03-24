@@ -3,7 +3,6 @@ package info.juanmendez.mockrealm.decorators;
 import info.juanmendez.mockrealm.models.RealmListStubbed;
 import io.realm.RealmList;
 import io.realm.RealmModel;
-import io.realm.RealmObject;
 
 import static org.mockito.Matchers.anyVararg;
 import static org.powermock.api.mockito.PowerMockito.spy;
@@ -15,7 +14,6 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  * www.juanmendez.info
  * contact@juanmendez.info
  */
-
 public class RealmListDecorator {
 
     public static void prepare() throws Exception {
@@ -40,12 +38,4 @@ public class RealmListDecorator {
         return new RealmListStubbed();
     }
 
-    public static void deleteRealmModel( RealmModel realmModel ){
-        if( realmModel instanceof RealmObject){
-            ((RealmObject) realmModel ).deleteFromRealm();
-        }
-        else{
-            RealmObject.deleteFromRealm( realmModel );
-        }
-    }
 }

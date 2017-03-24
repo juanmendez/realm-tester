@@ -56,7 +56,7 @@ public class RealmStorage {
                     realmMap.get(RealmModelUtil.getClass(realmModel) ).add( realmModel );
                     RealmObservable.onNext( new RealmEvent( RealmEvent.MODEL_ADDED, realmModel ) );
                 }else{
-                    throw new RealmException( "Instance of " + clazz.getName() + " cannot be added more than once" );
+                    System.out.println( "#mocking-realm: Instance of " + clazz.getName() + " cannot be added more than once" );
                 }
             }else{
 

@@ -28,6 +28,7 @@ import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mockingDetails;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -105,7 +106,7 @@ public class RealmDecorator {
                 if( invocationOnMock.getArguments().length > 0 ){
                     RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
 
-                    if( realmModel instanceof RealmObject ){
+                    if( realmModel instanceof RealmObject && !mockingDetails(realmModel).isSpy() ){
                         realmModel = RealmModelDecorator.decorate( (RealmObject) realmModel );
                     }
 

@@ -175,4 +175,13 @@ public class RealmModelDecorator {
             }
         }
     }
+
+    public static void deleteRealmModel( RealmModel realmModel ){
+        if( realmModel instanceof RealmObject){
+            ((RealmObject) realmModel ).deleteFromRealm();
+        }
+        else{
+            RealmObject.deleteFromRealm( realmModel );
+        }
+    }
 }
