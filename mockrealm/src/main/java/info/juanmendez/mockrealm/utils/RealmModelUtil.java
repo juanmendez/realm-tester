@@ -43,7 +43,7 @@ public class RealmModelUtil {
      * @param realmModel object to check variables and values
      * @return a json string
      */
-    public static String toString(Object realmModel){
+    public static String getState(Object realmModel){
 
         if( realmModel == null )
             return "";
@@ -58,7 +58,7 @@ public class RealmModelUtil {
 
             jsonString += Ob;
             for( RealmModel m: (AbstractList<RealmModel>)realmModel ){
-                jsonString += toString(m)+C;
+                jsonString += getState(m)+C;
             }
 
             jsonString = jsonString.substring(0,jsonString.length()-1);
@@ -74,11 +74,11 @@ public class RealmModelUtil {
                 currentObject = Whitebox.getInternalState(realmModel, field.getName() );
 
                 if(AbstractList.class.isAssignableFrom(field.getType())){
-                    jsonString+= Q + field.getName() + Q + ":" + toString(currentObject) + C;
+                    jsonString+= Q + field.getName() + Q + ":" + getState(currentObject) + C;
                 }
                 else
                 if(RealmModel.class.isAssignableFrom(field.getType())){
-                    jsonString+= Q + field.getName() + Q + ":" + toString( (RealmModel) currentObject ) + C;
+                    jsonString+= Q + field.getName() + Q + ":" + getState( (RealmModel) currentObject ) + C;
                 }
                 else
                 if (currentObject != null)

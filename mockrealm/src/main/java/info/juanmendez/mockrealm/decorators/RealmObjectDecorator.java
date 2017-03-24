@@ -167,13 +167,13 @@ public class RealmObjectDecorator {
                                     RealmResults<RealmModel> realmResults = queryTracker.getRealmResults();
 
                                     if( !realmResults.isEmpty() ){
-                                        initialJson = RealmModelUtil.toString( realmResults.get(0) );
+                                        initialJson = RealmModelUtil.getState( realmResults.get(0) );
                                     }
 
                                     realmResults = queryTracker.rewind();
 
                                     if( !realmResults.isEmpty() ){
-                                        currrentJson = RealmModelUtil.toString( realmResults.get(0) );
+                                        currrentJson = RealmModelUtil.getState( realmResults.get(0) );
                                     }
 
                                     if( !initialJson.equals( currrentJson )){
@@ -237,13 +237,13 @@ public class RealmObjectDecorator {
                     RealmResults<RealmModel> realmResults = queryTracker.getRealmResults();
 
                     if( !realmResults.isEmpty() ){
-                        initialJson = RealmModelUtil.toString( realmResults.get(0) );
+                        initialJson = RealmModelUtil.getState( realmResults.get(0) );
                     }
 
                     realmResults = queryTracker.rewind();
 
                     if( !realmResults.isEmpty() ){
-                        currrentJson = RealmModelUtil.toString( realmResults.get(0) );
+                        currrentJson = RealmModelUtil.getState( realmResults.get(0) );
                     }
 
                     if( !initialJson.equals( currrentJson )){

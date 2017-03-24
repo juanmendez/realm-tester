@@ -225,10 +225,10 @@ public class RealmResultsDecorator {
                                     String initialJson = "", currrentJson = "";
 
                                     RealmResults<RealmModel> results = queryTracker.getRealmResults();
-                                    initialJson = RealmModelUtil.toString( results );
+                                    initialJson = RealmModelUtil.getState( results );
 
                                     results = queryTracker.rewind();
-                                    currrentJson = RealmModelUtil.toString( results );
+                                    currrentJson = RealmModelUtil.getState( results );
 
                                     if( !initialJson.equals( currrentJson )){
                                         listener.onChange( results );
@@ -276,10 +276,10 @@ public class RealmResultsDecorator {
 
                     RealmResults<RealmModel> results = queryTracker.getRealmResults();
 
-                    initialJson = RealmModelUtil.toString( results );
+                    initialJson = RealmModelUtil.getState( results );
 
                     results = queryTracker.rewind();
-                    currrentJson = RealmModelUtil.toString( results );
+                    currrentJson = RealmModelUtil.getState( results );
 
                     if( !initialJson.equals( currrentJson )){
                         subject.onNext( results );
