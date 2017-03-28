@@ -18,14 +18,20 @@ import io.realm.exceptions.RealmException;
  * www.juanmendez.info
  * contact@juanmendez.info
  *
- * making sure our realmList is sorted by the given criteria
+ * This class takes care of sorting realmLists. The realmList can be in any level.
+ * For example persons.dogs.age, srots each dogs realmList, only.
+ * In case it's just persons.favoriteDog, then persons realmList is the one sorted
  */
 
 public class QuerySort {
 
     ArrayList<String> types;
 
-
+    /**
+     * takes only one filed to sort!
+     * @param arguments (must have field to sort, and either desc/asc order)
+     * @param realmList list to sort
+     */
     public void perform( Object[] arguments, RealmList<RealmModel> realmList ){
         this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
         searchInList( realmList, 0 );
@@ -33,24 +39,36 @@ public class QuerySort {
 
     private Object searchInList(RealmList<RealmModel> realmList, int level ){
 
-        ArrayList<QueryMap> queryMaps = new ArrayList<>();
-        for (RealmModel realmModel : realmList) {
-            queryMaps.add( new QueryMap( searchInModel(realmModel, level), realmModel ) );
-        }
+        if( realmList != null && !realmList.isEmpty()){
+            ModelKey modelKey;
+            ArrayList<ModelKey> modelKeys = new ArrayList<>();
 
-        Collections.sort(queryMaps, new GenericComparator(true) );
+            for (RealmModel realmModel : realmList) {
+                modelKeys.add( new ModelKey( searchInModel(realmModel, level), realmModel ) );
+            }
 
-        Iterator itr=queryMaps.iterator();
-        realmList.clear();
+            Collections.sort(modelKeys, new GenericComparator(true) );
 
-        while(itr.hasNext()){
-            QueryMap queryMap = (QueryMap) itr.next();
-            realmList.add( queryMap.realmModel );
+            Iterator itr= modelKeys.iterator();
+            realmList.clear();
+
+            while(itr.hasNext()){
+                modelKey = (ModelKey) itr.next();
+                realmList.add( modelKey.realmModel );
+            }
         }
 
         return null;
     }
 
+    /**
+     * find the current value based on the array types. if it's the final element from such array
+     * then it returns that value, otherwises it checks if the current value is a realmModel or realmList,
+     * and then does another iteration.
+     * @param realmModel
+     * @param level
+     * @return
+     */
     private Object searchInModel(RealmModel realmModel, int level) {
 
         Object o;
@@ -79,17 +97,24 @@ public class QuerySort {
         return o;
     }
 
-    class QueryMap{
+    /**
+     * we sort by having an instance of each realmModel and its value wrapped in a ModelKey
+     */
+    class ModelKey {
         Object key;
         RealmModel realmModel;
 
-        public QueryMap(Object key, RealmModel realmModel) {
+        public ModelKey(Object key, RealmModel realmModel) {
             this.key = key;
             this.realmModel = realmModel;
         }
     }
 
-    class GenericComparator implements Comparator<QueryMap>{
+    /**
+     * This is default Comparator. It welcomes ModelKeys, and based on their
+     * keys, it is able to sort.
+     */
+    class GenericComparator implements Comparator<ModelKey>{
 
         private int desc = 1;
 
@@ -98,8 +123,15 @@ public class QuerySort {
                 desc = -1;
         }
 
+        /**
+         * ModelKey's key is an object, so within compare we do comparisson
+         * based on their original class.
+         * @param q1
+         * @param q2
+         * @return
+         */
         @Override
-        public int compare(QueryMap q1, QueryMap q2) {
+        public int compare(ModelKey q1, ModelKey q2) {
             Object k1 = q1.key;
             Object k2 = q2.key;
             int returnValue = 0;
