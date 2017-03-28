@@ -17,6 +17,9 @@ import io.realm.exceptions.RealmException;
  * Created by Juan Mendez on 3/7/2017.
  * www.juanmendez.info
  * contact@juanmendez.info
+ *
+ * This util does a deep search through and check if the given haystack
+ * has any realmModel which meets the condition.
  */
 public class QuerySearch {
 
@@ -25,13 +28,13 @@ public class QuerySearch {
     Object[] arguments;
     Object needle;
     ArrayList<Object> needles;
-    ArrayList<Object> distinctNeedles;
+    ArrayList<Object> distinctValues;
 
     Class clazz;
     Case casing = Case.SENSITIVE;
 
-    Object left;
-    Object right;
+    Object inLeft;
+    Object inRight;
 
     public RealmList<RealmModel> search( String condition, Object[] arguments, RealmList<RealmModel> haystack ) {
 
@@ -51,14 +54,14 @@ public class QuerySearch {
         }
 
         if (condition == Compare.between) {
-            this.left = arguments[1];
-            this.right = arguments[2];
+            this.inLeft = arguments[1];
+            this.inRight = arguments[2];
         }
         else if (condition == Compare.in) {
             needles = new ArrayList<>(Arrays.asList((Object[]) needle));
         }
         else if( condition == Compare.distinct ) {
-            distinctNeedles = new ArrayList<>();
+            distinctValues = new ArrayList<>();
         }
 
         if (casing == Case.INSENSITIVE) {
@@ -140,13 +143,13 @@ public class QuerySearch {
                 if (clazz == Date.class) {
 
                     long time = ((Date)value).getTime();
-                    if( !distinctNeedles.contains(time) ){
-                        distinctNeedles.add( time );
+                    if( !distinctValues.contains(time) ){
+                        distinctValues.add( time );
                         return true;
                     }
 
-                } else if( !distinctNeedles.contains(value)){
-                    distinctNeedles.add( value );
+                } else if( !distinctValues.contains(value)){
+                    distinctValues.add( value );
                     return true;
                 }
             } else if (condition == Compare.less) {
@@ -221,17 +224,17 @@ public class QuerySearch {
 
                 if (clazz == Date.class) {
 
-                    if (((Date) value).getTime() >= ((Date) left).getTime() && ((Date) value).getTime() <= ((Date) right).getTime())
+                    if (((Date) value).getTime() >= ((Date) inLeft).getTime() && ((Date) value).getTime() <= ((Date) inRight).getTime())
                         return true;
-                } else if (clazz == Integer.class && ((int) value) >= ((int) left) && ((int) value) <= ((int) right)) {
+                } else if (clazz == Integer.class && ((int) value) >= ((int) inLeft) && ((int) value) <= ((int) inRight)) {
                     return true;
-                } else if (clazz == Double.class && ((double) value) >= ((double) left) && ((double) value) <= ((double) right)) {
+                } else if (clazz == Double.class && ((double) value) >= ((double) inLeft) && ((double) value) <= ((double) inRight)) {
                     return true;
-                } else if (clazz == Long.class && ((long) value) >= ((long) left) && ((long) value) <= ((long) right)) {
+                } else if (clazz == Long.class && ((long) value) >= ((long) inLeft) && ((long) value) <= ((long) inRight)) {
                     return true;
-                } else if (clazz == Float.class && ((float) value) >= ((float) left) && ((float) value) <= ((float) right)) {
+                } else if (clazz == Float.class && ((float) value) >= ((float) inLeft) && ((float) value) <= ((float) inRight)) {
                     return true;
-                } else if (clazz == Short.class && ((short) value) >= ((short) left) && ((short) value) <= ((short) right)) {
+                } else if (clazz == Short.class && ((short) value) >= ((short) inLeft) && ((short) value) <= ((short) inRight)) {
                     return true;
                 }
             } else if (condition == Compare.in) {
