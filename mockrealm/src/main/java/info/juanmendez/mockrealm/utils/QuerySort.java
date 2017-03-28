@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 
+import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.exceptions.RealmException;
@@ -28,15 +29,26 @@ public class QuerySort {
     ArrayList<String> types;
     private int desc = 1;
 
+
+
+    public RealmList<RealmModel> perform( Object[] args, RealmList<RealmModel> realmList ){
+        return perform( (SortField)args[0], realmList );
+    }
+
     /**
      * takes only one filed to sort!
      * @param sortField (must have field to sort, and either desc/asc order)
      * @param realmList list to sort
      */
-    public void perform( SortField sortField, RealmList<RealmModel> realmList ){
+    public RealmList<RealmModel> perform( SortField sortField, RealmList<RealmModel> realmList ){
         this.types = new ArrayList<>(Arrays.asList(((String) sortField.field).split("\\.")));
         this.desc = sortField.desc?1:-1;
-        searchInList( realmList, 0 );
+
+        RealmList<RealmModel> listToSort = RealmListDecorator.create();
+        listToSort.addAll(realmList);
+
+        searchInList( listToSort, 0 );
+        return listToSort;
     }
 
     private Object searchInList(RealmList<RealmModel> realmList, int level ){
@@ -44,6 +56,7 @@ public class QuerySort {
         if( realmList != null && !realmList.isEmpty()){
             ModelKey modelKey;
             ArrayList<ModelKey> modelKeys = new ArrayList<>();
+
 
             for (RealmModel realmModel : realmList) {
                 modelKeys.add( new ModelKey( searchInModel(realmModel, level), realmModel ) );
@@ -86,8 +99,8 @@ public class QuerySort {
             if (level < types.size() - 1) {
 
                 if (o instanceof RealmList) {
-                    return searchInList( (RealmList<RealmModel>) o, level + 1 );
-
+                    throw new RealmException("#mocking-realm: 'RealmList' field '" + types.get(level) + "' is not a supported link field here." );
+                    //could have sorted another level: return searchInList( (RealmList<RealmModel>) o, level + 1 );
                 } else if (o instanceof RealmModel) {
                     return searchInModel((RealmModel) o, level + 1);
                 }

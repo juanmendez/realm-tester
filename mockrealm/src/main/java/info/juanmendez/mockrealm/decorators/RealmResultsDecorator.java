@@ -302,19 +302,16 @@ public class RealmResultsDecorator {
         RealmResults realmResults = queryTracker.getRealmResults();
 
         doAnswer(invocation -> {
-            return invocateDistinct( queryTracker, invocation.getArguments() );
+            return invokeDistinct( queryTracker, invocation.getArguments() );
         }).when(realmResults).distinct( anyString() );
 
         doAnswer(invocation -> {
             System.out.println( "#mocking-realm: " + "There seems to be a bug, as in Realm only the first argument is doing all the distincts" );
-            return invocateDistinct( queryTracker, invocation.getArguments() );
+            return invokeDistinct( queryTracker, invocation.getArguments() );
         }).when(realmResults).distinct( anyString(), anyVararg());
     }
 
-
-
-
-    private static RealmResults<RealmModel> invocateDistinct(QueryTracker queryTracker, Object[] arguments ){
+    private static RealmResults<RealmModel> invokeDistinct(QueryTracker queryTracker, Object[] arguments ){
 
         QueryTracker resultsQueryTracker = queryTracker.clone();
         resultsQueryTracker.appendQuery(new Query(Compare.startTopGroup, new Object[]{resultsQueryTracker.getParentRealmList()}));
@@ -332,6 +329,7 @@ public class RealmResultsDecorator {
 
         return resultsQueryTracker.rewind();
     }
+
 
     private static void handleSorting(QueryTracker queryTracker) {
 
@@ -360,11 +358,13 @@ public class RealmResultsDecorator {
         doAnswer(invocation -> {
 
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
-            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[0], ((Sort) invocation.getArguments()[1]).getValue() ));
+
+            //sorting goes in reverse order!
             sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
+            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[0], ((Sort) invocation.getArguments()[1]).getValue() ));
 
             return invokeSort( queryTracker, sortFields  );
-        }).when( realmResults ).sort( anyString(), any(Sort.class));
+        }).when( realmResults ).sort( anyString(), any(Sort.class), anyString(), any(Sort.class));
 
 
 
@@ -378,10 +378,11 @@ public class RealmResultsDecorator {
             }
 
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
-            int len = fields.length;
+            int top = fields.length-1;
 
-            for( int i = 0; i < len; i++ ){
-                sortFields.add( new QuerySort.SortField( fields[i], sorts[i].getValue() ) );
+            //sorting goes in reverse order!
+            for( int i = 0; i <= top; i++ ){
+                sortFields.add( new QuerySort.SortField( fields[top-i], sorts[top-i].getValue() ) );
             }
 
             return invokeSort( queryTracker, sortFields  );

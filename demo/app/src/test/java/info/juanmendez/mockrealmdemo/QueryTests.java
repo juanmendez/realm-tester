@@ -14,7 +14,6 @@ import java.util.Set;
 
 import info.juanmendez.mockrealm.MockRealm;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
-import info.juanmendez.mockrealm.utils.QuerySort;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Case;
@@ -26,6 +25,7 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import rx.Observable;
 
 import static junit.framework.Assert.assertNull;
@@ -592,20 +592,13 @@ public class QueryTests
 
         realm.commitTransaction();
 
-        RealmResults<Person> persons = realm.where(Person.class).findAll();
-        RealmList<RealmModel> dogList = RealmStorage.getRealmMap().get(Dog.class);
+        RealmResults<Person> unsorted = realm.where( Person.class ).findAll();
+        RealmResults<Person> sorted = unsorted.sort( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
 
-        QuerySort querySort = new QuerySort();
-        RealmList<RealmModel> personList = RealmStorage.getRealmMap().get(Person.class);
-
-        querySort.perform(new QuerySort.SortField("dogs.name", true), personList );
-
-        for( RealmModel p: personList ){
+        for( RealmModel p: sorted ){
             System.out.println("");
-            System.out.println( ((Person)p).getName() + "'s dogs: "   );
-            for( Dog d: ((Person) p).getDogs()){
-                System.out.println( d.getName()  );
-            }
+            System.out.println( ((Person)p).getName() );
+            System.out.println( "Favorite dog: " + ((Person)p).getFavoriteDog().getName() + ", age: " + ((Person)p).getFavoriteDog().getAge() );
         }
     }
 }

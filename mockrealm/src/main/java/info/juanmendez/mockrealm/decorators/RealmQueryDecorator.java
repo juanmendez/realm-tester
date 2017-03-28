@@ -45,7 +45,6 @@ public class RealmQueryDecorator {
         handleMathMethods(queryTracker);
         handleSearchMethods(queryTracker);
 
-
         return realmQuery;
     }
 

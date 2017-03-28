@@ -200,8 +200,15 @@ public class QueryTracker {
         for ( Query query: queries ){
 
             if( !executeGroupQuery( query ) ){
-                searchList = new QuerySearch().search( query.getCondition(), query.getArgs(), getQueryList()  );
-                setQueryList( searchList );
+
+                if( query.getCondition() == Compare.sort ){
+                    searchList = new QuerySort().perform( query.getArgs(), getQueryList() );
+                    setQueryList( searchList );
+
+                }else{
+                    searchList = new QuerySearch().search( query.getCondition(), query.getArgs(), getQueryList()  );
+                    setQueryList( searchList );
+                }
             }
         }
 

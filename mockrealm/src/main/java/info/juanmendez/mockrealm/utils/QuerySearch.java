@@ -40,6 +40,7 @@ public class QuerySearch {
 
         this.condition = condition;
         this.arguments = arguments;
+
         this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
 
         int argsLen = arguments.length;
