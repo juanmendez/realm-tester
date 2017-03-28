@@ -588,17 +588,18 @@ public class QueryTests
         person.setFavoriteDog( chibi );
         person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
 
-
-
         realm.commitTransaction();
 
         RealmResults<Person> unsorted = realm.where( Person.class ).findAll();
-        RealmResults<Person> sorted = realm.where( Person.class ).findAllSorted( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
+        RealmResults<Person> sorted = realm.where( Person.class ).findAllSortedAsync( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
 
-        for( RealmModel p: sorted ){
-            System.out.println("");
-            System.out.println( ((Person)p).getName() );
-            System.out.println( "Favorite dog: " + ((Person)p).getFavoriteDog().getName() + ", age: " + ((Person)p).getFavoriteDog().getAge() );
-        }
+        sorted.addChangeListener(elements -> {
+
+            for( RealmModel p: elements ){
+                System.out.println("");
+                System.out.println( ((Person)p).getName() );
+                System.out.println( "Favorite dog: " + ((Person)p).getFavoriteDog().getName() + ", age: " + ((Person)p).getFavoriteDog().getAge() );
+            }
+        });
     }
 }

@@ -224,18 +224,14 @@ public class MainActivity extends AppCompatActivity {
         person.setFavoriteDog( chibi );
         person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
 
-
-
         realm.commitTransaction();
 
-
-
         RealmResults<Person> unsorted = realm.where( Person.class ).findAll();
-        RealmResults<Person> sorted = realm.where( Person.class ).findAllSorted( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
+        RealmResults<Person> sorted = unsorted.sort( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
+
         for( RealmModel p: sorted ){
             Log.i( "MainActivity", ((Person)p).getName() );
             Log.i( "MainActivity", "Favorite dog: " + ((Person)p).getFavoriteDog().getName() + ", age: " + ((Person)p).getFavoriteDog().getAge() );
-
         }
     }
 
