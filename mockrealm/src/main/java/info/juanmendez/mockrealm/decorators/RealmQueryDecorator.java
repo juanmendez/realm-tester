@@ -4,16 +4,20 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.models.Query;
+import info.juanmendez.mockrealm.utils.QuerySort;
 import info.juanmendez.mockrealm.utils.QueryTracker;
 import io.realm.Case;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.Sort;
+import io.realm.exceptions.RealmException;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -24,6 +28,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyShort;
 import static org.mockito.Matchers.anyString;
+import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
@@ -257,6 +262,119 @@ public class RealmQueryDecorator {
         when( realmQuery.in( anyString(), any(Boolean[].class) ) ).thenAnswer( createComparison(queryTracker, Compare.in ) );
         when( realmQuery.in( anyString(), any(Short[].class) ) ).thenAnswer( createComparison(queryTracker, Compare.in ) );
         when( realmQuery.in( anyString(), any(Date[].class) ) ).thenAnswer( createComparison(queryTracker, Compare.in ) );
+    }
+
+    private static void handleSortingMethods( QueryTracker queryTracker ){
+        RealmQuery realmQuery = queryTracker.getRealmQuery();
+
+        doAnswer(invocation -> {
+            String field = (String) invocation.getArguments()[0];
+            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, true)}));
+         return queryTracker.rewind();
+        }).when( realmQuery ).findAllSorted( anyString() );
+
+
+        doAnswer(invocation -> {
+            String field = (String) invocation.getArguments()[0];
+            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, true)}));
+            return queryTracker.getRealmResults();
+        }).when( realmQuery ).findAllSortedAsync( anyString() );
+
+
+        doAnswer(invocation -> {
+            String field = (String) invocation.getArguments()[0];
+            Sort sort = (Sort) invocation.getArguments()[1];
+
+            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, sort.getValue())}));
+            return queryTracker.rewind();
+        }).when( realmQuery ).findAllSorted( anyString(), any(Sort.class));
+
+        doAnswer(invocation -> {
+            String field = (String) invocation.getArguments()[0];
+            Sort sort = (Sort) invocation.getArguments()[1];
+
+            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, sort.getValue())}));
+            return queryTracker.getRealmResults();
+        }).when( realmQuery ).findAllSortedAsync( anyString(), any(Sort.class));
+
+        doAnswer(invocation -> {
+
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+
+            //sorting goes in reverse order!
+            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
+            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[0], ((Sort) invocation.getArguments()[1]).getValue() ));
+
+            for (QuerySort.SortField sortField:sortFields) {
+                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+            }
+
+            return queryTracker.rewind();
+        }).when( realmQuery ).findAllSorted( anyString(), any(Sort.class), anyString(), any(Sort.class));
+
+
+        doAnswer(invocation -> {
+
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+
+            //sorting goes in reverse order!
+            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
+            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[0], ((Sort) invocation.getArguments()[1]).getValue() ));
+
+            for (QuerySort.SortField sortField:sortFields) {
+                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+            }
+
+            return queryTracker.getRealmResults();
+        }).when( realmQuery ).findAllSortedAsync( anyString(), any(Sort.class), anyString(), any(Sort.class));
+
+
+        doAnswer(invocation -> {
+
+            String[] fields = (String[])invocation.getArguments()[0];
+            Sort[] sorts = (Sort[])invocation.getArguments()[1];
+
+            if( fields.length != sorts.length ){
+                throw new RealmException("#mocking-realm: either your field or sort array is missing one value" );
+            }
+
+            QuerySort.SortField sortField;
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+            int top = fields.length-1;
+
+            //sorting goes in reverse order!
+            for( int i = 0; i <= top; i++ ){
+
+                sortField = new QuerySort.SortField( fields[top-i], sorts[top-i].getValue() );
+                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+            }
+
+            return queryTracker.rewind();
+        }).when( realmQuery ).findAllSorted( any(String[].class), any(Sort[].class));
+
+
+        doAnswer(invocation -> {
+
+            String[] fields = (String[])invocation.getArguments()[0];
+            Sort[] sorts = (Sort[])invocation.getArguments()[1];
+
+            if( fields.length != sorts.length ){
+                throw new RealmException("#mocking-realm: either your field or sort array is missing one value" );
+            }
+
+            QuerySort.SortField sortField;
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+            int top = fields.length-1;
+
+            //sorting goes in reverse order!
+            for( int i = 0; i <= top; i++ ){
+
+                sortField = new QuerySort.SortField( fields[top-i], sorts[top-i].getValue() );
+                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+            }
+
+            return queryTracker.getRealmResults();
+        }).when( realmQuery ).findAllSortedAsync( any(String[].class), any(Sort[].class));
     }
 
 
