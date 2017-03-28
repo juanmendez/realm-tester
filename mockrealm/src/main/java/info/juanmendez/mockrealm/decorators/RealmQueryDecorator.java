@@ -49,6 +49,7 @@ public class RealmQueryDecorator {
         handleGroupingQueries(queryTracker);
         handleMathMethods(queryTracker);
         handleSearchMethods(queryTracker);
+        handleSortingMethods(queryTracker);
 
         return realmQuery;
     }
@@ -269,6 +270,7 @@ public class RealmQueryDecorator {
 
         doAnswer(invocation -> {
             String field = (String) invocation.getArguments()[0];
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
             queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, true)}));
          return queryTracker.rewind();
         }).when( realmQuery ).findAllSorted( anyString() );
@@ -276,6 +278,7 @@ public class RealmQueryDecorator {
 
         doAnswer(invocation -> {
             String field = (String) invocation.getArguments()[0];
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
             queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, true)}));
             return queryTracker.getRealmResults();
         }).when( realmQuery ).findAllSortedAsync( anyString() );
@@ -285,6 +288,7 @@ public class RealmQueryDecorator {
             String field = (String) invocation.getArguments()[0];
             Sort sort = (Sort) invocation.getArguments()[1];
 
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
             queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, sort.getValue())}));
             return queryTracker.rewind();
         }).when( realmQuery ).findAllSorted( anyString(), any(Sort.class));
@@ -293,6 +297,7 @@ public class RealmQueryDecorator {
             String field = (String) invocation.getArguments()[0];
             Sort sort = (Sort) invocation.getArguments()[1];
 
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
             queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, sort.getValue())}));
             return queryTracker.getRealmResults();
         }).when( realmQuery ).findAllSortedAsync( anyString(), any(Sort.class));
@@ -300,6 +305,8 @@ public class RealmQueryDecorator {
         doAnswer(invocation -> {
 
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
 
             //sorting goes in reverse order!
             sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
@@ -316,6 +323,8 @@ public class RealmQueryDecorator {
         doAnswer(invocation -> {
 
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
 
             //sorting goes in reverse order!
             sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
@@ -335,12 +344,14 @@ public class RealmQueryDecorator {
             Sort[] sorts = (Sort[])invocation.getArguments()[1];
 
             if( fields.length != sorts.length ){
-                throw new RealmException("#mocking-realm: either your field or sort array is missing one value" );
+                throw new RealmException("#mocking-realm: fields and sort arrays don't match" );
             }
 
             QuerySort.SortField sortField;
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
             int top = fields.length-1;
+
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
 
             //sorting goes in reverse order!
             for( int i = 0; i <= top; i++ ){
@@ -359,8 +370,10 @@ public class RealmQueryDecorator {
             Sort[] sorts = (Sort[])invocation.getArguments()[1];
 
             if( fields.length != sorts.length ){
-                throw new RealmException("#mocking-realm: either your field or sort array is missing one value" );
+                throw new RealmException("#mocking-realm: fields and sort arrays don't match" );
             }
+
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
 
             QuerySort.SortField sortField;
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();

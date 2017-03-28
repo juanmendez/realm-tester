@@ -593,7 +593,7 @@ public class QueryTests
         realm.commitTransaction();
 
         RealmResults<Person> unsorted = realm.where( Person.class ).findAll();
-        RealmResults<Person> sorted = unsorted.sort( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
+        RealmResults<Person> sorted = realm.where( Person.class ).findAllSorted( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
 
         for( RealmModel p: sorted ){
             System.out.println("");

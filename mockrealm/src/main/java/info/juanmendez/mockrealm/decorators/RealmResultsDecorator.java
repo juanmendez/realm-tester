@@ -374,7 +374,7 @@ public class RealmResultsDecorator {
             Sort[] sorts = (Sort[])invocation.getArguments()[1];
 
             if( fields.length != sorts.length ){
-                throw new RealmException("#mocking-realm: either your field or sort array is missing one value" );
+                throw new RealmException("#mocking-realm: fields and sort arrays don't match" );
             }
 
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
