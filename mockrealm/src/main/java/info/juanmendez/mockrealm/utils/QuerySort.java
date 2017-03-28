@@ -26,14 +26,16 @@ import io.realm.exceptions.RealmException;
 public class QuerySort {
 
     ArrayList<String> types;
+    private int desc = 1;
 
     /**
      * takes only one filed to sort!
-     * @param arguments (must have field to sort, and either desc/asc order)
+     * @param sortField (must have field to sort, and either desc/asc order)
      * @param realmList list to sort
      */
-    public void perform( Object[] arguments, RealmList<RealmModel> realmList ){
-        this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
+    public void perform( SortField sortField, RealmList<RealmModel> realmList ){
+        this.types = new ArrayList<>(Arrays.asList(((String) sortField.field).split("\\.")));
+        this.desc = sortField.desc?1:-1;
         searchInList( realmList, 0 );
     }
 
@@ -47,7 +49,7 @@ public class QuerySort {
                 modelKeys.add( new ModelKey( searchInModel(realmModel, level), realmModel ) );
             }
 
-            Collections.sort(modelKeys, new GenericComparator(true) );
+            Collections.sort(modelKeys, new GenericComparator() );
 
             Iterator itr= modelKeys.iterator();
             realmList.clear();
@@ -115,13 +117,6 @@ public class QuerySort {
      * keys, it is able to sort.
      */
     class GenericComparator implements Comparator<ModelKey>{
-
-        private int desc = 1;
-
-        public GenericComparator(Boolean isDesc) {
-            if( !isDesc )
-                desc = -1;
-        }
 
         /**
          * ModelKey's key is an object, so within compare we do comparisson
@@ -217,13 +212,27 @@ public class QuerySort {
                     returnValue = 0;
                 else
                 if( k1 == null  )
-                    returnValue = 1;
+                    returnValue = -1;
                 else
                 if( k2 == null )
-                    returnValue = -1;
+                    returnValue = 1;
             }
 
             return returnValue * desc;
+        }
+    }
+
+    public static class SortField{
+        private String field;
+        private Boolean desc;
+
+        public SortField(String field, Boolean desc) {
+            this.field = field;
+            this.desc = desc;
+        }
+
+        public String getField() {
+            return field;
         }
     }
 }

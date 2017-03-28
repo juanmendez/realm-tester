@@ -3,10 +3,13 @@ package info.juanmendez.mockrealm.decorators;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.util.ArrayList;
+
 import info.juanmendez.mockrealm.dependencies.Compare;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.Query;
 import info.juanmendez.mockrealm.models.TransactionEvent;
+import info.juanmendez.mockrealm.utils.QuerySort;
 import info.juanmendez.mockrealm.utils.QueryTracker;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import info.juanmendez.mockrealm.utils.SubscriptionsUtil;
@@ -16,6 +19,8 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import io.realm.Sort;
+import io.realm.exceptions.RealmException;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
@@ -57,6 +62,7 @@ public class RealmResultsDecorator {
         handleMathMethods( realmResults, realmList );
         handleAsyncMethods( queryTracker );
         handleDistinct( queryTracker );
+        handleSorting( queryTracker );
 
         return realmResults;
     }
@@ -305,6 +311,9 @@ public class RealmResultsDecorator {
         }).when(realmResults).distinct( anyString(), anyVararg());
     }
 
+
+
+
     private static RealmResults<RealmModel> invocateDistinct(QueryTracker queryTracker, Object[] arguments ){
 
         QueryTracker resultsQueryTracker = queryTracker.clone();
@@ -319,6 +328,77 @@ public class RealmResultsDecorator {
 
             System.out.println( "#mocking-realm: ensure '" + queryTracker.getClazz().getSimpleName() + "." + fieldName + "' has @index annotation" );
             resultsQueryTracker.appendQuery(new Query(Compare.distinct, fieldName, new String[]{fieldName}));
+        }
+
+        return resultsQueryTracker.rewind();
+    }
+
+    private static void handleSorting(QueryTracker queryTracker) {
+
+        RealmResults realmResults = queryTracker.getRealmResults();
+
+        doAnswer(invocation -> {
+            String field = (String) invocation.getArguments()[0];
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+            sortFields.add( new QuerySort.SortField(field, true));
+            return invokeSort( queryTracker, sortFields  );
+        }).when( realmResults ).sort( anyString() );
+
+
+        doAnswer(invocation -> {
+
+            String field = (String) invocation.getArguments()[0];
+            Sort sort = (Sort) invocation.getArguments()[1];
+
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+            sortFields.add( new QuerySort.SortField(field, sort.getValue() ));
+
+            return invokeSort( queryTracker, sortFields  );
+        }).when( realmResults ).sort( anyString(), any(Sort.class));
+
+
+        doAnswer(invocation -> {
+
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[0], ((Sort) invocation.getArguments()[1]).getValue() ));
+            sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
+
+            return invokeSort( queryTracker, sortFields  );
+        }).when( realmResults ).sort( anyString(), any(Sort.class));
+
+
+
+        doAnswer(invocation -> {
+
+            String[] fields = (String[])invocation.getArguments()[0];
+            Sort[] sorts = (Sort[])invocation.getArguments()[1];
+
+            if( fields.length != sorts.length ){
+                throw new RealmException("#mocking-realm: either your field or sort array is missing one value" );
+            }
+
+            ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
+            int len = fields.length;
+
+            for( int i = 0; i < len; i++ ){
+                sortFields.add( new QuerySort.SortField( fields[i], sorts[i].getValue() ) );
+            }
+
+            return invokeSort( queryTracker, sortFields  );
+        }).when( realmResults ).sort( any(String[].class), any(Sort[].class));
+
+        //doAnswer(invocation -> { return realmResults; }).when( realmResults ).sort( any(Comparator.class));
+    }
+
+    private static RealmResults<RealmModel> invokeSort(QueryTracker queryTracker, ArrayList<QuerySort.SortField> sortFields ){
+
+        QueryTracker resultsQueryTracker = queryTracker.clone();
+        resultsQueryTracker.appendQuery(new Query(Compare.startTopGroup, new Object[]{queryTracker.getQueryList()}));
+        resultsQueryTracker.appendQuery(new Query(Compare.endTopGroup));
+
+        for (QuerySort.SortField sortField: sortFields ) {
+
+            resultsQueryTracker.appendQuery(new Query(Compare.sort, new Object[]{sortField}));
         }
 
         return resultsQueryTracker.rewind();

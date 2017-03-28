@@ -598,7 +598,7 @@ public class QueryTests
         QuerySort querySort = new QuerySort();
         RealmList<RealmModel> personList = RealmStorage.getRealmMap().get(Person.class);
 
-        querySort.perform(new Object[]{"dogs.name"}, personList );
+        querySort.perform(new QuerySort.SortField("dogs.name", true), personList );
 
         for( RealmModel p: personList ){
             System.out.println("");

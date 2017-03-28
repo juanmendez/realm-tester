@@ -27,5 +27,6 @@ public class Compare{
     public static final String findAll = "findAll";
     public static final String findFirst = "findFirst";
     public static final String distinct = "distinct";
+    public static final String sort = "sort";
     public static final String async = "async";
 }
