@@ -10,7 +10,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.Date;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.TransactionEvent;
 import info.juanmendez.mockrealmdemo.models.Dog;
@@ -96,7 +95,7 @@ public class RxTests {
     @Test
     public void shouldBeRealmObjectAsObservable() {
 
-        RealmStorage.clear();
+        //RealmStorage.clear();
 
         Dog asyncDog = realm.where(Dog.class).equalTo("age", 2).findFirstAsync();
 
@@ -134,7 +133,7 @@ public class RxTests {
     @Test
     public void shouldBeRealmResultsAsObservable() {
 
-        RealmStorage.clear();
+        //RealmStorage.clear();
 
         RealmResults<Dog> asyncDog = realm.where(Dog.class).equalTo("age", 2).findAllAsync();
 
