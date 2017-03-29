@@ -204,14 +204,14 @@ public class QueryTracker {
             if( !executeGroupQuery( query ) ){
 
                 if( query.getCondition() == Compare.sort ){
-                    searchList = new QuerySort().perform( query.getArgs(), getQueryList() );
+                    searchList = new QuerySort().perform( query, getQueryList() );
                     setQueryList( searchList );
 
                 } else if( query.getCondition() == Compare.distinct ){
-                    searchList = new QueryDistinct().perform( query.getArgs(), getQueryList() );
+                    searchList = new QueryDistinct().perform( query, getQueryList() );
                     setQueryList( searchList );
                 } else{
-                    searchList = new QuerySearch().search( query.getCondition(), query.getArgs(), getQueryList()  );
+                    searchList = new QuerySearch().search( query, getQueryList()  );
                     setQueryList( searchList );
                 }
             }

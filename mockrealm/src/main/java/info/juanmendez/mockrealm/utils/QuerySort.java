@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Iterator;
 
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
+import info.juanmendez.mockrealm.models.Query;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.exceptions.RealmException;
@@ -31,8 +32,8 @@ public class QuerySort {
 
 
 
-    public RealmList<RealmModel> perform( Object[] args, RealmList<RealmModel> realmList ){
-        return perform( (SortField)args[0], realmList );
+    public RealmList<RealmModel> perform(Query query, RealmList<RealmModel> realmList ){
+        return perform( (SortField)query.getArgs()[0], realmList );
     }
 
     /**
