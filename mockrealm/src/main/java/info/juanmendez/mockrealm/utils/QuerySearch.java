@@ -8,6 +8,7 @@ import java.util.Date;
 
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
 import info.juanmendez.mockrealm.dependencies.Compare;
+import info.juanmendez.mockrealm.models.Query;
 import io.realm.Case;
 import io.realm.RealmList;
 import io.realm.RealmModel;
@@ -35,10 +36,10 @@ public class QuerySearch {
     Object inLeft;
     Object inRight;
 
-    public RealmList<RealmModel> search( String condition, Object[] arguments, RealmList<RealmModel> haystack ) {
+    public RealmList<RealmModel> search(Query query, RealmList<RealmModel> haystack ) {
 
-        this.condition = condition;
-        this.arguments = arguments;
+        this.condition = query.getCondition();
+        this.arguments = query.getArgs();
 
         this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
 

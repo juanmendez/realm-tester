@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import info.juanmendez.mockrealm.decorators.RealmListDecorator;
+import info.juanmendez.mockrealm.models.Query;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.exceptions.RealmException;
@@ -23,8 +24,8 @@ public class QueryDistinct {
 
     ArrayList<String> types;
 
-    public RealmList<RealmModel> perform( Object[] args, RealmList<RealmModel> realmList ){
-        return perform( (String)args[0], realmList );
+    public RealmList<RealmModel> perform(Query query, RealmList<RealmModel> realmList ){
+        return perform( (String)query.getArgs()[0], realmList );
     }
 
     /**
