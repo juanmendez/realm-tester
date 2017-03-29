@@ -2,12 +2,16 @@ package info.juanmendez.mockrealmdemo.models;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 
 /**
  * Created by musta on 2/19/2017.
  */
 public class Person extends RealmObject {
+
+    @Index
     private String name;
+
     private RealmList<Dog> dogs = new RealmList<>();
     private Dog favoriteDog;
 

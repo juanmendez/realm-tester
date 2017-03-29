@@ -28,7 +28,6 @@ public class QuerySearch {
     Object[] arguments;
     Object needle;
     ArrayList<Object> needles;
-    ArrayList<Object> distinctValues;
 
     Class clazz;
     Case casing = Case.SENSITIVE;
@@ -60,9 +59,6 @@ public class QuerySearch {
         }
         else if (condition == Compare.in) {
             needles = new ArrayList<>(Arrays.asList((Object[]) needle));
-        }
-        else if( condition == Compare.distinct ) {
-            distinctValues = new ArrayList<>();
         }
 
         if (casing == Case.INSENSITIVE) {
@@ -137,20 +133,6 @@ public class QuerySearch {
                 } else if (casing == Case.INSENSITIVE) {
                     return !needle.equals(((String) value).toLowerCase());
                 } else if (!needle.equals(value)) {
-                    return true;
-                }
-            } else if (condition == Compare.distinct ) {
-
-                if (clazz == Date.class) {
-
-                    long time = ((Date)value).getTime();
-                    if( !distinctValues.contains(time) ){
-                        distinctValues.add( time );
-                        return true;
-                    }
-
-                } else if( !distinctValues.contains(value)){
-                    distinctValues.add( value );
                     return true;
                 }
             } else if (condition == Compare.less) {

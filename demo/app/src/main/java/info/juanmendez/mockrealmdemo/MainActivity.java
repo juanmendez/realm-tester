@@ -12,9 +12,7 @@ import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmList;
-import io.realm.RealmModel;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -146,9 +144,11 @@ public class MainActivity extends AppCompatActivity {
     public void shouldSort(){
         realm = Realm.getDefaultInstance();
 
-
+//lets do this first with realmList
         Dog dog;
         Person person;
+        RealmList<Dog> dogs = new RealmList<>();
+        RealmList<Person> persons = new RealmList<>();
 
         realm.beginTransaction();
         dog = realm.createObject(Dog.class);
@@ -156,82 +156,100 @@ public class MainActivity extends AppCompatActivity {
         dog.setName("Idalgo");
         dog.setBirthdate( new Date(2016, 6, 9));
         Dog idalgo = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(6);
         dog.setName("Fido");
         dog.setBirthdate( new Date(2016, 6, 9));
         Dog fido = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Hernan");
         dog.setBirthdate( new Date(2015, 6, 10));
         Dog hernan  = dog;
+        dogs.add( dog );
 
 
         dog = realm.createObject(Dog.class);
-        Dog nully  = dog;
+        dog.setAge(10);
+        dog.setBirthdate( new Date(2007, 2, 1));
+        Dog beethoven = dog;
+        dogs.add( dog );
+
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan");
+        dog.setBirthdate( new Date(2015, 6, 10));
+        Dog hernan2  = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Chibi");
         dog.setBirthdate( new Date(2015, 2, 1));
         Dog chibi = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(3);
         dog.setName("Andromeda");
         dog.setBirthdate( new Date(2014, 2, 1));
         Dog andromeda = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(12);
         dog.setName("Baxter");
         dog.setBirthdate( new Date(2005, 2, 1));
         Dog baxter = dog;
+        dogs.add( dog );
+
+
 
         dog = realm.createObject(Dog.class);
-        dog.setAge(10);
-        dog.setName("Beethoven");
-        dog.setBirthdate( new Date(2007, 2, 1));
-        Dog beethoven = dog;
+        Dog nully  = dog;
+        dogs.add( dog );
+
         realm.commitTransaction();
 
         realm.beginTransaction();
         person = realm.createObject( Person.class );
         person.setName("Chiu-Ki");
         person.setFavoriteDog( nully );
+        persons.add( person );
 
         person = realm.createObject( Person.class );
         person.setName("Karl");
         person.setFavoriteDog( andromeda );
         person.setDogs(new RealmList<>( beethoven, baxter, hernan, nully ));
-
+        persons.add( person );
 
         person = realm.createObject( Person.class );
         person.setName("Jimmy");
         person.setFavoriteDog( baxter );
         person.setDogs(new RealmList<>( chibi, andromeda, fido, baxter ));
+        persons.add( person );
 
         person = realm.createObject( Person.class );
         person.setName("Donn");
         person.setFavoriteDog( fido );
         person.setDogs(new RealmList<>( idalgo, baxter, andromeda, nully, chibi  ));
+        persons.add( person );
 
         person = realm.createObject( Person.class );
-        person.setName("Mark");
         person.setFavoriteDog( chibi );
         person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
-
+        persons.add( person );
         realm.commitTransaction();
 
-        RealmResults<Person> unsorted = realm.where( Person.class ).findAll();
-        RealmResults<Person> sorted = unsorted.sort( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
+        RealmResults<Dog> distincts = realm.where( Dog.class ).distinct("name").sort( "name" );
 
-        for( RealmModel p: sorted ){
-            Log.i( "MainActivity", ((Person)p).getName() );
-            Log.i( "MainActivity", "Favorite dog: " + ((Person)p).getFavoriteDog().getName() + ", age: " + ((Person)p).getFavoriteDog().getAge() );
+        for( Dog d: distincts ){
+            Log.i( "MainActivity", "dog: " + d.getName() + ", age: " + d.getAge() );
         }
     }
 

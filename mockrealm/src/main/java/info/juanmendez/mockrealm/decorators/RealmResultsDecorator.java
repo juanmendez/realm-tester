@@ -27,7 +27,6 @@ import rx.subjects.BehaviorSubject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -61,7 +60,6 @@ public class RealmResultsDecorator {
         handleDeleteMethods( realmResults, realmList );
         handleMathMethods( realmResults, realmList );
         handleAsyncMethods( queryTracker );
-        handleDistinct( queryTracker );
         handleSorting( queryTracker );
 
         return realmResults;
@@ -295,39 +293,6 @@ public class RealmResultsDecorator {
 
             return subject;
         }).when( realmResults ).asObservable();
-    }
-
-    private static void handleDistinct( QueryTracker queryTracker ) {
-
-        RealmResults realmResults = queryTracker.getRealmResults();
-
-        doAnswer(invocation -> {
-            return invokeDistinct( queryTracker, invocation.getArguments() );
-        }).when(realmResults).distinct( anyString() );
-
-        doAnswer(invocation -> {
-            System.out.println( "#mocking-realm: " + "There seems to be a bug, as in Realm only the first argument is doing all the distincts" );
-            return invokeDistinct( queryTracker, invocation.getArguments() );
-        }).when(realmResults).distinct( anyString(), anyVararg());
-    }
-
-    private static RealmResults<RealmModel> invokeDistinct(QueryTracker queryTracker, Object[] arguments ){
-
-        QueryTracker resultsQueryTracker = queryTracker.clone();
-        resultsQueryTracker.appendQuery(new Query(Compare.startTopGroup, new Object[]{resultsQueryTracker.getParentRealmList()}));
-        resultsQueryTracker.appendQuery(new Query(Compare.endTopGroup));
-
-        String fieldName;
-        arguments = new Object[]{arguments[0]};
-
-        for (Object argument: arguments ) {
-            fieldName = (String) argument;
-
-            System.out.println( "#mocking-realm: ensure '" + queryTracker.getClazz().getSimpleName() + "." + fieldName + "' has @index annotation" );
-            resultsQueryTracker.appendQuery(new Query(Compare.distinct, fieldName, new String[]{fieldName}));
-        }
-
-        return resultsQueryTracker.rewind();
     }
 
 
