@@ -109,6 +109,9 @@ public class TransactionObservable {
 
     public static void removeSubscriptions(){
         subscriptionsUtil.removeAll();
+
+        //required in case of RealmStorage.clear()
+        subject = PublishSubject.create();
     }
 
     /**

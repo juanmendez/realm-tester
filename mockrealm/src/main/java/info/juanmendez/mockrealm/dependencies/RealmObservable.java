@@ -48,6 +48,9 @@ public class RealmObservable {
 
     public static void removeSubscriptions(){
         subscriptionsUtil.removeAll();
+
+        //recreate subject when RealmStorage.clear()
+        realmModelObserver = BehaviorSubject.create();
     }
 
     public static void unsubcribe( Object observer ){
