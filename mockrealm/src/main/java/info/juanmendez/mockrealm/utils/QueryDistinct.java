@@ -45,7 +45,7 @@ public class QueryDistinct {
             for (RealmModel realmModel : realmList) {
                 value = searchInModel(realmModel, 0);
 
-                if( value != null && !distinctValues.contains(value)){
+                if( !distinctValues.contains(value)){
                     distinctValues.add(value);
                     distinctList.add( realmModel );
                 }

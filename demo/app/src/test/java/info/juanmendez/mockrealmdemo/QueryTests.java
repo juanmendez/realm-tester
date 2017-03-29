@@ -563,10 +563,10 @@ public class QueryTests
        /* dogs = realm.where(Dog.class).findAll().distinct("birthdate");
         assertEquals("out of the first 6 dogs, there are 6 whose birthdays are unique", dogs.size(), 7 );*/
 
-        RealmResults<Dog> distincts = realm.where( Dog.class ).distinct("name");
+        RealmResults<Dog> distincts = realm.where( Dog.class ).distinct("name", "age").sort("name");
 
         for( Dog d: distincts ){
-            System.out.println( "dog: " + d.getName() );
+            System.out.println( "dog: " + d.getName() + ", age: " + d.getAge() );
         }
     }
 
