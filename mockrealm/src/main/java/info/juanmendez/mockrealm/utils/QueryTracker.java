@@ -23,7 +23,7 @@ public class QueryTracker {
 
     private ArrayList<Query> queries = new ArrayList<>();
 
-    private ArrayList<Boolean> andLevel = new ArrayList<>();
+    private boolean asAnd = true;
     private ArrayList<RealmList<RealmModel>> groupResults = new ArrayList<>();
     private int groupLevel = 0;
     private Class clazz;
@@ -60,7 +60,7 @@ public class QueryTracker {
     }
 
     public void setQueryList( RealmList<RealmModel> queryList ){
-        if( andLevel.get(groupLevel) ){
+        if( asAnd ){
             groupResults.get( groupLevel ).clear();
             groupResults.get( groupLevel ).addAll( queryList );
         }else{
@@ -75,11 +75,11 @@ public class QueryTracker {
         }
 
         //if the las query is based on OR(), then bounce back to AND()
-        andLevel.set(groupLevel, true );
+        this.asAnd = true;
     }
 
     private void onOrClause() {
-        andLevel.set( groupLevel, false );
+        this.asAnd = false;
     }
 
     private void onBeginGroupClause(){
@@ -91,14 +91,12 @@ public class QueryTracker {
 
         groupLevel++;
         groupResults.add( nextGroupList );
-        andLevel.add(true);
     }
 
     private void onCloseGroupClause(){
 
         RealmList<RealmModel> currentGroupList = groupResults.get( groupLevel );
         groupResults.remove( groupLevel );
-        andLevel.set(groupLevel, true );
 
         groupLevel--;
 
@@ -159,7 +157,7 @@ public class QueryTracker {
 
     public RealmList<RealmModel> getQueryList(){
 
-        if( !andLevel.get(groupLevel)){
+        if( !asAnd){
             return groupResults.get(groupLevel-1);
         }
 

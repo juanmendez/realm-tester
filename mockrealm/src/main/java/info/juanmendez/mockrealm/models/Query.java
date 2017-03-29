@@ -17,24 +17,8 @@ public class Query {
         return new Query();
     }
 
-    public Query(){
+    private Query(){}
 
-    }
-
-    public Query(String condition) {
-        this.condition = condition;
-    }
-
-    public Query( String condition, Object[] args ){
-        this( condition );
-        this.args = args;
-    }
-
-    public Query(String condition, String field, Object[] args) {
-        this( condition, args );
-        this.field = field;
-    }
-    
     public Query setField(String field) {
         this.field = field;
         return this;

@@ -60,17 +60,17 @@ public class RealmQueryDecorator {
         RealmQuery realmQuery = queryTracker.getRealmQuery();
 
         when( realmQuery.findAll() ).thenAnswer(invocation ->{
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
             return queryTracker.rewind();
         });
 
         when( realmQuery.findAllAsync() ).thenAnswer(invocation -> {
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
             return queryTracker.getRealmResults();
         });
 
         when( realmQuery.findFirst()).thenAnswer(invocation -> {
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
             RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
             if( realmResults.isEmpty() )
@@ -80,7 +80,7 @@ public class RealmQueryDecorator {
         });
 
         when( realmQuery.findFirstAsync() ).thenAnswer(invocation -> {
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
             RealmObject realmObject = (RealmObject) RealmModelDecorator.create( queryTracker.getClazz(), false );
             RealmObjectDecorator.handleAsyncMethods( realmObject, queryTracker );
             return realmObject;
@@ -91,18 +91,18 @@ public class RealmQueryDecorator {
 
         RealmQuery realmQuery = queryTracker.getRealmQuery();
         when( realmQuery.or()).then( invocation -> {
-            queryTracker.appendQuery( new Query(Compare.or));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.or));
             return  realmQuery;
         });
 
         when( realmQuery.beginGroup()).then( invocation -> {
-            queryTracker.appendQuery( new Query(Compare.startGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.startGroup));
             return  realmQuery;
         });
 
 
         when( realmQuery.endGroup()).then( invocation -> {
-            queryTracker.appendQuery( new Query(Compare.endGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endGroup));
             return  realmQuery;
         });
     }
@@ -114,7 +114,7 @@ public class RealmQueryDecorator {
         when( realmQuery.count() ).thenAnswer(new Answer<Integer>() {
             @Override
             public Integer answer(InvocationOnMock invocation) throws Throwable {
-                queryTracker.appendQuery( new Query(Compare.endTopGroup));
+                queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
                 RealmResults<RealmModel> realmResults = queryTracker.rewind();
                 return realmResults.size();
             }
@@ -125,7 +125,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
 
                 if( invocation.getArguments().length >= 1 ){
-                    queryTracker.appendQuery( new Query(Compare.endTopGroup));
+                    queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -140,7 +140,7 @@ public class RealmQueryDecorator {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
-                    queryTracker.appendQuery( new Query(Compare.endTopGroup));
+                    queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -157,7 +157,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryTracker.appendQuery( new Query(Compare.endTopGroup));
+                    queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -172,7 +172,7 @@ public class RealmQueryDecorator {
             public Number answer(InvocationOnMock invocation) throws Throwable {
                 if( invocation.getArguments().length >= 1 ){
 
-                    queryTracker.appendQuery( new Query(Compare.endTopGroup));
+                    queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
                     RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
                     String fieldName = (String) invocation.getArguments()[0];
@@ -272,16 +272,26 @@ public class RealmQueryDecorator {
 
         doAnswer(invocation -> {
             String field = (String) invocation.getArguments()[0];
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
-            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, true)}));
-         return queryTracker.rewind();
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
+
+            queryTracker.appendQuery( Query.build()
+                                            .setCondition(Compare.sort)
+                                            .setArgs(new Object[]{new QuerySort.SortField(field, true)}) );
+
+            return queryTracker.rewind();
         }).when( realmQuery ).findAllSorted( anyString() );
 
 
         doAnswer(invocation -> {
             String field = (String) invocation.getArguments()[0];
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
-            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, true)}));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
+
+
+
+            queryTracker.appendQuery( Query.build()
+                                        .setCondition(Compare.sort)
+                                        .setArgs(new Object[]{new QuerySort.SortField(field, true)}));
+
             return queryTracker.getRealmResults();
         }).when( realmQuery ).findAllSortedAsync( anyString() );
 
@@ -290,8 +300,8 @@ public class RealmQueryDecorator {
             String field = (String) invocation.getArguments()[0];
             Sort sort = (Sort) invocation.getArguments()[1];
 
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
-            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, sort.getValue())}));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.sort).setArgs(new Object[]{new QuerySort.SortField(field, sort.getValue())}));
             return queryTracker.rewind();
         }).when( realmQuery ).findAllSorted( anyString(), any(Sort.class));
 
@@ -299,8 +309,8 @@ public class RealmQueryDecorator {
             String field = (String) invocation.getArguments()[0];
             Sort sort = (Sort) invocation.getArguments()[1];
 
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
-            queryTracker.appendQuery( new Query(Compare.sort, new Object[]{new QuerySort.SortField(field, sort.getValue())}));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.sort).setArgs(new Object[]{new QuerySort.SortField(field, sort.getValue())}));
             return queryTracker.getRealmResults();
         }).when( realmQuery ).findAllSortedAsync( anyString(), any(Sort.class));
 
@@ -308,14 +318,14 @@ public class RealmQueryDecorator {
 
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
 
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
 
             //sorting goes in reverse order!
             sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
             sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[0], ((Sort) invocation.getArguments()[1]).getValue() ));
 
             for (QuerySort.SortField sortField:sortFields) {
-                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+                queryTracker.appendQuery( Query.build().setCondition(Compare.sort).setArgs(new Object[]{sortField}));
             }
 
             return queryTracker.rewind();
@@ -326,14 +336,14 @@ public class RealmQueryDecorator {
 
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
 
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
 
             //sorting goes in reverse order!
             sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[2], ((Sort) invocation.getArguments()[3]).getValue() ));
             sortFields.add( new QuerySort.SortField((String) invocation.getArguments()[0], ((Sort) invocation.getArguments()[1]).getValue() ));
 
             for (QuerySort.SortField sortField:sortFields) {
-                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+                queryTracker.appendQuery( Query.build().setCondition(Compare.sort).setArgs(new Object[]{sortField}));
             }
 
             return queryTracker.getRealmResults();
@@ -353,13 +363,13 @@ public class RealmQueryDecorator {
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
             int top = fields.length-1;
 
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
 
             //sorting goes in reverse order!
             for( int i = 0; i <= top; i++ ){
 
                 sortField = new QuerySort.SortField( fields[top-i], sorts[top-i].getValue() );
-                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+                queryTracker.appendQuery( Query.build().setCondition(Compare.sort).setArgs(new Object[]{sortField}));
             }
 
             return queryTracker.rewind();
@@ -375,7 +385,7 @@ public class RealmQueryDecorator {
                 throw new RealmException("#mocking-realm: fields and sort arrays don't match" );
             }
 
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
 
             QuerySort.SortField sortField;
             ArrayList<QuerySort.SortField> sortFields = new ArrayList<QuerySort.SortField>();
@@ -385,7 +395,10 @@ public class RealmQueryDecorator {
             for( int i = 0; i <= top; i++ ){
 
                 sortField = new QuerySort.SortField( fields[top-i], sorts[top-i].getValue() );
-                queryTracker.appendQuery( new Query(Compare.sort, new Object[]{sortField}));
+
+                queryTracker.appendQuery( Query.build()
+                                                .setCondition(Compare.sort)
+                                                .setArgs(new Object[]{sortField}));
             }
 
             return queryTracker.getRealmResults();
@@ -397,23 +410,35 @@ public class RealmQueryDecorator {
         RealmQuery realmQuery = queryTracker.getRealmQuery();
 
         doAnswer(invocation -> {
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
-            queryTracker.appendQuery( new Query(Compare.distinct, invocation.getArguments()));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
+
+            queryTracker.appendQuery( Query.build()
+                    .setCondition(Compare.distinct)
+                    .setArgs(invocation.getArguments()));
+
             return queryTracker.rewind();
         }).when(realmQuery).distinct(anyString());
 
         doAnswer(invocation -> {
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
 
             for( Object arg: invocation.getArguments() ){
-                queryTracker.appendQuery( new Query(Compare.distinct, new Object[]{arg}));
+                queryTracker.appendQuery(  Query.build()
+                                                .setCondition(Compare.distinct)
+                                                .setArgs(new Object[]{arg}));
             }
             return queryTracker.rewind();
         }).when(realmQuery).distinct(anyString(), anyVararg() );
 
         doAnswer(invocation -> {
-            queryTracker.appendQuery( new Query(Compare.endTopGroup));
-            queryTracker.appendQuery( new Query(Compare.distinct, invocation.getArguments()));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.endTopGroup));
+
+
+
+            queryTracker.appendQuery( Query.build()
+                                        .setCondition(Compare.distinct)
+                                        .setArgs(invocation.getArguments()));
+
             return queryTracker.getRealmResults();
         }).when(realmQuery).distinctAsync(anyString());
     }
@@ -445,7 +470,10 @@ public class RealmQueryDecorator {
                 return realmQuery;
             }
 
-            queryTracker.appendQuery( new Query(condition, type, invocationOnMock.getArguments()));
+            queryTracker.appendQuery(Query.build()
+                                    .setCondition(condition)
+                                    .setField(type)
+                                    .setArgs(invocationOnMock.getArguments()));
 
             return realmQuery;
         };
