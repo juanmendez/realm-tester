@@ -24,9 +24,8 @@ import io.realm.exceptions.RealmException;
  */
 public class QuerySearch {
 
-    String condition;
+    Query query;
     ArrayList<String> types;
-    Object[] arguments;
     Object needle;
     ArrayList<Object> needles;
 
@@ -38,8 +37,9 @@ public class QuerySearch {
 
     public RealmList<RealmModel> search(Query query, RealmList<RealmModel> haystack ) {
 
-        this.condition = query.getCondition();
-        this.arguments = query.getArgs();
+        this.query = query;
+        String condition = query.getCondition();
+        Object[] arguments = query.getArgs();
 
         this.types = new ArrayList<>(Arrays.asList(((String) arguments[0]).split("\\.")));
 
@@ -89,6 +89,7 @@ public class QuerySearch {
         //RunTimeErrorException if search field is not found in realmQueryClass
 
         Object value;
+        String condition = query.getCondition();
 
         try {
             value = Whitebox.getInternalState(realmModel, types.get(level));
