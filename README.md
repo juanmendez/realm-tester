@@ -5,7 +5,7 @@ This is ongoing work to mock Realm as much as possible hammering with Mockito, a
 [Wiki has a basic instructions how to import and use this library](https://github.com/juanmendez/Mocking-Realm/wiki)
 
 What has been done so far
-- Supporting Realm 2.3
+- Working with Realm 3.0.0
 - Supporting Robolectric 3.3.1
 - Works with Mockito 1.10.19
 - Works with PowerMockito 1.6.4
