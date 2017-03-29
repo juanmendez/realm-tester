@@ -14,7 +14,6 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -201,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         realm.beginTransaction();
         person = realm.createObject( Person.class );
         person.setName("Chiu-Ki");
-        person.setFavoriteDog( nully );
+        person.setFavoriteDog( fido );
 
         person = realm.createObject( Person.class );
         person.setName("Karl");
@@ -226,12 +225,11 @@ public class MainActivity extends AppCompatActivity {
 
         realm.commitTransaction();
 
-        RealmResults<Person> unsorted = realm.where( Person.class ).findAll();
-        RealmResults<Person> sorted = unsorted.sort( new String[]{"favoriteDog.name", "favoriteDog.age"}, new Sort[]{Sort.ASCENDING, Sort.ASCENDING});
+        RealmResults<Person> distincts = realm.where( Person.class ).distinct("name");
 
-        for( RealmModel p: sorted ){
-            Log.i( "MainActivity", ((Person)p).getName() );
-            Log.i( "MainActivity", "Favorite dog: " + ((Person)p).getFavoriteDog().getName() + ", age: " + ((Person)p).getFavoriteDog().getAge() );
+        for( RealmModel p: distincts ){
+            System.out.println( ((Person)p).getName() );
+            System.out.println(  "Favorite dog: " + ((Person)p).getFavoriteDog().getName() + ", age: " + ((Person)p).getFavoriteDog().getAge() );
         }
     }
 

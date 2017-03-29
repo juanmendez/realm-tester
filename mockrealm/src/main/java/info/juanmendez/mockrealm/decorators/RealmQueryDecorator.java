@@ -28,6 +28,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyShort;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyVararg;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -50,6 +51,7 @@ public class RealmQueryDecorator {
         handleMathMethods(queryTracker);
         handleSearchMethods(queryTracker);
         handleSortingMethods(queryTracker);
+        handleDistinct( queryTracker );
 
         return realmQuery;
     }
@@ -388,6 +390,32 @@ public class RealmQueryDecorator {
 
             return queryTracker.getRealmResults();
         }).when( realmQuery ).findAllSortedAsync( any(String[].class), any(Sort[].class));
+    }
+
+    private static void handleDistinct( QueryTracker queryTracker ){
+
+        RealmQuery realmQuery = queryTracker.getRealmQuery();
+
+        doAnswer(invocation -> {
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( new Query(Compare.distinct, invocation.getArguments()));
+            return queryTracker.rewind();
+        }).when(realmQuery).distinct(anyString());
+
+        doAnswer(invocation -> {
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+
+            for( Object arg: invocation.getArguments() ){
+                queryTracker.appendQuery( new Query(Compare.distinct, new Object[]{arg}));
+            }
+            return queryTracker.rewind();
+        }).when(realmQuery).distinct(anyString(), anyVararg() );
+
+        doAnswer(invocation -> {
+            queryTracker.appendQuery( new Query(Compare.endTopGroup));
+            queryTracker.appendQuery( new Query(Compare.distinct, invocation.getArguments()));
+            return queryTracker.getRealmResults();
+        }).when(realmQuery).distinctAsync(anyString());
     }
 
 

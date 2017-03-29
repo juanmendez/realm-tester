@@ -457,52 +457,117 @@ public class QueryTests
 
         //lets do this first with realmList
         Dog dog;
+        Person person;
+        RealmList<Dog> dogs = new RealmList<>();
+        RealmList<Person> persons = new RealmList<>();
 
+        realm.beginTransaction();
         dog = realm.createObject(Dog.class);
         dog.setAge(6);
         dog.setName("Idalgo");
         dog.setBirthdate( new Date(2016, 6, 9));
+        Dog idalgo = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(6);
         dog.setName("Fido");
         dog.setBirthdate( new Date(2016, 6, 9));
+        Dog fido = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Hernan");
         dog.setBirthdate( new Date(2015, 6, 10));
+        Dog hernan  = dog;
+        dogs.add( dog );
+
 
         dog = realm.createObject(Dog.class);
-        dog.setAge(5);
+        dog.setAge(2);
         dog.setName("Hernan");
-        dog.setBirthdate( new Date(2012, 2, 1));
+        dog.setBirthdate( new Date(2015, 6, 10));
+        Dog hernan2  = dog;
+        dogs.add( dog );
+
+        dog = realm.createObject(Dog.class);
+        Dog nully  = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(2);
         dog.setName("Chibi");
         dog.setBirthdate( new Date(2015, 2, 1));
+        Dog chibi = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(3);
         dog.setName("Andromeda");
         dog.setBirthdate( new Date(2014, 2, 1));
+        Dog andromeda = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(12);
         dog.setName("Baxter");
         dog.setBirthdate( new Date(2005, 2, 1));
+        Dog baxter = dog;
+        dogs.add( dog );
 
         dog = realm.createObject(Dog.class);
         dog.setAge(10);
         dog.setName("Beethoven");
         dog.setBirthdate( new Date(2007, 2, 1));
+        Dog beethoven = dog;
+        dogs.add( dog );
 
-        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name");
-        assertEquals("there are 7 dogs with distinct names", dogs.size(), 7 );
+        realm.commitTransaction();
 
-        dogs = realm.where(Dog.class).findAll().distinct("birthdate");
-        assertEquals("out of the first 6 dogs, there are 6 whose birthdays are unique", dogs.size(), 7 );
+        realm.beginTransaction();
+        person = realm.createObject( Person.class );
+        person.setName("Chiu-Ki");
+        person.setFavoriteDog( nully );
+        persons.add( person );
+
+        person = realm.createObject( Person.class );
+        person.setName("Karl");
+        person.setFavoriteDog( andromeda );
+        person.setDogs(new RealmList<>( beethoven, baxter, hernan, nully ));
+        persons.add( person );
+
+        person = realm.createObject( Person.class );
+        person.setName("Jimmy");
+        person.setFavoriteDog( baxter );
+        person.setDogs(new RealmList<>( chibi, andromeda, fido, baxter ));
+        persons.add( person );
+
+        person = realm.createObject( Person.class );
+        person.setName("Donn");
+        person.setFavoriteDog( fido );
+        person.setDogs(new RealmList<>( idalgo, baxter, andromeda, nully, chibi  ));
+        persons.add( person );
+
+        person = realm.createObject( Person.class );
+        person.setName("Mark");
+        person.setFavoriteDog( chibi );
+        person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
+        persons.add( person );
+        realm.commitTransaction();
+
+
+        /*RealmList<Person> distinctPersons = new QueryDistinct().perform("name", persons );
+        assertEquals("there are 7 dogs with distinct names", dogs.size(), 7 );*/
+
+       /* dogs = realm.where(Dog.class).findAll().distinct("birthdate");
+        assertEquals("out of the first 6 dogs, there are 6 whose birthdays are unique", dogs.size(), 7 );*/
+
+        RealmResults<Dog> distincts = realm.where( Dog.class ).distinct("name");
+
+        for( Dog d: distincts ){
+            System.out.println( "dog: " + d.getName() );
+        }
     }
 
 

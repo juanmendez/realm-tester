@@ -205,7 +205,10 @@ public class QueryTracker {
                     searchList = new QuerySort().perform( query.getArgs(), getQueryList() );
                     setQueryList( searchList );
 
-                }else{
+                } else if( query.getCondition() == Compare.distinct ){
+                    searchList = new QueryDistinct().perform( query.getArgs(), getQueryList() );
+                    setQueryList( searchList );
+                } else{
                     searchList = new QuerySearch().search( query.getCondition(), query.getArgs(), getQueryList()  );
                     setQueryList( searchList );
                 }

@@ -14,7 +14,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  * www.juanmendez.info
  * contact@juanmendez.info
  */
-public class RealmListDecorator {
+public class RealmListDecorator <T extends RealmModel>{
 
     public static void prepare() throws Exception {
 

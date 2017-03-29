@@ -113,7 +113,7 @@ public class QuerySort {
     }
 
     /**
-     * we sort by having an instance of each realmModel and its value wrapped in a ModelKey
+     * we sort by having an instance of each realmModel and its value wrapped in a ValueKey
      */
     class ModelKey {
         Object key;
@@ -132,7 +132,7 @@ public class QuerySort {
     class GenericComparator implements Comparator<ModelKey>{
 
         /**
-         * ModelKey's key is an object, so within compare we do comparisson
+         * ValueKey's value is an object, so within compare we do comparisson
          * based on their original class.
          * @param q1
          * @param q2
