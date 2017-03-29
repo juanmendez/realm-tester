@@ -16,6 +16,8 @@ What has been done so far
 - Asynchronous and synchronous transactions with RxJava
     - Schedulers for testing use Schedulers.immediate()
 - Support or() for chaining queries
+- realmQuery.distinct(*), realmResults.distinct() has been deprecated in Realm 3.0.0
+- realmQuery.sort(*), realmResults.sort(*)
 - Grouping
 - Querying against realmResults
 - delete reamModels in cascading mode
