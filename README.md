@@ -23,7 +23,7 @@ What has been done so far
 - support realmQuery.*Async() methods
 - realmResults.addChangeListener(), realmObject.addChangeListener()
 - realmResults.asObservable(),realmObject.asObservable(), not supporting realm.asObservable() at this time
-- Several features not covered will simply pass, and not perform anything. In this situation, I am going to include a console message with prefix #Mocking-Realm and let you know when that occurs. The same rule will apply for features which I cover partially. For example during mocking Realm I couldn't track their annotations, due to their retention type. So I am just going to let you know to make sure include @Index in your attributes.
+- Several features not covered will simply pass, and not perform anything. In this situation, I am going to include a console message with prefix #Mocking-Realm and let you know when that occurs. The same rule will apply for features which I cover partially. For example during mocking Realm I couldn't track their annotations, due to their retention type. So I am just going to let you know to make sure include @Index in your attributes when required to use realmQuery.distinct(*) for instance.
 
 What is coming next
 - Cover RealmQuery.not()
