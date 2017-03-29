@@ -22,7 +22,9 @@ What has been done so far
 - support also for deleting methods found in realmResults, realmModel, realmObject and realmLists
 - support realmQuery.*Async() methods
 - realmResults.addChangeListener(), realmObject.addChangeListener()
-- realmResults.asObservable(),realmObject.asObservable()
+- realmResults.asObservable(),realmObject.asObservable(), not supporting realm.asObservable() at this time
+- Several features not covered will simply pass, and not perform anything. In this situation, I am going to include a console message with prefix #Mocking-Realm and let you know when that occurs. The same rule will apply for features which I cover partially. For example during mocking Realm I couldn't track their annotations, due to their retention type. So I am just going to let you know to make sure include @Index in your attributes.
 
 What is coming next
-- A chart with what's being covered and what is not from RealmModel, RealmObject, RealmQuery, RealmResults, and RealmList
+- Cover RealmQuery.not()
+- Finally a chart with what is covered, and what will be mocked to be ignored.
