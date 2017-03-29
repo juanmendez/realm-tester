@@ -31,8 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
-
-        shouldSort();
     }
 
     void shouldQueryChain(){
@@ -137,8 +135,13 @@ public class MainActivity extends AppCompatActivity {
         dog.setBirthdate( new Date(2007, 2, 1));
         realm.commitTransaction();
 
-        RealmResults<Dog> dogs = realm.where(Dog.class).findAll().distinct("name").distinct("age");
+        RealmResults<Dog> dogs = realm.where(Dog.class).distinct("name", "age" );
         textView.setText("We found " + dogs.size() + " with distinct names, and birthdays!" );
+
+        Log.i( "MainActivity", "Dogs with distinct age and name" );
+        for( Dog d: dogs ){
+            Log.i( "MainActivity", "dog: " + d.getName() + ", age: " + d.getAge() );
+        }
     }
 
     public void shouldSort(){
@@ -218,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
         realm.beginTransaction();
         person = realm.createObject( Person.class );
-        person.setName("Chiu-Ki");
+        person.setName("Andrea");
         person.setFavoriteDog( nully );
         persons.add( person );
 
@@ -241,15 +244,26 @@ public class MainActivity extends AppCompatActivity {
         persons.add( person );
 
         person = realm.createObject( Person.class );
+        person.setName("Erica");
         person.setFavoriteDog( chibi );
         person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
         persons.add( person );
         realm.commitTransaction();
 
-        RealmResults<Dog> distincts = realm.where( Dog.class ).distinct("name").sort( "name" );
+        RealmResults<Dog> sortedDogs = realm.where( Dog.class ).findAllSorted("name");
 
-        for( Dog d: distincts ){
+        Log.i( "MainActivity", "dogs sorted by name" );
+        for( Dog d: sortedDogs ){
             Log.i( "MainActivity", "dog: " + d.getName() + ", age: " + d.getAge() );
+        }
+
+
+        RealmResults<Person> sortedPeople = realm.where( Person.class ).findAllSorted("favoriteDog.name");
+
+        Log.i( "MainActivity", "People sorted by their favorite dog name" );
+
+        for( Person p: sortedPeople ){
+            Log.i( "MainActivity", "person: " + p.getName() + ", favorite dog's name: " + (p.getFavoriteDog()!=null?p.getFavoriteDog().getName():"null") );
         }
     }
 

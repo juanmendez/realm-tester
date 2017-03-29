@@ -225,11 +225,11 @@ public class QuerySort {
                 if( k1 == null && k2 == null )
                     returnValue = 0;
                 else
-                if( k1 == null  )
-                    returnValue = -1;
-                else
-                if( k2 == null )
+                if( k1 != null  )
                     returnValue = 1;
+                else
+                if( k2 != null )
+                    returnValue = -1;
             }
 
             return returnValue * desc;
