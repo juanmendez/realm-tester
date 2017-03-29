@@ -52,14 +52,22 @@ public class RealmModelUtil {
 
         if( realmModel instanceof AbstractList ){
 
-            if( ((AbstractList<RealmModel>)realmModel).isEmpty()  ){
+            AbstractList<RealmModel> abstractList = (AbstractList<RealmModel>)realmModel;
+
+            if( abstractList.isEmpty() ){
                 return Ob+Cb;
             }
 
             jsonString += Ob;
-            for( RealmModel m: (AbstractList<RealmModel>)realmModel ){
-                jsonString += getState(m)+C;
+            try{
+                for( RealmModel m: abstractList ){
+                    jsonString += getState(m)+C;
+                }
             }
+            catch( Exception e ){
+                System.err.println( e.getMessage() );
+            }
+
 
             jsonString = jsonString.substring(0,jsonString.length()-1);
             jsonString+= Cb;

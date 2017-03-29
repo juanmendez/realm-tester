@@ -143,7 +143,7 @@ public class RealmDecorator {
                     realmMap.put(clazz, new RealmList<>());
                 }
 
-                queryTracker.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmMap.get(clazz)} ));
+                queryTracker.appendQuery( Query.build().setCondition(Compare.startTopGroup).setArgs(new Object[]{realmMap.get(clazz)}) );
 
 
                 return realmQuery;

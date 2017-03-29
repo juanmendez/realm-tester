@@ -48,7 +48,7 @@ public class RealmResultsDecorator {
             public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
 
                 QueryTracker resultsQueryTracker = queryTracker.clone();
-                resultsQueryTracker.appendQuery( new Query(Compare.startTopGroup, new Object[]{realmList}));
+                resultsQueryTracker.appendQuery( Query.build().setCondition(Compare.startTopGroup).setArgs(new Object[]{realmList}));
 
                 RealmQuery realmQuery = RealmQueryDecorator.create(resultsQueryTracker);
 
@@ -359,12 +359,12 @@ public class RealmResultsDecorator {
     private static RealmResults<RealmModel> invokeSort(QueryTracker queryTracker, ArrayList<QuerySort.SortField> sortFields ){
 
         QueryTracker resultsQueryTracker = queryTracker.clone();
-        resultsQueryTracker.appendQuery(new Query(Compare.startTopGroup, new Object[]{queryTracker.getQueryList()}));
-        resultsQueryTracker.appendQuery(new Query(Compare.endTopGroup));
+        resultsQueryTracker.appendQuery(Query.build().setCondition(Compare.startTopGroup).setArgs(new Object[]{queryTracker.getQueryList()}));
+        resultsQueryTracker.appendQuery(Query.build().setCondition(Compare.endTopGroup));
 
         for (QuerySort.SortField sortField: sortFields ) {
 
-            resultsQueryTracker.appendQuery(new Query(Compare.sort, new Object[]{sortField}));
+            resultsQueryTracker.appendQuery(Query.build().setCondition(Compare.sort).setArgs(new Object[]{sortField}));
         }
 
         return resultsQueryTracker.rewind();
