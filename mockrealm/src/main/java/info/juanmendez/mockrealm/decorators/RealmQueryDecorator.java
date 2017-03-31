@@ -105,6 +105,12 @@ public class RealmQueryDecorator {
             queryTracker.appendQuery( Query.build().setCondition(Compare.endGroup));
             return  realmQuery;
         });
+
+
+        when( realmQuery.not() ).thenAnswer( invocation -> {
+            queryTracker.appendQuery(Query.build().setCondition(Compare.not));
+            return realmQuery;
+        });
     }
 
     private static void handleMathMethods( QueryTracker queryTracker){
@@ -185,7 +191,7 @@ public class RealmQueryDecorator {
 
     private static void handleSearchMethods( QueryTracker queryTracker){
         RealmQuery realmQuery = queryTracker.getRealmQuery();
-        
+
         when( realmQuery.lessThan( any(), anyInt() ) ).thenAnswer( createComparison(queryTracker, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyByte()) ).thenAnswer( createComparison(queryTracker, Compare.less ) );
         when( realmQuery.lessThan( anyString(), anyDouble() ) ).thenAnswer( createComparison(queryTracker, Compare.less ) );
@@ -238,16 +244,16 @@ public class RealmQueryDecorator {
         when( realmQuery.equalTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison(queryTracker, Compare.equal ) );
 
 
-        when( realmQuery.notEqualTo( anyString(), anyInt() ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyByte()) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyDouble() ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyFloat() ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyLong() ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyString() ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyBoolean() ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), anyShort() ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
-        when( realmQuery.notEqualTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison(queryTracker, Compare.not_equal ) );
+        when( realmQuery.notEqualTo( anyString(), anyInt() ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyByte()) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyDouble() ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyFloat() ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyLong() ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyString() ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyBoolean() ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), anyShort() ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
+        when( realmQuery.notEqualTo( anyString(), any(Date.class) ) ).thenAnswer( createComparison(queryTracker, Compare.equal, false ) );
 
         when( realmQuery.contains( anyString(), anyString() ) ).thenAnswer( createComparison(queryTracker, Compare.contains ) );
         when( realmQuery.contains( anyString(), anyString(), any(Case.class) ) ).thenAnswer( createComparison(queryTracker, Compare.contains ) );
@@ -452,6 +458,10 @@ public class RealmQueryDecorator {
      */
 
     public static Answer<RealmQuery> createComparison(QueryTracker queryTracker, String condition ){
+        return  createComparison(queryTracker, condition, true );
+    };
+
+    public static Answer<RealmQuery> createComparison(QueryTracker queryTracker, String condition, Boolean assertive ){
 
         RealmQuery realmQuery = queryTracker.getRealmQuery();
         
@@ -468,6 +478,10 @@ public class RealmQueryDecorator {
             }
             else if( argsLen < 2 ){
                 return realmQuery;
+            }
+
+            if( !assertive ){
+                queryTracker.appendQuery(Query.build().setCondition(Compare.not));
             }
 
             queryTracker.appendQuery(Query.build()

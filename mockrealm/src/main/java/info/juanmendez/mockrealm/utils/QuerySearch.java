@@ -75,9 +75,14 @@ public class QuerySearch {
         }
 
         RealmList<RealmModel> queriedList = RealmListDecorator.create();
-
+        Boolean returnValue;
         for (RealmModel realmModel : haystack) {
-            if (checkRealmObject(realmModel, 0)) {
+            returnValue = checkRealmObject(realmModel, 0);
+
+            if( !query.getAsTrue() )
+                returnValue = !returnValue;
+
+            if (returnValue) {
                 queriedList.add(realmModel);
             }
         }
@@ -126,15 +131,6 @@ public class QuerySearch {
                 } else if (casing == Case.INSENSITIVE) {
                     return needle.equals(((String) value).toLowerCase());
                 } else if (needle.equals(value)) {
-                    return true;
-                }
-            } else if (condition == Compare.not_equal) {
-
-                if (clazz == Date.class && (((Date) value)).compareTo((Date) needle) != 0) {
-                    return true;
-                } else if (casing == Case.INSENSITIVE) {
-                    return !needle.equals(((String) value).toLowerCase());
-                } else if (!needle.equals(value)) {
                     return true;
                 }
             } else if (condition == Compare.less) {

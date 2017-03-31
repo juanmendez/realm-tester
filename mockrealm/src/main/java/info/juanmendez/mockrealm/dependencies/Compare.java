@@ -18,6 +18,7 @@ public class Compare{
     public static final String in = "in";
 
     public static final String or = "or";
+    public static final String not = "not";
     public static final String startGroup = "startGroup";
     public static final String endGroup = "endGroup";
     public static final String startTopGroup = "startTopGroup";
