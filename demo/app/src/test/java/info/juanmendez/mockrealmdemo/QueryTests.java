@@ -750,7 +750,6 @@ public class QueryTests
         person.setName("Mark");
         person.setFavoriteDog( chibi );
         person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
-
         realm.commitTransaction();
 
         long dogCount = realm.where(Dog.class).count();
@@ -762,7 +761,52 @@ public class QueryTests
                     .equalTo("name", "Fido")
                 .endGroup()
             .findAll();
+
         assertEquals( "There is one less dog", dogCount-2, dogs.size() );
 
+        dogs = realm.where( Dog.class )
+                .not()
+                .isNull("name")
+                .findAll();
+
+        //nully has no name
+        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+
+        //isNotNull, same process as not().isNull()
+        dogs = realm.where( Dog.class )
+                .isNotNull( "name")
+                .findAll();
+        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+
+        //just making sure, we find nully dog.
+        dogs = realm.where( Dog.class )
+                .isNull("name")
+                .findAll();
+        assertEquals( "Dogs with names", 1, dogs.size() );
+
+        Long ownersCount = realm.where( Person.class ).count();
+
+        //find dog owners whose favorite dogs do not contain names such as Baxter of Fidl
+        RealmResults<Person> owners = realm.where( Person.class).not()
+                .beginGroup()
+                    .contains("favoriteDog.name", "Fido")
+                    .or()
+                    .contains( "favoriteDog.name", "Baxter")
+                .endGroup()
+                .findAll();
+
+        assertEquals("Two owners have those dogs", ownersCount-2, owners.size());
+
+
+        //find owners who don't have Fido, and Baxter among their dogs realmList.
+        owners = realm.where( Person.class).not()
+                .beginGroup()
+                .contains("dogs.name", "Fido")
+                .or()
+                .contains( "dogs.name", "Baxter")
+                .endGroup()
+                .findAll();
+
+        assertEquals("One owner doesn't have those dogs", 1, owners.size());
     }
 }

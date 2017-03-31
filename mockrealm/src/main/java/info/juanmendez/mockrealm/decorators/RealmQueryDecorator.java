@@ -189,13 +189,13 @@ public class RealmQueryDecorator {
         });
 
         when( realmQuery.isNull(anyString())).thenAnswer( invocation -> {
-            queryTracker.appendQuery( Query.build().setCondition(Compare.isNull));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.isNull).setArgs(invocation.getArguments()));
             return realmQuery;
         });
 
         when( realmQuery.isNotNull(anyString())).thenAnswer(invocation -> {
             queryTracker.appendQuery( Query.build().setCondition(Compare.not));
-            queryTracker.appendQuery( Query.build().setCondition(Compare.isNull));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.isNull).setArgs(invocation.getArguments()));
             return realmQuery;
         });
     }
