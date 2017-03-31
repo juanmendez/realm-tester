@@ -105,7 +105,7 @@ public class QueryTracker {
     private void onCloseGroupClause() {
 
         RealmList<RealmModel> currentGroupList = groupResults.get(groupLevel);
-        Boolean isThereYesInPreviousGroup = queryYesList.get(groupLevel);
+        Boolean isThereAYes = queryYesList.get(groupLevel);
 
         groupResults.remove(groupLevel);
         queryAndList.remove(groupLevel);
@@ -117,13 +117,12 @@ public class QueryTracker {
             throw (new RealmException("There is an attempt to close more than the number of groups created"));
         }
 
-        //when closing group; normally, currentGroup replaces previous group
-        //otherwise if closing with a not(), previous group retains all the same elements except the ones from currentGroupList.
-        if (isThereYesInPreviousGroup) {
+        //If there is a not(), we are going to exclude the items from currentGroupList from the previousGroup.
+        //Otherwise, we are confident to replace the elements from currentGroupList into previousGroup
+        if (isThereAYes) {
             groupResults.get(groupLevel).clear();
             groupResults.get(groupLevel).addAll(currentGroupList);
         } else {
-
             RealmList<RealmModel> previousGroup = groupResults.get(groupLevel);
             for (RealmModel realmModel : currentGroupList) {
                 if (previousGroup.contains(realmModel)) {
@@ -246,7 +245,7 @@ public class QueryTracker {
                     setQueryList( searchList );
                 }
 
-                //set back level to yes, instead of no.
+                //set back current level to yes, instead of no.
                 queryYesList.set( groupLevel, true );
             }
         }
