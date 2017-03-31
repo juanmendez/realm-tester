@@ -249,6 +249,8 @@ public class QuerySearch {
                     }
                 }
             }
+        }else if( condition == Compare.isNull){
+            return true;
         }
 
         return false;

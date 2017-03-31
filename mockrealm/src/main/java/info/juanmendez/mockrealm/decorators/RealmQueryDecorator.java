@@ -187,6 +187,17 @@ public class RealmQueryDecorator {
                 return  null;
             }
         });
+
+        when( realmQuery.isNull(anyString())).thenAnswer( invocation -> {
+            queryTracker.appendQuery( Query.build().setCondition(Compare.isNull));
+            return realmQuery;
+        });
+
+        when( realmQuery.isNotNull(anyString())).thenAnswer(invocation -> {
+            queryTracker.appendQuery( Query.build().setCondition(Compare.not));
+            queryTracker.appendQuery( Query.build().setCondition(Compare.isNull));
+            return realmQuery;
+        });
     }
 
     private static void handleSearchMethods( QueryTracker queryTracker){
