@@ -754,10 +754,15 @@ public class QueryTests
         realm.commitTransaction();
 
         long dogCount = realm.where(Dog.class).count();
-        RealmResults<Dog> dogs = realm.where( Dog.class ).not().equalTo( "name", "Baxter").findAll();
-        assertEquals( "There is one less dog", dogCount-1, dogs.size() );
+        RealmResults<Dog> dogs = realm.where( Dog.class )
+                .not()
+                .beginGroup()
+                    .equalTo( "name", "Baxter")
+                    .or()
+                    .equalTo("name", "Fido")
+                .endGroup()
+            .findAll();
+        assertEquals( "There is one less dog", dogCount-2, dogs.size() );
 
-        dogs = realm.where( Dog.class ).not().beginGroup().equalTo("name", "Baxter").endGroup().findAll();
-        assertEquals( "There are two dogs less", dogCount-2, dogs.size() );
     }
 }

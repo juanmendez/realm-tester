@@ -102,21 +102,35 @@ public class QueryTracker {
         queryYesList.add( true );
     }
 
-    private void onCloseGroupClause(){
+    private void onCloseGroupClause() {
 
-        RealmList<RealmModel> currentGroupList = groupResults.get( groupLevel );
-        groupResults.remove( groupLevel );
-        queryAndList.remove( groupLevel );
-        queryYesList.remove( groupLevel );
+        RealmList<RealmModel> currentGroupList = groupResults.get(groupLevel);
+        Boolean isThereYesInPreviousGroup = queryYesList.get(groupLevel);
+
+        groupResults.remove(groupLevel);
+        queryAndList.remove(groupLevel);
+        queryYesList.remove(groupLevel);
 
         groupLevel--;
 
-        if( groupLevel < 0 ){
-            throw( new RealmException("There is an attempt to close more than the number of groups created" ));
+        if (groupLevel < 0) {
+            throw (new RealmException("There is an attempt to close more than the number of groups created"));
         }
 
-        groupResults.get(groupLevel).clear();
-        groupResults.get(groupLevel).addAll( currentGroupList );
+        //when closing group; normally, currentGroup replaces previous group
+        //otherwise if closing with a not(), previous group retains all the same elements except the ones from currentGroupList.
+        if (isThereYesInPreviousGroup) {
+            groupResults.get(groupLevel).clear();
+            groupResults.get(groupLevel).addAll(currentGroupList);
+        } else {
+
+            RealmList<RealmModel> previousGroup = groupResults.get(groupLevel);
+            for (RealmModel realmModel : currentGroupList) {
+                if (previousGroup.contains(realmModel)) {
+                    previousGroup.remove(realmModel);
+                }
+            }
+        }
     }
 
     private void onTopGroupClose(){
@@ -217,7 +231,7 @@ public class QueryTracker {
             if( !executeGroupQuery( query ) ){
 
                 if( groupLevel >=1 ){
-                    query.setAsTrue( queryYesList.get(groupLevel) && queryYesList.get(groupLevel-1) );
+                    query.setAsTrue( queryYesList.get(groupLevel) );
                 }
 
                 if( query.getCondition() == Compare.sort ){
@@ -232,6 +246,7 @@ public class QueryTracker {
                     setQueryList( searchList );
                 }
 
+                //set back level to yes, instead of no.
                 queryYesList.set( groupLevel, true );
             }
         }

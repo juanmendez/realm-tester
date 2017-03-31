@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
+
+        shouldWorkWithNot();
     }
 
     void shouldQueryChain(){
@@ -265,6 +267,100 @@ public class MainActivity extends AppCompatActivity {
         for( Person p: sortedPeople ){
             Log.i( "MainActivity", "person: " + p.getName() + ", favorite dog's name: " + (p.getFavoriteDog()!=null?p.getFavoriteDog().getName():"null") );
         }
+    }
+
+    public void shouldWorkWithNot(){
+        realm = Realm.getDefaultInstance();
+
+        //lets do this first with realmList
+        Dog dog;
+        Person person;
+
+        realm.beginTransaction();
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Idalgo");
+        dog.setBirthdate( new Date(2016, 6, 9));
+        Dog idalgo = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Fido");
+        dog.setBirthdate( new Date(2016, 6, 9));
+        Dog fido = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan");
+        dog.setBirthdate( new Date(2015, 6, 10));
+        Dog hernan  = dog;
+
+
+        dog = realm.createObject(Dog.class);
+        Dog nully  = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Chibi");
+        dog.setBirthdate( new Date(2015, 2, 1));
+        Dog chibi = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(3);
+        dog.setName("Andromeda");
+        dog.setBirthdate( new Date(2014, 2, 1));
+        Dog andromeda = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(12);
+        dog.setName("Baxter");
+        dog.setBirthdate( new Date(2005, 2, 1));
+        Dog baxter = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(10);
+        dog.setName("Beethoven");
+        dog.setBirthdate( new Date(2007, 2, 1));
+        Dog beethoven = dog;
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        person = realm.createObject( Person.class );
+        person.setName("Chiu-Ki");
+        person.setFavoriteDog( nully );
+
+        person = realm.createObject( Person.class );
+        person.setName("Karl");
+        person.setFavoriteDog( andromeda );
+        person.setDogs(new RealmList<>( beethoven, baxter, hernan, nully ));
+
+
+        person = realm.createObject( Person.class );
+        person.setName("Jimmy");
+        person.setFavoriteDog( baxter );
+        person.setDogs(new RealmList<>( chibi, andromeda, fido, baxter ));
+
+        person = realm.createObject( Person.class );
+        person.setName("Donn");
+        person.setFavoriteDog( fido );
+        person.setDogs(new RealmList<>( idalgo, baxter, andromeda, nully, chibi  ));
+
+        person = realm.createObject( Person.class );
+        person.setName("Mark");
+        person.setFavoriteDog( chibi );
+        person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
+
+        realm.commitTransaction();
+
+        long dogCount = realm.where(Dog.class).count();
+        RealmResults<Dog> dogs = realm.where( Dog.class ).not().equalTo( "name", "Baxter").notEqualTo("name", "Fido").findAll();
+
+
+        dogs = realm.where( Dog.class ).not().beginGroup().equalTo("name", "Baxter").endGroup().findAll();
+
+        dogs = realm.where( Dog.class).not().equalTo("name", "Baxter").or().equalTo("name", "Fido").findAll();
+
+        Log.i("MainActivity", "there are " + dogs.size() );
     }
 
     @Override
