@@ -99,7 +99,7 @@ public class QuerySearch {
         try {
             value = Whitebox.getInternalState(realmModel, types.get(level));
         } catch (Exception e) {
-            throw (new RealmException( "'" + RealmModelUtil.getClass(realmModel).getName() + "' doesn't have the attribute " + types.get(level)));
+            throw (new RealmException( "'" + RealmModelUtil.getClass(realmModel).getName() + "' doesn't have the attribute '" + types.get(level) + "'"));
         }
 
         if (value != null) {

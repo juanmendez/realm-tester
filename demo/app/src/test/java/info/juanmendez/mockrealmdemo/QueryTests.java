@@ -762,7 +762,15 @@ public class QueryTests
                 .endGroup()
             .findAll();
 
-        assertEquals( "There is one less dog", dogCount-2, dogs.size() );
+        assertEquals( "There are two dogs excluded", dogCount-2, dogs.size() );
+
+        //Of course, with this particular query, it is probably easier to use in() --Realm
+        dogs = realm.where( Dog.class )
+                .not()
+                .in( "name", new String[]{"Fido", "Baxter"})
+                .findAll();
+
+        assertEquals( "There are two dogs excluded", dogCount-2, dogs.size() );
 
         //find dogs whose name is null
         dogs = realm.where( Dog.class )
@@ -771,32 +779,32 @@ public class QueryTests
                 .findAll();
 
         //nully has no name
-        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+        assertEquals( "There is one dog excluded", dogCount-1, dogs.size() );
 
         //using isNotNull whichi is the same process as not().isNull()
         dogs = realm.where( Dog.class )
                 .isNotNull( "name")
                 .findAll();
-        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+        assertEquals( "There is one dog excluded", dogCount-1, dogs.size() );
 
         //just making sure, we find nully dog.
         dogs = realm.where( Dog.class )
                 .isNull("name")
                 .findAll();
-        assertEquals( "Dogs with names", 1, dogs.size() );
+        assertEquals( "There is one dog excluded", 1, dogs.size() );
 
 
         //find all dogs whose nane is not Fido
         dogs = realm.where( Dog.class )
                 .not().equalTo("name", "Fido")
                 .findAll();
-        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+        assertEquals( "There is one dog excluded", dogCount-1, dogs.size() );
 
         //same as not().isEqualTo
         dogs = realm.where( Dog.class )
                 .notEqualTo("name", "Fido")
                 .findAll();
-        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+        assertEquals( "There is one dog excluded", dogCount-1, dogs.size() );
 
 
         Long ownersCount = realm.where( Person.class ).count();
@@ -810,7 +818,7 @@ public class QueryTests
                 .endGroup()
                 .findAll();
 
-        assertEquals("Two owners have those dogs", ownersCount-2, owners.size());
+        assertEquals("There are two owners excluded", ownersCount-2, owners.size());
 
 
         //find owners who don't have Fido, and Baxter among their dogs realmList.
