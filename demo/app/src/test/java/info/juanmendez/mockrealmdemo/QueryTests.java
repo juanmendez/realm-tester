@@ -764,6 +764,7 @@ public class QueryTests
 
         assertEquals( "There is one less dog", dogCount-2, dogs.size() );
 
+        //find dogs whose name is null
         dogs = realm.where( Dog.class )
                 .not()
                 .isNull("name")
@@ -772,7 +773,7 @@ public class QueryTests
         //nully has no name
         assertEquals( "Dogs with names", dogCount-1, dogs.size() );
 
-        //isNotNull, same process as not().isNull()
+        //using isNotNull whichi is the same process as not().isNull()
         dogs = realm.where( Dog.class )
                 .isNotNull( "name")
                 .findAll();
@@ -783,6 +784,20 @@ public class QueryTests
                 .isNull("name")
                 .findAll();
         assertEquals( "Dogs with names", 1, dogs.size() );
+
+
+        //find all dogs whose nane is not Fido
+        dogs = realm.where( Dog.class )
+                .not().equalTo("name", "Fido")
+                .findAll();
+        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+
+        //same as not().isEqualTo
+        dogs = realm.where( Dog.class )
+                .notEqualTo("name", "Fido")
+                .findAll();
+        assertEquals( "Dogs with names", dogCount-1, dogs.size() );
+
 
         Long ownersCount = realm.where( Person.class ).count();
 
