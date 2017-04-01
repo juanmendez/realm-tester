@@ -2,6 +2,19 @@
 
 This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito.
 
+Gradle:
+```Groovy
+repositories {
+...
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+...
+    testCompile 'com.github.juanmendez:Mocking-Realm:master-SNAPSHOT'
+}
+```
+
 [Wiki has a basic instructions how to import and use this library](https://github.com/juanmendez/Mocking-Realm/wiki)
 
 What has been done so far
