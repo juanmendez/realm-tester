@@ -16,6 +16,7 @@ What has been done so far
 - Asynchronous and synchronous transactions with RxJava
     - Schedulers for testing use Schedulers.immediate()
 - Support or() for chaining queries
+- Support not()
 - realmQuery.distinct(*), realmResults.distinct() has been deprecated in Realm 3.0.0
 - realmQuery.sort(*), realmResults.sort(*)
 - Grouping
@@ -28,5 +29,4 @@ What has been done so far
 - Several features not covered will simply pass, and not perform anything. In this situation, I am going to include a console message with prefix `#Mocking-Realm` and let you know when that occurs. The same rule will apply for features which I cover partially. For example during mocking Realm I couldn't track their annotations, due to their retention type. So I am just going to let you know to make sure include `@Index` in your attributes when required to use realmQuery.distinct(*) for instance.
 
 What is coming next
-- Cover RealmQuery.not()
 - Finally a chart with what is covered, and what will be mocked to be ignored.
