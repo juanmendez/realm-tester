@@ -26,6 +26,7 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import io.realm.exceptions.RealmException;
 import rx.Observable;
 
 import static junit.framework.Assert.assertNull;
@@ -833,7 +834,7 @@ public class QueryTests
         assertEquals("One owner doesn't have those dogs", 1, owners.size());
     }
 
-    @Test
+    @Test(expected = RealmException.class)
     public void shouldEmptyWork(){
 
         RealmStorage.clear();
@@ -933,6 +934,9 @@ public class QueryTests
 
         //there is one owner who has no dogs.
         assertEquals( "everyone has a dog except one", ownersCount-1, owners.size() );
+
+        //we expect this to be an error, as isEmpty takes care of lists, strings, and binaries
+        realm.where(Person.class).not().isEmpty("favoriteDog").findAll();
 
     }
 }
