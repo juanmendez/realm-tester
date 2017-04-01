@@ -282,6 +282,9 @@ public class RealmQueryDecorator {
         when( realmQuery.in( anyString(), any(Boolean[].class) ) ).thenAnswer( createComparison(queryTracker, Compare.in ) );
         when( realmQuery.in( anyString(), any(Short[].class) ) ).thenAnswer( createComparison(queryTracker, Compare.in ) );
         when( realmQuery.in( anyString(), any(Date[].class) ) ).thenAnswer( createComparison(queryTracker, Compare.in ) );
+
+        when( realmQuery.isEmpty(anyString())).thenAnswer(createComparison(queryTracker, Compare.isEmpty));
+        when( realmQuery.isNotEmpty(anyString())).thenAnswer(createComparison(queryTracker, Compare.isEmpty, false));
     }
 
     private static void handleSortingMethods( QueryTracker queryTracker ){

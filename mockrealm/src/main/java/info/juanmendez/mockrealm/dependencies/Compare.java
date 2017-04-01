@@ -29,4 +29,5 @@ public class Compare{
     public static final String distinct = "distinct";
     public static final String sort = "sort";
     public static final String async = "async";
+    public static final String isEmpty = "isEmpty";
 }
