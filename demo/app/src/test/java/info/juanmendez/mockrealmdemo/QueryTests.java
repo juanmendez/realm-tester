@@ -26,6 +26,7 @@ import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import io.realm.exceptions.RealmException;
 import rx.Observable;
 
 import static junit.framework.Assert.assertNull;
@@ -831,5 +832,111 @@ public class QueryTests
                 .findAll();
 
         assertEquals("One owner doesn't have those dogs", 1, owners.size());
+    }
+
+    @Test(expected = RealmException.class)
+    public void shouldEmptyWork(){
+
+        RealmStorage.clear();
+
+        //lets do this first with realmList
+        Dog dog;
+        Person person;
+
+        realm.beginTransaction();
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Idalgo");
+        dog.setBirthdate( new Date(2016, 6, 9));
+        Dog idalgo = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(6);
+        dog.setName("Fido");
+        dog.setBirthdate( new Date(2016, 6, 9));
+        Dog fido = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Hernan");
+        dog.setBirthdate( new Date(2015, 6, 10));
+        Dog hernan  = dog;
+
+
+        dog = realm.createObject(Dog.class);
+        Dog nully  = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(2);
+        dog.setName("Chibi");
+        dog.setBirthdate( new Date(2015, 2, 1));
+        Dog chibi = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(3);
+        dog.setName("Andromeda");
+        dog.setBirthdate( new Date(2014, 2, 1));
+        Dog andromeda = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(12);
+        dog.setName("Baxter");
+        dog.setBirthdate( new Date(2005, 2, 1));
+        Dog baxter = dog;
+
+        dog = realm.createObject(Dog.class);
+        dog.setAge(10);
+        dog.setName("Beethoven");
+        dog.setBirthdate( new Date(2007, 2, 1));
+        Dog beethoven = dog;
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        person = realm.createObject( Person.class );
+        person.setName("Chiu-Ki");
+        person.setFavoriteDog( nully );
+
+        person = realm.createObject( Person.class );
+        person.setName("Karl");
+        person.setFavoriteDog( andromeda );
+        person.setDogs(new RealmList<>( beethoven, baxter, hernan, nully ));
+
+
+        person = realm.createObject( Person.class );
+        person.setName("Jimmy");
+        person.setFavoriteDog( baxter );
+        person.setDogs(new RealmList<>( chibi, andromeda, fido, baxter ));
+
+        person = realm.createObject( Person.class );
+        person.setName("Donn");
+        person.setFavoriteDog( fido );
+        person.setDogs(new RealmList<>( idalgo, baxter, andromeda, nully, chibi  ));
+
+        person = realm.createObject( Person.class );
+        person.setName("Mark");
+        person.setFavoriteDog( chibi );
+        person.setDogs(new RealmList<>( chibi, nully, andromeda, baxter  ));
+        realm.commitTransaction();
+
+
+        Long ownersCount = realm.where( Person.class ).count();
+        RealmResults<Person> owners = realm.where(Person.class).isEmpty("dogs").findAll();
+        //there is one owner who has no dogs.
+        assertEquals( "there is one dog without dogs", 1, owners.size() );
+
+        owners = realm.where(Person.class).isNotEmpty("dogs").findAll();
+
+        //there is one owner who has no dogs.
+        assertEquals( "everyone has a dog except one", ownersCount-1, owners.size() );
+
+
+        owners = realm.where(Person.class).not().isEmpty("dogs").findAll();
+
+        //there is one owner who has no dogs.
+        assertEquals( "everyone has a dog except one", ownersCount-1, owners.size() );
+
+        //we expect this to be an error, as isEmpty takes care of lists, strings, and binaries
+        realm.where(Person.class).not().isEmpty("favoriteDog").findAll();
+
     }
 }

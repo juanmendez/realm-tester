@@ -2,6 +2,7 @@ package info.juanmendez.mockrealm.utils;
 
 import org.mockito.internal.util.reflection.Whitebox;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -247,6 +248,17 @@ public class QuerySearch {
                     } else if (casing == Case.INSENSITIVE && (((String) value).toLowerCase()).endsWith(((String) needle))) {
                         return true;
                     }
+                }
+            }else if( condition == Compare.isEmpty ){
+
+                if( value instanceof String || value instanceof AbstractList ){
+                    if( value instanceof String && ((String)value).isEmpty() )
+                        return true;
+                    else
+                    if( value instanceof AbstractList && ((AbstractList)value).isEmpty() )
+                        return true;
+                }else{
+                    throw new RealmException( "Field '" + types.get(level) + "': type mismatch. Was OBJECT, expected [STRING, BINARY, LIST]" );
                 }
             }
         }else if( condition == Compare.isNull){
