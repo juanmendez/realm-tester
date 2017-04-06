@@ -2,10 +2,6 @@ package info.juanmendez.mockrealmdemo;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Date;
 
@@ -13,22 +9,16 @@ import info.juanmendez.mockrealm.MockRealm;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
 import info.juanmendez.mockrealm.models.TransactionEvent;
+import info.juanmendez.mockrealm.test.MockRealmTester;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.KeyTransaction;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmList;
-import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 /**
  * Created by @juanmendezinfo on 2/10/2017.
  */
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"org.mockito.*", "android.*"})
-@PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class })
-public class RxTests {
+public class RxTests extends MockRealmTester{
     Realm realm;
 
     @Before

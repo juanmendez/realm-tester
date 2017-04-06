@@ -2,10 +2,6 @@ package info.juanmendez.mockrealmdemo;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
@@ -14,16 +10,14 @@ import java.util.Set;
 
 import info.juanmendez.mockrealm.MockRealm;
 import info.juanmendez.mockrealm.dependencies.RealmStorage;
+import info.juanmendez.mockrealm.test.MockRealmTester;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmModel;
-import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import io.realm.exceptions.RealmException;
@@ -36,11 +30,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by @juanmendezinfo on 2/10/2017.
  */
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"org.mockito.*", "android.*"})
-@PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class })
-public class QueryTests
-{
+public class QueryTests extends MockRealmTester{
     Realm realm;
 
     @Before
