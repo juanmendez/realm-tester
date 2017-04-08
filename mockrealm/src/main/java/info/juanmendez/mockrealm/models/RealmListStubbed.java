@@ -66,6 +66,9 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
             }
         }
 
+        if( minValue == null )
+            minValue = 0;
+
         return minValue;
     }
 
@@ -85,6 +88,9 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
                 maxValue = value;
             }
         }
+
+        if( maxValue == null )
+            maxValue = 0;
 
         return maxValue;
     }
