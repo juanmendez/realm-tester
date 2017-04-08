@@ -32,6 +32,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by @juanmendezinfo on 2/15/2017.
+ *
+ * RealmResults methods rely on RealmListStubbed, which is a subclass of RealmList.
  */
 public class RealmResultsDecorator {
 
@@ -56,6 +58,9 @@ public class RealmResultsDecorator {
             }
         }).when(realmResults).where();
 
+        /**
+         * realmList is a shadow of realmResults.
+         */
         handleBasicActions( realmResults, realmList );
         handleDeleteMethods( realmResults, realmList );
         handleMathMethods( realmResults, realmList );
@@ -144,8 +149,15 @@ public class RealmResultsDecorator {
         }).when( realmResults ).deleteFromRealm( anyInt() );
     }
 
+    /**
+     * The supported methods from realmResults are calling
+     * and returning values from the counterpart methods of list
+     * @param realmResults
+     * @param list
+     */
     private static void handleMathMethods( RealmResults realmResults, RealmList<RealmModel> list ){
 
+        //realmResults.sum( fieldString )
         when( realmResults.sum( anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
@@ -160,6 +172,7 @@ public class RealmResultsDecorator {
             }
         });
 
+        //realmResults.average( fieldString )
         when( realmResults.average(anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
@@ -173,7 +186,7 @@ public class RealmResultsDecorator {
             }
         });
 
-
+        //realmResults.max( fieldString )
         when( realmResults.max(anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
@@ -186,6 +199,7 @@ public class RealmResultsDecorator {
             }
         });
 
+        //realmResults.min( fieldString )
         when( realmResults.min(anyString()) ).thenAnswer(new Answer<Number>() {
             @Override
             public Number answer(InvocationOnMock invocation) throws Throwable {
