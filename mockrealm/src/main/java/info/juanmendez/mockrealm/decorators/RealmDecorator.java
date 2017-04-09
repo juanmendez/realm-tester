@@ -20,7 +20,6 @@ import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmModel;
-import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import rx.Observable;
 import rx.Scheduler;
@@ -28,7 +27,6 @@ import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mockingDetails;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -98,31 +96,25 @@ public class RealmDecorator {
             return realmModel;
         });
 
+        //realm.copyToRealm( realmModel )
         when( realm.copyToRealm(Mockito.any( RealmModel.class ))).thenAnswer( new Answer<RealmModel>(){
 
             @Override
             public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                if( invocationOnMock.getArguments().length > 0 ){
-                    RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                return createOrUpdate( newRealmModel );
+            }
+        });
 
-                    if( realmModel instanceof RealmObject && !mockingDetails(realmModel).isSpy() ){
-                        realmModel = RealmModelDecorator.decorate( (RealmObject) realmModel );
-                    }
+        //realm.copyToRealmOrUpdate( realmModel ) same as realm.copyToRealm( realmModel )
+        when( realm.copyToRealmOrUpdate(Mockito.any( RealmModel.class ))).thenAnswer( new Answer<RealmModel>(){
 
-                    Class clazz = RealmModelUtil.getClass(realmModel);
-                    HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+            @Override
+            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                    if( !realmMap.containsKey(clazz)){
-                        realmMap.put(clazz, RealmListDecorator.create());
-                    }
-
-
-                    RealmStorage.addModel( realmModel );
-                    return realmModel;
-                }
-
-                return null;
+                RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                return createOrUpdate( newRealmModel );
             }
         });
 
@@ -149,6 +141,25 @@ public class RealmDecorator {
                 return realmQuery;
             }
         });
+    }
+
+    private static RealmModel createOrUpdate( RealmModel newRealmModel ){
+        HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+        Class clazz = RealmModelUtil.getClass(newRealmModel);
+
+        if( !realmMap.containsKey(clazz)){
+            realmMap.put(clazz, RealmListDecorator.create());
+        }
+
+        RealmModel updatedRealmModel = RealmModelUtil.tryToUpdate( newRealmModel );
+
+        if( updatedRealmModel != null ){
+            return updatedRealmModel;
+        }
+
+        newRealmModel = RealmModelDecorator.decorate( newRealmModel );
+        RealmStorage.addModel( newRealmModel );
+        return newRealmModel;
     }
 
     private static void handleAsyncTransactions(Realm realm ){

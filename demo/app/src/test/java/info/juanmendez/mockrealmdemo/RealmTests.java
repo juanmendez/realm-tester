@@ -4,7 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import info.juanmendez.mockrealm.MockRealm;
+import info.juanmendez.mockrealm.models.RealmAnnotation;
 import info.juanmendez.mockrealm.test.MockRealmTester;
+import info.juanmendez.mockrealmdemo.models.Dog;
+import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -21,6 +24,16 @@ public class RealmTests  extends MockRealmTester{
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
+
+        /**
+         * We need now to specify each class having realm annotations
+         */
+        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+                        .primaryField("id")
+                        .indexedFields("name", "age", "birthdate", "nickname"),
+                RealmAnnotation.build(Person.class)
+                        .primaryField("id")
+                        .indexedFields("name"));
     }
 
     @Test

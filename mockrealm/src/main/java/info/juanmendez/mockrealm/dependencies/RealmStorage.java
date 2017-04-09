@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import info.juanmendez.mockrealm.decorators.RealmObjectDecorator;
 import info.juanmendez.mockrealm.decorators.RealmResultsDecorator;
+import info.juanmendez.mockrealm.models.RealmAnnotation;
 import info.juanmendez.mockrealm.models.RealmEvent;
 import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import io.realm.RealmList;
@@ -16,6 +17,7 @@ import io.realm.exceptions.RealmException;
 public class RealmStorage {
 
     private static HashMap<Class, RealmList<RealmModel>> realmMap = new HashMap<>();
+    private static HashMap<Class, RealmAnnotation> annotationMap = new HashMap<>();
 
     /*keeps collections keyed by a sub-class of RealmModel.*/
     public static HashMap<Class, RealmList<RealmModel>> getRealmMap() {
@@ -71,5 +73,13 @@ public class RealmStorage {
         RealmObjectDecorator.removeSubscriptions();
         RealmResultsDecorator.removeSubscriptions();
         realmMap.clear();
+    }
+
+    public static void addAnnotations(  RealmAnnotation realmAnnotation ){
+        annotationMap.put( realmAnnotation.getClazz(), realmAnnotation );
+    }
+
+    public static HashMap<Class, RealmAnnotation> getAnnotationMap() {
+        return annotationMap;
     }
 }

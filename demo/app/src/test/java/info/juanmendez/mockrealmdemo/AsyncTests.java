@@ -7,7 +7,7 @@ import java.util.Date;
 
 import info.juanmendez.mockrealm.MockRealm;
 import info.juanmendez.mockrealm.dependencies.RealmObservable;
-import info.juanmendez.mockrealm.dependencies.RealmStorage;
+import info.juanmendez.mockrealm.models.RealmAnnotation;
 import info.juanmendez.mockrealm.models.RealmEvent;
 import info.juanmendez.mockrealm.test.MockRealmTester;
 import info.juanmendez.mockrealmdemo.models.Dog;
@@ -29,12 +29,23 @@ public class AsyncTests extends MockRealmTester{
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
+
+        /**
+         * We need now to specify each class having realm annotations
+         */
+        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+                        .primaryField("id")
+                        .indexedFields("name", "age", "birthdate", "nickname"),
+                RealmAnnotation.build(Person.class)
+                        .primaryField("id")
+                        .indexedFields("name"));
+
         realm = Realm.getDefaultInstance();
     }
 
     @Test
     public void shouldQuerySynchronousTransaction(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         realm.executeTransaction(realm1 -> {
             Dog dog = realm.createObject(Dog.class);
@@ -49,7 +60,7 @@ public class AsyncTests extends MockRealmTester{
     @Test
     public void shouldQueryAsyncTransactionOnSuccessAndError(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         realm.executeTransactionAsync( realm1 -> {
             Dog dog = realm.createObject(Dog.class);
@@ -83,7 +94,7 @@ public class AsyncTests extends MockRealmTester{
 
     @Test
     public void shouldRealmObservableWork(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         RealmObservable.add(
                 RealmObservable.asObservable()
@@ -120,7 +131,7 @@ public class AsyncTests extends MockRealmTester{
     @Test
     public void shouldDoAllAsync(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog;
 
@@ -161,7 +172,7 @@ public class AsyncTests extends MockRealmTester{
     @Test
     public void shouldGetFirstAsync(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog;
 
@@ -199,7 +210,7 @@ public class AsyncTests extends MockRealmTester{
 
     @Test
     public void shouldChangeListenersWork(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
         assertNotNull( "realmObject exists", results );
@@ -236,7 +247,7 @@ public class AsyncTests extends MockRealmTester{
 
     @Test
     public void shouldChangeListenerWorkWithExecuteTransactions(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
         assertNotNull( "realmObject exists", results );
@@ -276,7 +287,7 @@ public class AsyncTests extends MockRealmTester{
 
     @Test
     public void shouldChangeListenerWorkWithExecuteTransactions2(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         RealmResults<Dog> results = realm.where( Dog.class ).findAllAsync();
         assertNotNull( "realmObject exists", results );

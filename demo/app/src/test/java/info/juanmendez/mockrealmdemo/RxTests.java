@@ -6,12 +6,13 @@ import org.junit.Test;
 import java.util.Date;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.dependencies.TransactionObservable;
+import info.juanmendez.mockrealm.models.RealmAnnotation;
 import info.juanmendez.mockrealm.models.TransactionEvent;
 import info.juanmendez.mockrealm.test.MockRealmTester;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.KeyTransaction;
+import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -24,6 +25,17 @@ public class RxTests extends MockRealmTester{
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
+
+        /**
+         * We need now to specify each class having realm annotations
+         */
+        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+                        .primaryField("id")
+                        .indexedFields("name", "age", "birthdate", "nickname"),
+                RealmAnnotation.build(Person.class)
+                        .primaryField("id")
+                        .indexedFields("name"));
+
         realm = Realm.getDefaultInstance();
     }
 
@@ -31,7 +43,7 @@ public class RxTests extends MockRealmTester{
      */
     @Test(timeout = 6000)
     public void shouldBlockOtherTransactions(){
-        RealmStorage.clear();
+        MockRealm.clearData();
         TransactionObservable.asObservable().subscribe(transactionEvent -> {
             System.out.println( transactionEvent.getState() + ", " + transactionEvent.getTarget().toString() );
         });
@@ -86,7 +98,7 @@ public class RxTests extends MockRealmTester{
     @Test
     public void shouldBeRealmObjectAsObservable() {
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog asyncDog = realm.where(Dog.class).equalTo("age", 2).findFirstAsync();
 
@@ -124,7 +136,7 @@ public class RxTests extends MockRealmTester{
     @Test
     public void shouldBeRealmResultsAsObservable() {
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         RealmResults<Dog> asyncDog = realm.where(Dog.class).equalTo("age", 2).findAllAsync();
 

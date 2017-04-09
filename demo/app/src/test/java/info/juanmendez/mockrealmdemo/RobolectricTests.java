@@ -14,7 +14,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.dependencies.RealmStorage;
+import info.juanmendez.mockrealm.models.RealmAnnotation;
+import info.juanmendez.mockrealmdemo.models.Dog;
+import info.juanmendez.mockrealmdemo.models.Person;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
@@ -52,6 +54,18 @@ public class RobolectricTests {
     public void before() throws Exception {
 
         MockRealm.prepare();
+
+        /**
+         * We need now to specify each class having realm annotations
+         */
+        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+                        .primaryField("id")
+                        .indexedFields("name", "age", "birthdate", "nickname"),
+                RealmAnnotation.build(Person.class)
+                        .primaryField("id")
+                        .indexedFields("name"));
+
+
         realm = Realm.getDefaultInstance();
         activity = Robolectric.setupActivity( MainActivity.class );
     }
@@ -63,7 +77,7 @@ public class RobolectricTests {
     @Test
     public void shouldAssertWhatsOnMainActivity(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
         activity.shouldShowChangesFromRealmResultsWithAsyncTransactions();
 
         assertEquals( "The current message is ", "There are 3 dogs", activity.textView.getText() );
@@ -71,7 +85,7 @@ public class RobolectricTests {
 
     @Test
     public void shouldEnsureDistinctinRealmResults(){
-        RealmStorage.clear();
+        MockRealm.clearData();
         activity.shouldDoDistinctIn_realmResults();
 
         assertEquals( "There are 6 dogs ", "We found " + 5 + " with distinct names, and birthdays!", activity.textView.getText() );
@@ -79,7 +93,7 @@ public class RobolectricTests {
 
     @Test
     public void shouldSortPersonsByTheirFavoriteDogs(){
-        RealmStorage.clear();
+        MockRealm.clearData();
         activity.shouldSort();
     }
 }

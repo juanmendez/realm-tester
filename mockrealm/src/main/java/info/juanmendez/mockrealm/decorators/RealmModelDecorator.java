@@ -8,7 +8,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 
 import info.juanmendez.mockrealm.dependencies.RealmObservable;
+import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.RealmEvent;
+import info.juanmendez.mockrealm.utils.RealmModelUtil;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -61,6 +63,13 @@ public class RealmModelDecorator {
     }
 
     public static RealmModel decorate(RealmModel realmModel ){
+
+        Class clazz = RealmModelUtil.getClass( realmModel );
+
+        //only decorate new realmModels
+        if(RealmStorage.getRealmMap().get(clazz).contains( realmModel)){
+            return realmModel;
+        }
 
         if( realmModel instanceof RealmObject ){
             realmModel = spy( realmModel );
