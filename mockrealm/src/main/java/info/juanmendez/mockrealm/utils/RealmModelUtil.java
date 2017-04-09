@@ -6,9 +6,11 @@ import java.lang.reflect.Field;
 import java.util.AbstractList;
 import java.util.Set;
 
-import io.realm.RealmList;
+import info.juanmendez.mockrealm.models.RealmListStubbed;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+
+import static org.mockito.Mockito.mockingDetails;
 
 /**
  * Created by Juan Mendez on 3/17/2017.
@@ -29,7 +31,7 @@ public class RealmModelUtil {
 
         Class clazz = object.getClass();
 
-        if( object instanceof RealmObject || object instanceof RealmList ){
+        if( (object instanceof RealmObject && mockingDetails(object).isSpy()) || object instanceof RealmListStubbed ){
             return clazz.getSuperclass();
         }
 
@@ -79,19 +81,21 @@ public class RealmModelUtil {
 
             for (Field field: fieldSet) {
 
-                currentObject = Whitebox.getInternalState(realmModel, field.getName() );
+                if( !RealmAnnotationUtil.isIgnored(field) ){
+                    currentObject = Whitebox.getInternalState(realmModel, field.getName() );
 
-                if(AbstractList.class.isAssignableFrom(field.getType())){
-                    jsonString+= Q + field.getName() + Q + ":" + getState(currentObject) + C;
-                }
-                else
-                if(RealmModel.class.isAssignableFrom(field.getType())){
-                    jsonString+= Q + field.getName() + Q + ":" + getState( (RealmModel) currentObject ) + C;
-                }
-                else
-                if (currentObject != null)
-                {
-                    jsonString+= Q + field.getName() + Q + ":" + Q +  currentObject.toString() + Q + C;
+                    if(AbstractList.class.isAssignableFrom(field.getType())){
+                        jsonString+= Q + field.getName() + Q + ":" + getState(currentObject) + C;
+                    }
+                    else
+                    if(RealmModel.class.isAssignableFrom(field.getType())){
+                        jsonString+= Q + field.getName() + Q + ":" + getState( (RealmModel) currentObject ) + C;
+                    }
+                    else
+                    if (currentObject != null)
+                    {
+                        jsonString+= Q + field.getName() + Q + ":" + Q +  currentObject.toString() + Q + C;
+                    }
                 }
             }
 
@@ -101,5 +105,32 @@ public class RealmModelUtil {
 
 
         return jsonString;
+    }
+
+
+    /**
+     * Make originalRealmModel have the same attribute values from copyRealmModel
+     * @param originalRealmModel
+     * @param copyRealmModel
+     */
+    public static void extend( RealmModel originalRealmModel, RealmModel copyRealmModel ){
+
+        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(copyRealmModel);
+        Object currentObject;
+        AbstractList copyList, originalList;
+
+        for (Field field: fieldSet) {
+
+            currentObject = Whitebox.getInternalState(copyRealmModel, field.getName() );
+
+            if( currentObject instanceof AbstractList ){
+                copyList = (AbstractList) currentObject;
+                originalList = (AbstractList) Whitebox.getInternalState(originalRealmModel, field.getName() );
+                originalList.clear();
+                originalList.addAll( copyList );
+            }else{
+                Whitebox.setInternalState( originalRealmModel, field.getName(), currentObject );
+            }
+        }
     }
 }
