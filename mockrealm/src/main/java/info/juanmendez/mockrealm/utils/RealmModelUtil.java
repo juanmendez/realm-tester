@@ -4,9 +4,12 @@ import org.powermock.reflect.Whitebox;
 
 import java.lang.reflect.Field;
 import java.util.AbstractList;
+import java.util.HashMap;
 import java.util.Set;
 
+import info.juanmendez.mockrealm.dependencies.RealmStorage;
 import info.juanmendez.mockrealm.models.RealmListStubbed;
+import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 
@@ -113,7 +116,7 @@ public class RealmModelUtil {
      * @param originalRealmModel
      * @param copyRealmModel
      */
-    public static void extend( RealmModel originalRealmModel, RealmModel copyRealmModel ){
+    public static RealmModel extend( RealmModel originalRealmModel, RealmModel copyRealmModel ){
 
         Set<Field> fieldSet =  Whitebox.getAllInstanceFields(copyRealmModel);
         Object currentObject;
@@ -132,5 +135,34 @@ public class RealmModelUtil {
                 Whitebox.setInternalState( originalRealmModel, field.getName(), currentObject );
             }
         }
+
+        return originalRealmModel;
+    }
+
+    public static RealmModel tryToUpdate( RealmModel newRealmModel ){
+
+        HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+        Class clazz = RealmModelUtil.getClass(newRealmModel);
+
+        Object newKey, storedKey;
+        RealmList<RealmModel> realmList = realmMap.get(clazz);
+
+        if( !realmList.contains( newRealmModel )){
+
+            newKey = RealmAnnotationUtil.findPrimaryKey( newRealmModel );
+
+            if( newKey != null ){
+
+                for( RealmModel realmModel: realmList ){
+                    storedKey = RealmAnnotationUtil.findPrimaryKey( realmModel );
+
+                    if( storedKey != null && storedKey.equals( newKey ) ){
+                        return RealmModelUtil.extend( realmModel, newRealmModel );
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

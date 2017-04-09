@@ -20,7 +20,6 @@ import io.realm.RealmAsyncTask;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmModel;
-import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import rx.Observable;
 import rx.Scheduler;
@@ -28,7 +27,6 @@ import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mockingDetails;
 import static org.powermock.api.mockito.PowerMockito.doAnswer;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -103,26 +101,23 @@ public class RealmDecorator {
             @Override
             public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                if( invocationOnMock.getArguments().length > 0 ){
-                    RealmModel realmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+                RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                Class clazz = RealmModelUtil.getClass(newRealmModel);
 
-                    if( realmModel instanceof RealmObject && !mockingDetails(realmModel).isSpy() ){
-                        realmModel = RealmModelDecorator.decorate( (RealmObject) realmModel );
-                    }
-
-                    Class clazz = RealmModelUtil.getClass(realmModel);
-                    HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
-
-                    if( !realmMap.containsKey(clazz)){
-                        realmMap.put(clazz, RealmListDecorator.create());
-                    }
-
-
-                    RealmStorage.addModel( realmModel );
-                    return realmModel;
+                if( !realmMap.containsKey(clazz)){
+                    realmMap.put(clazz, RealmListDecorator.create());
                 }
 
-                return null;
+                RealmModel updatedRealmModel = RealmModelUtil.tryToUpdate( newRealmModel );
+
+                if( updatedRealmModel != null ){
+                    return updatedRealmModel;
+                }
+
+                newRealmModel = RealmModelDecorator.decorate( newRealmModel );
+                RealmStorage.addModel( newRealmModel );
+                return newRealmModel;
             }
         });
 
