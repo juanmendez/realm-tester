@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Set;
 
 import info.juanmendez.mockrealm.MockRealm;
-import info.juanmendez.mockrealm.dependencies.RealmStorage;
+import info.juanmendez.mockrealm.models.RealmAnnotation;
 import info.juanmendez.mockrealm.test.MockRealmTester;
 import info.juanmendez.mockrealmdemo.models.Dog;
 import info.juanmendez.mockrealmdemo.models.Person;
@@ -36,12 +36,23 @@ public class QueryTests extends MockRealmTester{
     @Before
     public void before() throws Exception {
         MockRealm.prepare();
+
+        /**
+         * We need now to specify each class having realm annotations
+         */
+        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+                            .primaryField("id")
+                            .indexedFields("name", "age", "birthdate", "nickname"),
+                        RealmAnnotation.build(Person.class)
+                            .primaryField("id")
+                            .indexedFields("name"));
+
         realm = Realm.getDefaultInstance();
     }
 
     @Test
     public void shouldCreateObject(){
-        RealmStorage.clear();
+        MockRealm.clearData();
         assertNotNull( realm.createObject(Dog.class));
     }
 
@@ -51,7 +62,7 @@ public class QueryTests extends MockRealmTester{
      */
     @Test
     public void shouldCopyToRealm() throws Exception {
-        RealmStorage.clear();
+        MockRealm.clearData();
         Dog dog = new Dog();
         dog.setName("Max");
         dog.setAge(1);
@@ -66,7 +77,8 @@ public class QueryTests extends MockRealmTester{
      */
     @Test
     public void shouldExecuteTransaction(){
-        RealmStorage.clear();
+        MockRealm.clearData();
+
         realm.executeTransaction( realm1 -> {
             Dog dog = realm.createObject(Dog.class);
             dog.setAge(1);
@@ -74,7 +86,41 @@ public class QueryTests extends MockRealmTester{
             dog.setBirthdate( new Date(2011, 6, 10));
         });
 
-        assertEquals( "there is now one element available", realm.where(Dog.class).findAll().size(), 1 );
+        assertEquals( "there is now one element available", realm.where(Dog.class).count(), 1 );
+    }
+
+    @Test
+    public void shouldUpdate(){
+
+        //@Before specifies primary, and indexed fields in Dog class
+        MockRealm.clearData();
+
+        Dog dog;
+
+        realm.beginTransaction();
+        dog = realm.createObject(Dog.class);
+        dog.setId(1);
+        dog.setAge(1);
+        dog.setName("Max");
+        dog.setBirthdate( new Date(2011, 6, 10));
+
+        dog = realm.createObject(Dog.class);
+        dog.setId(2);
+        dog.setAge(2);
+        dog.setName("Rex");
+        dog.setBirthdate( new Date(2016, 6, 10));
+        realm.commitTransaction();
+
+        realm.beginTransaction();
+        dog =  new Dog();
+        dog.setId(1);
+        dog.setNickname( "Maximilian" );
+        realm.copyToRealm(dog);
+        realm.commitTransaction();
+
+        assertEquals( "There are two dogs after updating one", realm.where(Dog.class).count(), 2 );
+        assertEquals( "Our updated dog has a new nickname", realm.where(Dog.class).equalTo("id", 1).findFirst().getNickname(), "Maximilian" );
+
     }
 
     /**
@@ -82,7 +128,8 @@ public class QueryTests extends MockRealmTester{
      */
     @Test
     public void shouldQueryByConditions(){
-        RealmStorage.clear();
+        MockRealm.clearData();
+
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
         dog.setName("Max");
@@ -111,7 +158,7 @@ public class QueryTests extends MockRealmTester{
     @Test
     public void shouldQueryByCaseSensitivity(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
@@ -137,7 +184,7 @@ public class QueryTests extends MockRealmTester{
 
     @Test
     public void shouldCount(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog = realm.createObject(Dog.class);
         dog.setAge(1);
@@ -155,7 +202,7 @@ public class QueryTests extends MockRealmTester{
 
     @Test
     public void shouldDoLinkingQueries(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Person person;
         Dog dog;
@@ -200,7 +247,7 @@ public class QueryTests extends MockRealmTester{
     @Test
     public void shouldQueryByOr(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog;
 
@@ -241,7 +288,7 @@ public class QueryTests extends MockRealmTester{
     @Test
     public void shouldQueryAgainstRealmResults(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog;
 
@@ -277,7 +324,7 @@ public class QueryTests extends MockRealmTester{
 
     @Test
     public void shouldDeleteRealmObject(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         realm.where(Person.class).findFirstAsync().addChangeListener(new RealmChangeListener<RealmModel>() {
             @Override
@@ -319,7 +366,7 @@ public class QueryTests extends MockRealmTester{
     @Test
     public void findModelRelationship(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Person person = realm.createObject( Person.class );
         person.setDogs( new RealmList<>());
@@ -337,7 +384,7 @@ public class QueryTests extends MockRealmTester{
     @Test
     public void shouldFilterByPersonClass(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         RealmList list = new RealmList(new Dog(), new Dog(), new Dog() );
         list.add( new Dog() );
@@ -362,7 +409,7 @@ public class QueryTests extends MockRealmTester{
     @Test
     public void shouldBeIn(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog;
 
@@ -409,7 +456,7 @@ public class QueryTests extends MockRealmTester{
     @Test
     public void shouldDoMax(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         Dog dog;
 
@@ -444,7 +491,7 @@ public class QueryTests extends MockRealmTester{
 
     @Test
     public void shouldDoDistinct(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         //lets do this first with realmList
         Dog dog;
@@ -564,7 +611,7 @@ public class QueryTests extends MockRealmTester{
 
     @Test
     public void shouldQuerySortGoSmooth(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         //lets do this first with realmList
         Dog dog;
@@ -662,7 +709,7 @@ public class QueryTests extends MockRealmTester{
 
     @Test
     public void sholdWorkWithNot(){
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         //lets do this first with realmList
         Dog dog;
@@ -827,7 +874,7 @@ public class QueryTests extends MockRealmTester{
     @Test(expected = RealmException.class)
     public void shouldEmptyWork(){
 
-        RealmStorage.clear();
+        MockRealm.clearData();
 
         //lets do this first with realmList
         Dog dog;

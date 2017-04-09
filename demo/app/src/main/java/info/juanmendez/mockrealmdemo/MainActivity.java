@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         textView = (TextView) findViewById(R.id.textView);
-        shouldWorkWithNot();
     }
 
     void shouldQueryChain(){

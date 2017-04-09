@@ -66,12 +66,14 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
             }
         }
 
-        if( minValue == null )
-            minValue = 0;
-
         return minValue;
     }
 
+    /**
+     * if realmModel is empty or null, then returns null
+     * @param fieldName
+     * @return
+     */
     @Override
     public Number max(String fieldName) {
 
@@ -89,12 +91,14 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
             }
         }
 
-        if( maxValue == null )
-            maxValue = 0;
-
         return maxValue;
     }
 
+    /**
+     * if realmModel is empty or null, then returns null
+     * @param fieldName
+     * @return
+     */
     @Override
     public Number sum(String fieldName) {
 
@@ -108,6 +112,11 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
         return sumValue;
     }
 
+    /**
+     * if realmModel is empty or null, then returns null
+     * @param fieldName
+     * @return
+     */
     @Override
     public double average(String fieldName) {
 
