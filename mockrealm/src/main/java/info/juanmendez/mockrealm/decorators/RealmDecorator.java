@@ -96,28 +96,25 @@ public class RealmDecorator {
             return realmModel;
         });
 
+        //realm.copyToRealm( realmModel )
         when( realm.copyToRealm(Mockito.any( RealmModel.class ))).thenAnswer( new Answer<RealmModel>(){
 
             @Override
             public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
                 RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
-                Class clazz = RealmModelUtil.getClass(newRealmModel);
+                return createOrUpdate( newRealmModel );
+            }
+        });
 
-                if( !realmMap.containsKey(clazz)){
-                    realmMap.put(clazz, RealmListDecorator.create());
-                }
+        //realm.copyToRealmOrUpdate( realmModel ) same as realm.copyToRealm( realmModel )
+        when( realm.copyToRealmOrUpdate(Mockito.any( RealmModel.class ))).thenAnswer( new Answer<RealmModel>(){
 
-                RealmModel updatedRealmModel = RealmModelUtil.tryToUpdate( newRealmModel );
+            @Override
+            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
 
-                if( updatedRealmModel != null ){
-                    return updatedRealmModel;
-                }
-
-                newRealmModel = RealmModelDecorator.decorate( newRealmModel );
-                RealmStorage.addModel( newRealmModel );
-                return newRealmModel;
+                RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                return createOrUpdate( newRealmModel );
             }
         });
 
@@ -144,6 +141,25 @@ public class RealmDecorator {
                 return realmQuery;
             }
         });
+    }
+
+    private static RealmModel createOrUpdate( RealmModel newRealmModel ){
+        HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
+        Class clazz = RealmModelUtil.getClass(newRealmModel);
+
+        if( !realmMap.containsKey(clazz)){
+            realmMap.put(clazz, RealmListDecorator.create());
+        }
+
+        RealmModel updatedRealmModel = RealmModelUtil.tryToUpdate( newRealmModel );
+
+        if( updatedRealmModel != null ){
+            return updatedRealmModel;
+        }
+
+        newRealmModel = RealmModelDecorator.decorate( newRealmModel );
+        RealmStorage.addModel( newRealmModel );
+        return newRealmModel;
     }
 
     private static void handleAsyncTransactions(Realm realm ){
