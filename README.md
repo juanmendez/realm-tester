@@ -44,4 +44,4 @@ What has been done so far
 
 What is coming next
 - Finally a chart with what is covered, and what will be mocked to be ignored.
-- Do you have questions or comments? Feel free to chat with me on my [mockingRealm channel](https://gitter.im/MockingRealm/Lobby) 
+- Do you have questions or comments? join me at this [gitter channel](https://gitter.im/MockingRealm/Lobby) 
