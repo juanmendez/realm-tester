@@ -1,6 +1,6 @@
 # Mocking-Realm
 
-This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito. [mockingRealm@gitterChannel](https://gitter.im/MockingRealm/Lobby) 
+This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito. QA: [mockingRealm@gitterChannel](https://gitter.im/MockingRealm/Lobby) 
 
 Gradle:
 ```Groovy
