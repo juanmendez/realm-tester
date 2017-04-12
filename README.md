@@ -1,6 +1,6 @@
 # Mocking-Realm
 
-This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito.
+This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito. [mockingRealm@gitterChannel](https://gitter.im/MockingRealm/Lobby) 
 
 Gradle:
 ```Groovy
@@ -44,4 +44,3 @@ What has been done so far
 
 What is coming next
 - Finally a chart with what is covered, and what will be mocked to be ignored.
-- Do you have questions or comments? join me at this [gitter channel](https://gitter.im/MockingRealm/Lobby) 
