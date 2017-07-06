@@ -80,7 +80,6 @@ public class RealmModelDecorator {
         if( realmModel instanceof RealmObject ){
             RealmObjectDecorator.handleDeleteActions( (RealmObject) realmModel);
             RealmObjectDecorator.handleAsyncMethods( (RealmObject) realmModel);
-            setValid( realmModel, true );
         }
 
         return realmModel;
