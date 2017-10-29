@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/demo.iml" filepath="$PROJECT_DIR$/demo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../library/library.iml" filepath="$PROJECT_DIR$/../library/library.iml" />
+      <module fileurl="file://C:\codes\Android\misc\mockRealm\library\library.iml" filepath="C:\codes\Android\misc\mockRealm\library\library.iml" />
       <module fileurl="file://$PROJECT_DIR$/../mockrealm/mockrealm.iml" filepath="$PROJECT_DIR$/../mockrealm/mockrealm.iml" />
     </modules>
   </component>
