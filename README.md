@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
 ...
-    testCompile 'com.github.juanmendez:Mocking-Realm:master-SNAPSHOT'
+    testImplementation 'com.github.juanmendez:Mocking-Realm:master-SNAPSHOT'
 }
 ```
 
