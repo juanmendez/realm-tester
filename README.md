@@ -43,6 +43,3 @@ What has been done so far
 - realmResults.addChangeListener(), realmObject.addChangeListener()
 - realmResults.asObservable(),realmObject.asObservable(), not supporting realm.asObservable() at this time
 - Several features not covered will simply pass, and not perform anything. In this situation, I am going to include a console message with prefix `#Mocking-Realm` and let you know when that occurs. The same rule will apply for features which I cover partially
-
-What is coming next
-- Finally a chart with what is covered, and what will be mocked to be ignored.
