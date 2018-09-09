@@ -16,10 +16,6 @@ import io.realm.RealmModel;
 import io.realm.exceptions.RealmException;
 
 /**
- * Created by Juan Mendez on 3/7/2017.
- * www.juanmendez.info
- * contact@juanmendez.info
- *
  * This util does a deep search through and check if the given haystack
  * has any realmModel which meets the condition.
  */
@@ -36,7 +32,7 @@ public class QuerySearch {
     Object inLeft;
     Object inRight;
 
-    public RealmList<RealmModel> search(Query query, RealmList<RealmModel> haystack ) {
+    public RealmList<RealmModel> search(Query query, RealmList<RealmModel> haystack) {
 
         this.query = query;
         String condition = query.getCondition();
@@ -46,7 +42,7 @@ public class QuerySearch {
 
         int argsLen = arguments.length;
 
-        if( argsLen >= 2){
+        if (argsLen >= 2) {
             this.needle = arguments[1];
             this.clazz = RealmModelUtil.getClass(needle);
 
@@ -58,8 +54,7 @@ public class QuerySearch {
         if (condition == Compare.between) {
             this.inLeft = arguments[1];
             this.inRight = arguments[2];
-        }
-        else if (condition == Compare.in) {
+        } else if (condition == Compare.in) {
             needles = new ArrayList<>(Arrays.asList((Object[]) needle));
         }
 
@@ -80,7 +75,7 @@ public class QuerySearch {
         for (RealmModel realmModel : haystack) {
             returnValue = checkRealmObject(realmModel, 0);
 
-            if( !query.getAsTrue() )
+            if (!query.getAsTrue())
                 returnValue = !returnValue;
 
             if (returnValue) {
@@ -100,7 +95,7 @@ public class QuerySearch {
         try {
             value = Whitebox.getInternalState(realmModel, types.get(level));
         } catch (Exception e) {
-            throw (new RealmException( "'" + RealmModelUtil.getClass(realmModel).getName() + "' doesn't have the attribute '" + types.get(level) + "'"));
+            throw (new RealmException("'" + RealmModelUtil.getClass(realmModel).getName() + "' doesn't have the attribute '" + types.get(level) + "'"));
         }
 
         if (value != null) {
@@ -249,19 +244,18 @@ public class QuerySearch {
                         return true;
                     }
                 }
-            }else if( condition == Compare.isEmpty ){
+            } else if (condition == Compare.isEmpty) {
 
-                if( value instanceof String || value instanceof AbstractList ){
-                    if( value instanceof String && ((String)value).isEmpty() )
+                if (value instanceof String || value instanceof AbstractList) {
+                    if (value instanceof String && ((String) value).isEmpty())
                         return true;
-                    else
-                    if( value instanceof AbstractList && ((AbstractList)value).isEmpty() )
+                    else if (value instanceof AbstractList && ((AbstractList) value).isEmpty())
                         return true;
-                }else{
-                    throw new RealmException( "Field '" + types.get(level) + "': type mismatch. Was OBJECT, expected [STRING, BINARY, LIST]" );
+                } else {
+                    throw new RealmException("Field '" + types.get(level) + "': type mismatch. Was OBJECT, expected [STRING, BINARY, LIST]");
                 }
             }
-        }else if( condition == Compare.isNull){
+        } else if (condition == Compare.isNull) {
             return true;
         }
 

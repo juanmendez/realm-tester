@@ -1,11 +1,5 @@
 package info.juanmendez.mockrealm.models;
 
-/**
- * Created by Juan Mendez on 3/6/2017.
- * www.juanmendez.info
- * contact@juanmendez.info
- */
-
 public class Query {
 
     private String field;
@@ -13,11 +7,12 @@ public class Query {
     private Object[] args;
     private Boolean asTrue = true;
 
-    public static Query build(){
+    public static Query build() {
         return new Query();
     }
 
-    private Query(){}
+    private Query() {
+    }
 
     public Query setField(String field) {
         this.field = field;

@@ -16,23 +16,21 @@ import io.realm.RealmResults;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-/**
- * Created by @juanmendezinfo on 2/15/2017.
- */
 public class MockRealm {
 
     /**
      * This is a method required in order to start up
      * testing.
+     *
      * @throws Exception
      */
     public static void prepare() throws Exception {
-        mockStatic( RealmList.class );
-        mockStatic( Realm.class );
-        mockStatic( RealmConfiguration.class);
-        mockStatic( RealmQuery.class );
-        mockStatic( RealmResults.class );
-        mockStatic( RealmObject.class );
+        mockStatic(RealmList.class);
+        mockStatic(Realm.class);
+        mockStatic(RealmConfiguration.class);
+        mockStatic(RealmQuery.class);
+        mockStatic(RealmResults.class);
+        mockStatic(RealmObject.class);
 
         RealmListDecorator.prepare();
         RealmModelDecorator.prepare();
@@ -44,11 +42,12 @@ public class MockRealm {
     /**
      * Make sure to include each of your class annotation references through RealmAnnotation
      * before testing each type of realmModel in your project
+     *
      * @param annotations
      */
-    public static void addAnnotations(RealmAnnotation ... annotations ){
-        for( RealmAnnotation annotation: annotations ){
-            RealmStorage.addAnnotations( annotation );
+    public static void addAnnotations(RealmAnnotation... annotations) {
+        for (RealmAnnotation annotation : annotations) {
+            RealmStorage.addAnnotations(annotation);
         }
     }
 
@@ -56,7 +55,7 @@ public class MockRealm {
      * Call this method each time you want to clear your realm entries;
      * specially, when starting a new test.
      */
-    public static void clearData(){
+    public static void clearData() {
         RealmStorage.clear();
     }
 }

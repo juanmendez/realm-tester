@@ -7,11 +7,7 @@ import io.realm.annotations.Ignore;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
-/**
- * Created by musta on 2/10/2017.
- */
-
-public class Dog extends RealmObject{
+public class Dog extends RealmObject {
 
     @PrimaryKey
     private int id;

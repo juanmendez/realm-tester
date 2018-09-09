@@ -19,7 +19,7 @@ import static junit.framework.Assert.assertNotNull;
  * contact@juanmendez.info
  */
 
-public class RealmTests  extends MockRealmTester{
+public class RealmTests extends MockRealmTester {
 
     @Before
     public void before() throws Exception {
@@ -28,7 +28,7 @@ public class RealmTests  extends MockRealmTester{
         /**
          * We need now to specify each class having realm annotations
          */
-        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+        MockRealm.addAnnotations(RealmAnnotation.build(Dog.class)
                         .primaryField("id")
                         .indexedFields("name", "age", "birthdate", "nickname"),
                 RealmAnnotation.build(Person.class)
@@ -37,26 +37,26 @@ public class RealmTests  extends MockRealmTester{
     }
 
     @Test
-    public void shouldBuilderPass(){
+    public void shouldBuilderPass() {
 
         RealmConfiguration.Builder builder = new RealmConfiguration.Builder();
-        assertNotNull( "Builder exists", builder);
+        assertNotNull("Builder exists", builder);
     }
 
     @Test
-    public void shouldBuilderBuildPass(){
+    public void shouldBuilderBuildPass() {
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().build();
-        assertNotNull( "Builder exists", realmConfiguration);
+        assertNotNull("Builder exists", realmConfiguration);
     }
 
     @Test
-    public void shouldBuildNamePass(){
+    public void shouldBuildNamePass() {
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder().name("mocking-realm").build();
-        assertNotNull( "Builder exists", realmConfiguration);
+        assertNotNull("Builder exists", realmConfiguration);
     }
 
     @Test
-    public void shouldBeSameRealm(){
+    public void shouldBeSameRealm() {
         assertNotNull("is the same?", Realm.getDefaultInstance());
     }
 }

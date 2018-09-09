@@ -16,9 +16,6 @@ import io.realm.exceptions.RealmException;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-/**
- * Created by @juanmendezinfo on 2/19/2017.
- */
 public class QueryTracker {
 
     private ArrayList<Query> queries = new ArrayList<>();
@@ -36,70 +33,70 @@ public class QueryTracker {
      */
     private RealmList<RealmModel> parentRealmList;
 
-    public QueryTracker(Class clazz){
+    public QueryTracker(Class clazz) {
         this.clazz = clazz;
         realmQuery = mock(RealmQuery.class);
         setUpRealmResults();
     }
 
-    private void setUpRealmResults(){
+    private void setUpRealmResults() {
         //beforehand we are going to take care of realmResults
-        realmResults = PowerMockito.mock( RealmResults.class );
+        realmResults = PowerMockito.mock(RealmResults.class);
 
         //level 0, we are going to start a realmList
-        groupResults.add( RealmListDecorator.create() );
-        RealmResultsDecorator.create( this );
+        groupResults.add(RealmListDecorator.create());
+        RealmResultsDecorator.create(this);
     }
 
-    private void onTopGroupBegin(RealmList<RealmModel> realmList ){
+    private void onTopGroupBegin(RealmList<RealmModel> realmList) {
 
         //we update the current list instead of assigning one.
         groupResults.get(groupLevel).clear();
-        groupResults.get(groupLevel).addAll( realmList );
-        queryAndList.add( true );
-        queryYesList.add( true );
+        groupResults.get(groupLevel).addAll(realmList);
+        queryAndList.add(true);
+        queryYesList.add(true);
 
         onBeginGroupClause();
     }
 
-    public void setQueryList( RealmList<RealmModel> queryList ){
-        if( queryAndList.get( groupLevel ) ){
-            groupResults.get( groupLevel ).clear();
-            groupResults.get( groupLevel ).addAll( queryList );
-        }else{
+    public void setQueryList(RealmList<RealmModel> queryList) {
+        if (queryAndList.get(groupLevel)) {
+            groupResults.get(groupLevel).clear();
+            groupResults.get(groupLevel).addAll(queryList);
+        } else {
 
-            RealmList<RealmModel> currentGroupList = groupResults.get( groupLevel );
+            RealmList<RealmModel> currentGroupList = groupResults.get(groupLevel);
 
-            for (RealmModel realmModel: queryList) {
-              if( !currentGroupList.contains( realmModel)){
-                  currentGroupList.add( realmModel );
-              }
+            for (RealmModel realmModel : queryList) {
+                if (!currentGroupList.contains(realmModel)) {
+                    currentGroupList.add(realmModel);
+                }
             }
         }
 
         //if the las query is based on OR(), then bounce back to AND()
-        queryAndList.set( groupLevel, true );
+        queryAndList.set(groupLevel, true);
     }
 
     private void onOrClause() {
-        queryAndList.set( groupLevel, false );
+        queryAndList.set(groupLevel, false);
     }
 
-    private void onNotClause(){
-        queryYesList.set( groupLevel, false );
+    private void onNotClause() {
+        queryYesList.set(groupLevel, false);
     }
 
-    private void onBeginGroupClause(){
+    private void onBeginGroupClause() {
 
-        RealmList<RealmModel> previousGroupList = groupResults.get( groupLevel );
+        RealmList<RealmModel> previousGroupList = groupResults.get(groupLevel);
 
         RealmList<RealmModel> nextGroupList = RealmListDecorator.create();
-        nextGroupList.addAll( previousGroupList );
+        nextGroupList.addAll(previousGroupList);
 
         groupLevel++;
-        groupResults.add( nextGroupList );
-        queryAndList.add( true );
-        queryYesList.add( true );
+        groupResults.add(nextGroupList);
+        queryAndList.add(true);
+        queryYesList.add(true);
     }
 
     private void onCloseGroupClause() {
@@ -132,22 +129,22 @@ public class QueryTracker {
         }
     }
 
-    private void onTopGroupClose(){
+    private void onTopGroupClose() {
         onCloseGroupClause();
 
-        if( groupLevel > 0 ){
-            throw( new RealmException("Required to close all groups. Current group level is " + groupLevel ));
+        if (groupLevel > 0) {
+            throw (new RealmException("Required to close all groups. Current group level is " + groupLevel));
         }
     }
 
-    private Boolean executeGroupQuery(Query query ){
+    private Boolean executeGroupQuery(Query query) {
 
         Boolean used = false;
 
-        switch ( query.getCondition() ){
+        switch (query.getCondition()) {
 
             case Compare.startTopGroup:
-                onTopGroupBegin( (RealmList<RealmModel>) query.getArgs()[0] );
+                onTopGroupBegin((RealmList<RealmModel>) query.getArgs()[0]);
                 used = true;
                 break;
             case Compare.startGroup:
@@ -179,30 +176,30 @@ public class QueryTracker {
         return clazz;
     }
 
-    public void appendQuery( Query query ){
-        queries.add( query );
+    public void appendQuery(Query query) {
+        queries.add(query);
     }
 
-    public RealmList<RealmModel> getQueryList(){
+    public RealmList<RealmModel> getQueryList() {
 
-        if( !queryAndList.isEmpty() && !queryAndList.get( groupLevel )){
-            return groupResults.get(groupLevel-1);
+        if (!queryAndList.isEmpty() && !queryAndList.get(groupLevel)) {
+            return groupResults.get(groupLevel - 1);
         }
 
         return groupResults.get(groupLevel);
     }
 
-    public ArrayList<Query> getQueries(){
+    public ArrayList<Query> getQueries() {
         return queries;
     }
 
     @Override
-    public QueryTracker clone(){
-        QueryTracker cloned = new QueryTracker( this.clazz );
+    public QueryTracker clone() {
+        QueryTracker cloned = new QueryTracker(this.clazz);
 
-        if( parentRealmList != null ){
+        if (parentRealmList != null) {
             cloned.parentRealmList = parentRealmList;
-        }else{
+        } else {
             cloned.parentRealmList = getQueryList();
         }
 
@@ -221,32 +218,32 @@ public class QueryTracker {
         return parentRealmList;
     }
 
-    public RealmResults<RealmModel> rewind(){
+    public RealmResults<RealmModel> rewind() {
         ArrayList<Query> queries = getQueries();
         RealmList<RealmModel> searchList;
 
-        for ( Query query: queries ){
+        for (Query query : queries) {
 
-            if( !executeGroupQuery( query ) ){
+            if (!executeGroupQuery(query)) {
 
-                if( groupLevel >=1 ){
-                    query.setAsTrue( queryYesList.get(groupLevel) );
+                if (groupLevel >= 1) {
+                    query.setAsTrue(queryYesList.get(groupLevel));
                 }
 
-                if( query.getCondition() == Compare.sort ){
-                    searchList = new QuerySort().perform( query, getQueryList() );
-                    setQueryList( searchList );
+                if (query.getCondition() == Compare.sort) {
+                    searchList = new QuerySort().perform(query, getQueryList());
+                    setQueryList(searchList);
 
-                } else if( query.getCondition() == Compare.distinct ){
-                    searchList = new QueryDistinct().perform( query, getQueryList() );
-                    setQueryList( searchList );
-                } else{
-                    searchList = new QuerySearch().search( query, getQueryList()  );
-                    setQueryList( searchList );
+                } else if (query.getCondition() == Compare.distinct) {
+                    searchList = new QueryDistinct().perform(query, getQueryList());
+                    setQueryList(searchList);
+                } else {
+                    searchList = new QuerySearch().search(query, getQueryList());
+                    setQueryList(searchList);
                 }
 
                 //set back current level to yes, instead of no.
-                queryYesList.set( groupLevel, true );
+                queryYesList.set(groupLevel, true);
             }
         }
 

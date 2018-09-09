@@ -2,13 +2,11 @@ package info.juanmendez.mockrealm.dependencies;
 
 import org.mockito.ArgumentMatcher;
 
-/**
- * Created by @juanmendezinfo on 2/15/2017.
- */
 public class RealmMatchers {
 
     /**
      * argument matcher checks if targetClass is the super class of the object passed.
+     *
      * @param <T>
      */
     public static class ClassMatcher<T> extends ArgumentMatcher<Class<T>> {
@@ -30,9 +28,10 @@ public class RealmMatchers {
 
     /**
      * checks if instance matches class
+     *
      * @param <T>
      */
-    class InstanceMatcher<T> extends ArgumentMatcher<T>{
+    class InstanceMatcher<T> extends ArgumentMatcher<T> {
 
         private final Class<T> targetClass;
 
@@ -42,7 +41,7 @@ public class RealmMatchers {
 
         @Override
         public boolean matches(Object o) {
-            return targetClass.isInstance( o );
+            return targetClass.isInstance(o);
         }
     }
 }

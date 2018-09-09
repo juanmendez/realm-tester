@@ -2,14 +2,6 @@ package info.juanmendez.mockrealm.models;
 
 import io.realm.RealmModel;
 
-/**
- * Created by Juan Mendez on 3/10/2017.
- * www.juanmendez.info
- * contact@juanmendez.info
- *
- * It captures a change in realm
- */
-
 public class RealmEvent {
     public static final String MODEL_ADDED = "RealmModelAdded";
     public static final String MODEL_REMOVED = "RealmModelRemoved";
@@ -17,7 +9,7 @@ public class RealmEvent {
     private String state;
     private RealmModel realmModel;
 
-    public RealmEvent( String state ){
+    public RealmEvent(String state) {
         this.state = state;
     }
 

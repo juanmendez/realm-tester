@@ -19,7 +19,7 @@ import io.realm.RealmResults;
 /**
  * Created by @juanmendezinfo on 2/10/2017.
  */
-public class RxTests extends MockRealmTester{
+public class RxTests extends MockRealmTester {
     Realm realm;
 
     @Before
@@ -29,7 +29,7 @@ public class RxTests extends MockRealmTester{
         /**
          * We need now to specify each class having realm annotations
          */
-        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+        MockRealm.addAnnotations(RealmAnnotation.build(Dog.class)
                         .primaryField("id")
                         .indexedFields("name", "age", "birthdate", "nickname"),
                 RealmAnnotation.build(Person.class)
@@ -42,17 +42,17 @@ public class RxTests extends MockRealmTester{
     /**
      */
     @Test(timeout = 6000)
-    public void shouldBlockOtherTransactions(){
+    public void shouldBlockOtherTransactions() {
         MockRealm.clearData();
         TransactionObservable.asObservable().subscribe(transactionEvent -> {
-            System.out.println( transactionEvent.getState() + ", " + transactionEvent.getTarget().toString() );
+            System.out.println(transactionEvent.getState() + ", " + transactionEvent.getTarget().toString());
         });
 
         KeyTransaction keyTransaction;
 
         new Thread(() -> {
             KeyTransaction t = new KeyTransaction("_t1");
-            executeWork( t, 50 );
+            executeWork(t, 50);
         }).start();
 
         keyTransaction = new KeyTransaction("t2");
@@ -65,31 +65,31 @@ public class RxTests extends MockRealmTester{
 
         new Thread(() -> {
             KeyTransaction t = new KeyTransaction("_t4");
-            executeWork( t, 60 );
+            executeWork(t, 60);
         }).start();
 
         new Thread(() -> {
             KeyTransaction t = new KeyTransaction("_t5");
-            executeWork( t, 30 );
+            executeWork(t, 30);
         }).start();
     }
 
-    public void executeWork( Object initiator, long mils ){
+    public void executeWork(Object initiator, long mils) {
 
         TransactionObservable.startRequest(initiator,
                 TransactionObservable.asObservable()
                         .filter(transactionEvent -> {
-                            return transactionEvent.getState()== TransactionEvent.START_TRANSACTION && transactionEvent.getTarget() == initiator;
+                            return transactionEvent.getState() == TransactionEvent.START_TRANSACTION && transactionEvent.getTarget() == initiator;
                         })
                         .subscribe(o -> {
 
                             try {
-                                Thread.sleep( mils );
+                                Thread.sleep(mils);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
 
-                            System.out.println( "completed " + initiator.toString() );
+                            System.out.println("completed " + initiator.toString());
                             TransactionObservable.endRequest(initiator);
                         })
         );
@@ -143,7 +143,7 @@ public class RxTests extends MockRealmTester{
         asyncDog.<RealmResults<Dog>>asObservable().subscribe(theseDogs -> {
             System.out.println("realmObject " + theseDogs);
         }, throwable -> {
-            System.err.println( throwable.getMessage() );
+            System.err.println(throwable.getMessage());
         });
 
         Dog dog;
