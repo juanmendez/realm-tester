@@ -6,7 +6,7 @@ import io.realm.RealmModel;
  * Created by Juan Mendez on 3/10/2017.
  * www.juanmendez.info
  * contact@juanmendez.info
- *
+ * <p>
  * It captures a change in realm
  */
 
@@ -17,7 +17,7 @@ public class RealmEvent {
     private String state;
     private RealmModel realmModel;
 
-    public RealmEvent( String state ){
+    public RealmEvent(String state) {
         this.state = state;
     }
 

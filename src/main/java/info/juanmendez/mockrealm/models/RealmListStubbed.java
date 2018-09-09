@@ -11,17 +11,17 @@ import io.realm.RealmModel;
  * Created by Juan Mendez on 3/1/2017.
  * www.juanmendez.info
  * contact@juanmendez.info
- *
+ * <p>
  * This subclass replaces functionality from RealmList.
  */
 
-public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
+public class RealmListStubbed<T extends RealmModel> extends RealmList<T> {
 
     @Override
     public boolean deleteFirstFromRealm() {
-        if( !isEmpty() ){
+        if (!isEmpty()) {
             RealmModel realmModel = get(0);
-            RealmModelDecorator.deleteRealmModel( realmModel );
+            RealmModelDecorator.deleteRealmModel(realmModel);
             return true;
         }
 
@@ -31,9 +31,9 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
     @Override
     public boolean deleteLastFromRealm() {
 
-        if( !isEmpty()  ){
-            RealmModel realmModel = get( size()-1 );
-            RealmModelDecorator.deleteRealmModel( realmModel );
+        if (!isEmpty()) {
+            RealmModel realmModel = get(size() - 1);
+            RealmModelDecorator.deleteRealmModel(realmModel);
             return true;
         }
 
@@ -42,10 +42,10 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
     @Override
     public void deleteFromRealm(int location) {
-        if( !isEmpty()){
-            RealmModel realmModel = get( size() - 1 );
+        if (!isEmpty()) {
+            RealmModel realmModel = get(size() - 1);
 
-            RealmModelDecorator.deleteRealmModel( realmModel );
+            RealmModelDecorator.deleteRealmModel(realmModel);
         }
     }
 
@@ -54,14 +54,13 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
         Number value, minValue = null;
 
-        for (Object item: this ) {
+        for (Object item : this) {
 
-            value = (Number) Whitebox.getInternalState( item, fieldName );
+            value = (Number) Whitebox.getInternalState(item, fieldName);
 
-            if( minValue == null )
+            if (minValue == null)
                 minValue = value;
-            else
-            if(  value.floatValue() < minValue.floatValue()  ){
+            else if (value.floatValue() < minValue.floatValue()) {
                 minValue = value;
             }
         }
@@ -71,6 +70,7 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
     /**
      * if realmModel is empty or null, then returns null
+     *
      * @param fieldName
      * @return
      */
@@ -79,14 +79,13 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
         Number value, maxValue = null;
 
-        for (Object item: this ) {
+        for (Object item : this) {
 
-            value = (Number) Whitebox.getInternalState( item, fieldName );
+            value = (Number) Whitebox.getInternalState(item, fieldName);
 
-            if( maxValue == null )
+            if (maxValue == null)
                 maxValue = value;
-            else
-            if(  value.floatValue() > maxValue.floatValue()  ){
+            else if (value.floatValue() > maxValue.floatValue()) {
                 maxValue = value;
             }
         }
@@ -96,6 +95,7 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
     /**
      * if realmModel is empty or null, then returns null
+     *
      * @param fieldName
      * @return
      */
@@ -104,9 +104,9 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
         double sumValue = 0;
 
-        for (Object item: this ) {
+        for (Object item : this) {
 
-            sumValue += ((Number) Whitebox.getInternalState( item, fieldName )).floatValue();
+            sumValue += ((Number) Whitebox.getInternalState(item, fieldName)).floatValue();
         }
 
         return sumValue;
@@ -114,6 +114,7 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
     /**
      * if realmModel is empty or null, then returns null
+     *
      * @param fieldName
      * @return
      */
@@ -122,18 +123,18 @@ public class RealmListStubbed<T extends  RealmModel> extends RealmList<T> {
 
         float sumValue = 0;
 
-        for (Object item: this ) {
+        for (Object item : this) {
 
-            sumValue += ((Number) Whitebox.getInternalState( item, fieldName )).floatValue();
+            sumValue += ((Number) Whitebox.getInternalState(item, fieldName)).floatValue();
         }
 
-        return (sumValue/size());
+        return (sumValue / size());
     }
 
     @Override
     public boolean deleteAllFromRealm() {
-        for (Object realmModel: this) {
-            RealmModelDecorator.deleteRealmModel( (RealmModel) realmModel );
+        for (Object realmModel : this) {
+            RealmModelDecorator.deleteRealmModel((RealmModel) realmModel);
         }
 
         return true;

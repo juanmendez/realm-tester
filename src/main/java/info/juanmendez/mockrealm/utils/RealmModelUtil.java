@@ -30,11 +30,11 @@ public class RealmModelUtil {
     private static final String Ob = "[";
     private static final String Cb = "]";
 
-    public static Class getClass( Object object ){
+    public static Class getClass(Object object) {
 
         Class clazz = object.getClass();
 
-        if( (object instanceof RealmObject && mockingDetails(object).isSpy()) || object instanceof RealmListStubbed ){
+        if ((object instanceof RealmObject && mockingDetails(object).isSpy()) || object instanceof RealmListStubbed) {
             return clazz.getSuperclass();
         }
 
@@ -42,67 +42,61 @@ public class RealmModelUtil {
     }
 
     /**
-     *  This is a cheap way to save the state of an object. Unfortunately, @Ignore variables cannot be
+     * This is a cheap way to save the state of an object. Unfortunately, @Ignore variables cannot be
      * tracked due to their nature of their retention policy which is not of Runtime policy type.
      * http://stackoverflow.com/questions/4453159/how-to-get-annotations-of-a-member-variable
+     *
      * @param realmModel object to check variables and values
      * @return a json string
      */
-    public static String getState(Object realmModel){
+    public static String getState(Object realmModel) {
 
-        if( realmModel == null )
+        if (realmModel == null)
             return "";
 
         String jsonString = "";
 
-        if( realmModel instanceof AbstractList ){
+        if (realmModel instanceof AbstractList) {
 
-            AbstractList<RealmModel> abstractList = (AbstractList<RealmModel>)realmModel;
+            AbstractList<RealmModel> abstractList = (AbstractList<RealmModel>) realmModel;
 
-            if( abstractList.isEmpty() ){
-                return Ob+Cb;
+            if (abstractList.isEmpty()) {
+                return Ob + Cb;
             }
 
             jsonString += Ob;
-            try{
-                for( RealmModel m: abstractList ){
-                    jsonString += getState(m)+C;
+            try {
+                for (RealmModel m : abstractList) {
+                    jsonString += getState(m) + C;
                 }
-            }
-            catch( Exception e ){
-                System.err.println( e.getMessage() );
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
 
 
-            jsonString = jsonString.substring(0,jsonString.length()-1);
-            jsonString+= Cb;
-        }
-        else{
-            Set<Field> fieldSet =  Whitebox.getAllInstanceFields(realmModel);
+            jsonString = jsonString.substring(0, jsonString.length() - 1);
+            jsonString += Cb;
+        } else {
+            Set<Field> fieldSet = Whitebox.getAllInstanceFields(realmModel);
             jsonString += Op;
             Object currentObject;
 
-            for (Field field: fieldSet) {
+            for (Field field : fieldSet) {
 
-                if( !RealmAnnotationUtil.isIgnored(field) ){
-                    currentObject = Whitebox.getInternalState(realmModel, field.getName() );
+                if (!RealmAnnotationUtil.isIgnored(field)) {
+                    currentObject = Whitebox.getInternalState(realmModel, field.getName());
 
-                    if(AbstractList.class.isAssignableFrom(field.getType())){
-                        jsonString+= Q + field.getName() + Q + ":" + getState(currentObject) + C;
-                    }
-                    else
-                    if(RealmModel.class.isAssignableFrom(field.getType())){
-                        jsonString+= Q + field.getName() + Q + ":" + getState( (RealmModel) currentObject ) + C;
-                    }
-                    else
-                    if (currentObject != null)
-                    {
-                        jsonString+= Q + field.getName() + Q + ":" + Q +  currentObject.toString() + Q + C;
+                    if (AbstractList.class.isAssignableFrom(field.getType())) {
+                        jsonString += Q + field.getName() + Q + ":" + getState(currentObject) + C;
+                    } else if (RealmModel.class.isAssignableFrom(field.getType())) {
+                        jsonString += Q + field.getName() + Q + ":" + getState((RealmModel) currentObject) + C;
+                    } else if (currentObject != null) {
+                        jsonString += Q + field.getName() + Q + ":" + Q + currentObject.toString() + Q + C;
                     }
                 }
             }
 
-            jsonString = jsonString.substring(0,jsonString.length()-1);
+            jsonString = jsonString.substring(0, jsonString.length() - 1);
             jsonString += Cp;
         }
 
@@ -113,33 +107,34 @@ public class RealmModelUtil {
 
     /**
      * Make originalRealmModel have the same attribute values from copyRealmModel
+     *
      * @param originalRealmModel
      * @param copyRealmModel
      */
-    public static RealmModel extend( RealmModel originalRealmModel, RealmModel copyRealmModel ){
+    public static RealmModel extend(RealmModel originalRealmModel, RealmModel copyRealmModel) {
 
-        Set<Field> fieldSet =  Whitebox.getAllInstanceFields(copyRealmModel);
+        Set<Field> fieldSet = Whitebox.getAllInstanceFields(copyRealmModel);
         Object currentObject;
         AbstractList copyList, originalList;
 
-        for (Field field: fieldSet) {
+        for (Field field : fieldSet) {
 
-            currentObject = Whitebox.getInternalState(copyRealmModel, field.getName() );
+            currentObject = Whitebox.getInternalState(copyRealmModel, field.getName());
 
-            if( currentObject instanceof AbstractList ){
+            if (currentObject instanceof AbstractList) {
                 copyList = (AbstractList) currentObject;
-                originalList = (AbstractList) Whitebox.getInternalState(originalRealmModel, field.getName() );
+                originalList = (AbstractList) Whitebox.getInternalState(originalRealmModel, field.getName());
                 originalList.clear();
-                originalList.addAll( copyList );
-            }else{
-                Whitebox.setInternalState( originalRealmModel, field.getName(), currentObject );
+                originalList.addAll(copyList);
+            } else {
+                Whitebox.setInternalState(originalRealmModel, field.getName(), currentObject);
             }
         }
 
         return originalRealmModel;
     }
 
-    public static RealmModel tryToUpdate( RealmModel newRealmModel ){
+    public static RealmModel tryToUpdate(RealmModel newRealmModel) {
 
         HashMap<Class, RealmList<RealmModel>> realmMap = RealmStorage.getRealmMap();
         Class clazz = RealmModelUtil.getClass(newRealmModel);
@@ -147,17 +142,17 @@ public class RealmModelUtil {
         Object newKey, storedKey;
         RealmList<RealmModel> realmList = realmMap.get(clazz);
 
-        if( !realmList.contains( newRealmModel )){
+        if (!realmList.contains(newRealmModel)) {
 
-            newKey = RealmAnnotationUtil.findPrimaryKey( newRealmModel );
+            newKey = RealmAnnotationUtil.findPrimaryKey(newRealmModel);
 
-            if( newKey != null ){
+            if (newKey != null) {
 
-                for( RealmModel realmModel: realmList ){
-                    storedKey = RealmAnnotationUtil.findPrimaryKey( realmModel );
+                for (RealmModel realmModel : realmList) {
+                    storedKey = RealmAnnotationUtil.findPrimaryKey(realmModel);
 
-                    if( storedKey != null && storedKey.equals( newKey ) ){
-                        return RealmModelUtil.extend( realmModel, newRealmModel );
+                    if (storedKey != null && storedKey.equals(newKey)) {
+                        return RealmModelUtil.extend(realmModel, newRealmModel);
                     }
                 }
             }

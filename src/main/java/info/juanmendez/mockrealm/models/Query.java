@@ -13,11 +13,12 @@ public class Query {
     private Object[] args;
     private Boolean asTrue = true;
 
-    public static Query build(){
+    public static Query build() {
         return new Query();
     }
 
-    private Query(){}
+    private Query() {
+    }
 
     public Query setField(String field) {
         this.field = field;

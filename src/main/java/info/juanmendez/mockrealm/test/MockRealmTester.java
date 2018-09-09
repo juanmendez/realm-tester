@@ -20,6 +20,6 @@ import io.realm.RealmResults;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "android.*"})
-@PrepareForTest({ RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class })
+@PrepareForTest({RealmConfiguration.class, Realm.class, RealmQuery.class, RealmResults.class, RealmList.class, RealmObject.class})
 public abstract class MockRealmTester {
 }

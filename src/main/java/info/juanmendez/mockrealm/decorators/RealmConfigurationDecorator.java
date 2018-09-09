@@ -34,18 +34,18 @@ public class RealmConfigurationDecorator {
         // magically return the mock when a new instance is required
         whenNew(RealmConfiguration.Builder.class).withNoArguments().thenAnswer(invocation -> mockedBuilder);
         whenNew(RealmConfiguration.Builder.class).withAnyArguments().thenAnswer(invocation -> mockedBuilder);
-        doAnswer(invocation -> mockRealmConfig ).when(mockedBuilder ).build();
+        doAnswer(invocation -> mockRealmConfig).when(mockedBuilder).build();
 
         //what to do with builder configs
-        doReturn(mockedBuilder).when( mockedBuilder ).name(anyString());
-        doReturn(mockedBuilder).when( mockedBuilder ).directory(any(File.class));
-        doReturn(mockedBuilder).when( mockedBuilder ).encryptionKey(any());
-        doReturn(mockedBuilder).when( mockedBuilder ).schemaVersion(anyLong());
-        doReturn(mockedBuilder).when( mockedBuilder ).migration(any(RealmMigration.class));
-        doReturn(mockedBuilder).when( mockedBuilder ).deleteRealmIfMigrationNeeded();
-        doReturn(mockedBuilder).when( mockedBuilder ).inMemory();
-        doReturn(mockedBuilder).when( mockedBuilder ).modules(any(), anyVararg());
-        doReturn(mockedBuilder).when( mockedBuilder ).rxFactory(any(RxObservableFactory.class));
-        doReturn(mockedBuilder).when( mockedBuilder ).assetFile(anyString());
+        doReturn(mockedBuilder).when(mockedBuilder).name(anyString());
+        doReturn(mockedBuilder).when(mockedBuilder).directory(any(File.class));
+        doReturn(mockedBuilder).when(mockedBuilder).encryptionKey(any());
+        doReturn(mockedBuilder).when(mockedBuilder).schemaVersion(anyLong());
+        doReturn(mockedBuilder).when(mockedBuilder).migration(any(RealmMigration.class));
+        doReturn(mockedBuilder).when(mockedBuilder).deleteRealmIfMigrationNeeded();
+        doReturn(mockedBuilder).when(mockedBuilder).inMemory();
+        doReturn(mockedBuilder).when(mockedBuilder).modules(any(), anyVararg());
+        doReturn(mockedBuilder).when(mockedBuilder).rxFactory(any(RxObservableFactory.class));
+        doReturn(mockedBuilder).when(mockedBuilder).assetFile(anyString());
     }
 }

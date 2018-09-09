@@ -14,26 +14,26 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  * www.juanmendez.info
  * contact@juanmendez.info
  */
-public class RealmListDecorator <T extends RealmModel>{
+public class RealmListDecorator<T extends RealmModel> {
 
     public static void prepare() throws Exception {
 
         spy(RealmList.class);
 
-        whenNew( RealmList.class ).withArguments(anyVararg()).thenAnswer(invocation -> {
+        whenNew(RealmList.class).withArguments(anyVararg()).thenAnswer(invocation -> {
 
             RealmList<RealmModel> realmList = create();
             Object[] args = invocation.getArguments();
 
-            for (Object arg:args) {
-                realmList.add((RealmModel)arg);
+            for (Object arg : args) {
+                realmList.add((RealmModel) arg);
             }
 
             return realmList;
         });
     }
 
-    public static RealmList<RealmModel> create(){
+    public static RealmList<RealmModel> create() {
 
         return new RealmListStubbed();
     }

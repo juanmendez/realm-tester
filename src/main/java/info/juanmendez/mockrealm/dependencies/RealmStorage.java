@@ -24,50 +24,50 @@ public class RealmStorage {
         return realmMap;
     }
 
-    public static void removeModel( RealmModel realmModel ){
+    public static void removeModel(RealmModel realmModel) {
 
-        if( realmModel != null ){
+        if (realmModel != null) {
 
             Class clazz = RealmModelUtil.getClass(realmModel);
 
-            if( RealmModel.class.isAssignableFrom(clazz) ){
+            if (RealmModel.class.isAssignableFrom(clazz)) {
 
-                if( realmMap.get(clazz) != null && realmMap.get(clazz).contains( realmModel ) ){
-                    realmMap.get( clazz ).remove( realmModel );
-                    RealmObservable.onNext( new RealmEvent( RealmEvent.MODEL_REMOVED, realmModel ) );
-                }else{
-                    throw new RealmException( "Instance of " + clazz.getName() + " cannot be deleted as it's not part of the realm database" );
+                if (realmMap.get(clazz) != null && realmMap.get(clazz).contains(realmModel)) {
+                    realmMap.get(clazz).remove(realmModel);
+                    RealmObservable.onNext(new RealmEvent(RealmEvent.MODEL_REMOVED, realmModel));
+                } else {
+                    throw new RealmException("Instance of " + clazz.getName() + " cannot be deleted as it's not part of the realm database");
                 }
 
-            }else{
+            } else {
 
-                throw new RealmException( clazz.getName() + " is not an instance of RealmModel"  );
+                throw new RealmException(clazz.getName() + " is not an instance of RealmModel");
             }
         }
     }
 
-    public static void addModel( RealmModel realmModel ){
+    public static void addModel(RealmModel realmModel) {
 
-        if( realmModel != null ){
+        if (realmModel != null) {
 
             Class clazz = RealmModelUtil.getClass(realmModel);
 
-            if( RealmModel.class.isAssignableFrom(clazz) ){
+            if (RealmModel.class.isAssignableFrom(clazz)) {
 
-                if( !realmMap.get(clazz).contains( realmModel ) ){
-                    realmMap.get(RealmModelUtil.getClass(realmModel) ).add( realmModel );
-                    RealmObservable.onNext( new RealmEvent( RealmEvent.MODEL_ADDED, realmModel ) );
-                }else{
-                    System.out.println( "#mocking-realm: Instance of " + clazz.getName() + " cannot be added more than once" );
+                if (!realmMap.get(clazz).contains(realmModel)) {
+                    realmMap.get(RealmModelUtil.getClass(realmModel)).add(realmModel);
+                    RealmObservable.onNext(new RealmEvent(RealmEvent.MODEL_ADDED, realmModel));
+                } else {
+                    System.out.println("#mocking-realm: Instance of " + clazz.getName() + " cannot be added more than once");
                 }
-            }else{
+            } else {
 
-                throw new RealmException( clazz.getName() + " is not an instance of RealmModel"  );
+                throw new RealmException(clazz.getName() + " is not an instance of RealmModel");
             }
         }
     }
 
-    public static void clear(){
+    public static void clear() {
         RealmObservable.removeSubscriptions();
         TransactionObservable.removeSubscriptions();
         RealmObjectDecorator.removeSubscriptions();
@@ -75,8 +75,8 @@ public class RealmStorage {
         realmMap.clear();
     }
 
-    public static void addAnnotations(  RealmAnnotation realmAnnotation ){
-        annotationMap.put( realmAnnotation.getClazz(), realmAnnotation );
+    public static void addAnnotations(RealmAnnotation realmAnnotation) {
+        annotationMap.put(realmAnnotation.getClazz(), realmAnnotation);
     }
 
     public static HashMap<Class, RealmAnnotation> getAnnotationMap() {
