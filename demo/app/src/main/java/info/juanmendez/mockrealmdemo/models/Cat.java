@@ -5,14 +5,8 @@ import java.util.Date;
 import io.realm.RealmModel;
 import io.realm.annotations.RealmClass;
 
-/**
- * Created by Juan Mendez on 3/19/2017.
- * www.juanmendez.info
- * contact@juanmendez.info
- */
-
 @RealmClass
-public class Cat implements RealmModel{
+public class Cat implements RealmModel {
     private int id;
     private String name;
     private int age;

@@ -37,7 +37,7 @@ import static junit.framework.Assert.assertEquals;
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @SuppressStaticInitializationFor("io.realm.internal.Util")
 @PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class,
-                 RealmList.class, RealmCore.class, RealmObject.class, RealmDependencies.class })
+        RealmList.class, RealmCore.class, RealmObject.class, RealmDependencies.class})
 public class RobolectricTests {
 
     @Rule
@@ -46,7 +46,7 @@ public class RobolectricTests {
     Realm realm;
     MainActivity activity;
 
-    static{
+    static {
         ShadowLog.stream = System.out;
     }
 
@@ -58,7 +58,7 @@ public class RobolectricTests {
         /**
          * We need now to specify each class having realm annotations
          */
-        MockRealm.addAnnotations( RealmAnnotation.build(Dog.class)
+        MockRealm.addAnnotations(RealmAnnotation.build(Dog.class)
                         .primaryField("id")
                         .indexedFields("name", "age", "birthdate", "nickname"),
                 RealmAnnotation.build(Person.class)
@@ -67,7 +67,7 @@ public class RobolectricTests {
 
 
         realm = Realm.getDefaultInstance();
-        activity = Robolectric.setupActivity( MainActivity.class );
+        activity = Robolectric.setupActivity(MainActivity.class);
     }
 
     /**
@@ -75,24 +75,24 @@ public class RobolectricTests {
      * realm configuration is mocked!
      */
     @Test
-    public void shouldAssertWhatsOnMainActivity(){
+    public void shouldAssertWhatsOnMainActivity() {
 
         MockRealm.clearData();
         activity.shouldShowChangesFromRealmResultsWithAsyncTransactions();
 
-        assertEquals( "The current message is ", "There are 3 dogs", activity.textView.getText() );
+        assertEquals("The current message is ", "There are 3 dogs", activity.textView.getText());
     }
 
     @Test
-    public void shouldEnsureDistinctinRealmResults(){
+    public void shouldEnsureDistinctinRealmResults() {
         MockRealm.clearData();
         activity.shouldDoDistinctIn_realmResults();
 
-        assertEquals( "There are 6 dogs ", "We found " + 5 + " with distinct names, and birthdays!", activity.textView.getText() );
+        assertEquals("There are 6 dogs ", "We found " + 5 + " with distinct names, and birthdays!", activity.textView.getText());
     }
 
     @Test
-    public void shouldSortPersonsByTheirFavoriteDogs(){
+    public void shouldSortPersonsByTheirFavoriteDogs() {
         MockRealm.clearData();
         activity.shouldSort();
     }
