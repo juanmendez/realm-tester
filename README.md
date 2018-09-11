@@ -1,5 +1,4 @@
-# Mocking-Realm
-
+# realm-mocked
 This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito. 
 
 QA: [mockingRealm@gitterChannel](https://gitter.im/MockingRealm/Lobby) 
@@ -17,7 +16,7 @@ dependencies {
 }
 ```
 
-[Wiki has a basic instructions how to import and use this library](https://github.com/juanmendez/Mocking-Realm/wiki)
+[Wiki has a basic instructions how to import and use this library](https://github.com/juanmendez/realm-mocked/wiki)
 
 What has been done so far
 - Working with Realm 3.0.0
@@ -26,7 +25,7 @@ What has been done so far
 - Works with PowerMockito 1.6.4
 - Have Realm.getDefaultInstance()
 - To track realm annotations, register with MockRealm your tested class annotations based on RealmAnnotations, see demo.
-- If desired, do realm configurations in a dependency class rather than an Android component see [wiki](https://github.com/juanmendez/Mocking-Realm/wiki/How-to-initialize-Realm-when-testing).
+- If desired, do realm configurations in a dependency class rather than an Android component see [wiki](https://github.com/juanmendez/realm-mocked/wiki/How-to-initialize-Realm-when-testing).
 - Querying works for around 70% of all methods, more to come in the next phase.
 - Chaining queries
 - Asynchronous and synchronous transactions with RxJava
