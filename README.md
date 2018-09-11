@@ -1,5 +1,5 @@
 # realm-tester
-This is ongoing work to mock Realm as much as possible hammering with Mockito, and PowerMockito. 
+This is ongoing work to uni test Realm as much as possible hammering with Mockito, and PowerMockito. 
 
 QA: [mockingRealm@gitterChannel](https://gitter.im/MockingRealm/Lobby) 
 
