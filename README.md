@@ -1,7 +1,7 @@
 # realm-tester
-This is ongoing work to unit test Realm as much as possible hammering with Mockito, and PowerMockito. 
+-- status: tuning prior to making it work with latest Realm
 
-QA: [mockingRealm@gitterChannel](https://gitter.im/MockingRealm/Lobby) 
+This is ongoing work to unit test Realm as much as possible hammering with Mockito, and PowerMockito. 
 
 Gradle:
 ```Groovy
