@@ -1,3 +1,3 @@
 include ':app'
-include 'mockrealm'
-project(':mockrealm').projectDir = new File(settingsDir, '../mockrealm')
+include 'realmtester'
+project(':realmtester').projectDir = new File(settingsDir, '../realmtester')
