@@ -33,7 +33,7 @@ public class SubscriptionsUtil<S, O> {
     private ArrayList<O> getSubjectObservers(S subject) {
 
         if (!subjectToObservers.containsKey(subject)) {
-            subjectToObservers.put(subject, new ArrayList<O>());
+            subjectToObservers.put(subject, new ArrayList<>());
         }
 
         return subjectToObservers.get(subject);

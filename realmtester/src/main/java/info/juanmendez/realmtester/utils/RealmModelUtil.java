@@ -48,7 +48,7 @@ public class RealmModelUtil {
         if (realmModel == null)
             return "";
 
-        String jsonString = "";
+        StringBuilder jsonString = new StringBuilder();
 
         if (realmModel instanceof AbstractList) {
 
@@ -58,21 +58,21 @@ public class RealmModelUtil {
                 return Ob + Cb;
             }
 
-            jsonString += Ob;
+            jsonString.append(Ob);
             try {
                 for (RealmModel m : abstractList) {
-                    jsonString += getState(m) + C;
+                    jsonString.append(getState(m)).append(C);
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
 
 
-            jsonString = jsonString.substring(0, jsonString.length() - 1);
-            jsonString += Cb;
+            jsonString = new StringBuilder(jsonString.substring(0, jsonString.length() - 1));
+            jsonString.append(Cb);
         } else {
             Set<Field> fieldSet = Whitebox.getAllInstanceFields(realmModel);
-            jsonString += Op;
+            jsonString.append(Op);
             Object currentObject;
 
             for (Field field : fieldSet) {
@@ -81,21 +81,21 @@ public class RealmModelUtil {
                     currentObject = Whitebox.getInternalState(realmModel, field.getName());
 
                     if (AbstractList.class.isAssignableFrom(field.getType())) {
-                        jsonString += Q + field.getName() + Q + ":" + getState(currentObject) + C;
+                        jsonString.append(Q).append(field.getName()).append(Q).append(":").append(getState(currentObject)).append(C);
                     } else if (RealmModel.class.isAssignableFrom(field.getType())) {
-                        jsonString += Q + field.getName() + Q + ":" + getState((RealmModel) currentObject) + C;
+                        jsonString.append(Q).append(field.getName()).append(Q).append(":").append(getState((RealmModel) currentObject)).append(C);
                     } else if (currentObject != null) {
-                        jsonString += Q + field.getName() + Q + ":" + Q + currentObject.toString() + Q + C;
+                        jsonString.append(Q).append(field.getName()).append(Q).append(":").append(Q).append(currentObject.toString()).append(Q).append(C);
                     }
                 }
             }
 
-            jsonString = jsonString.substring(0, jsonString.length() - 1);
-            jsonString += Cp;
+            jsonString = new StringBuilder(jsonString.substring(0, jsonString.length() - 1));
+            jsonString.append(Cp);
         }
 
 
-        return jsonString;
+        return jsonString.toString();
     }
 
 
@@ -117,7 +117,7 @@ public class RealmModelUtil {
 
             if (currentObject instanceof AbstractList) {
                 copyList = (AbstractList) currentObject;
-                originalList = (AbstractList) Whitebox.getInternalState(originalRealmModel, field.getName());
+                originalList = Whitebox.getInternalState(originalRealmModel, field.getName());
                 originalList.clear();
                 originalList.addAll(copyList);
             } else {

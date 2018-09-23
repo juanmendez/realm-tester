@@ -7,8 +7,8 @@ import org.mockito.stubbing.Answer;
 import java.util.ArrayList;
 import java.util.Date;
 
-import info.juanmendez.realmtester.dependencies.Compare;
 import info.juanmendez.realmtester.demo.models.Query;
+import info.juanmendez.realmtester.dependencies.Compare;
 import info.juanmendez.realmtester.utils.QuerySort;
 import info.juanmendez.realmtester.utils.QueryTracker;
 import io.realm.Case;

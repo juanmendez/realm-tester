@@ -210,17 +210,14 @@ public class RealmObjectDecorator {
                     .observeOn(RealmDecorator.getResponseScheduler());
 
             //first time make a call!
-            Observable.fromCallable(new Callable<RealmModel>() {
-                @Override
-                public RealmModel call() throws Exception {
+            Observable.fromCallable(() -> {
 
-                    RealmResults<RealmModel> realmResults = queryTracker.rewind();
+                RealmResults<RealmModel> realmResults = queryTracker.rewind();
 
-                    if (!realmResults.isEmpty())
-                        return realmResults.get(0);
-                    else
-                        return realmObject;
-                }
+                if (!realmResults.isEmpty())
+                    return realmResults.get(0);
+                else
+                    return realmObject;
             }).subscribeOn(RealmDecorator.getTransactionScheduler())
                     .observeOn(RealmDecorator.getResponseScheduler())
                     .subscribe(realmModel -> {

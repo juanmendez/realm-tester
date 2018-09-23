@@ -1,18 +1,17 @@
 package info.juanmendez.realmtester.decorators;
 
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
+import info.juanmendez.realmtester.demo.models.Query;
+import info.juanmendez.realmtester.demo.models.TransactionEvent;
 import info.juanmendez.realmtester.dependencies.Compare;
 import info.juanmendez.realmtester.dependencies.RealmMatchers;
 import info.juanmendez.realmtester.dependencies.RealmStorage;
 import info.juanmendez.realmtester.dependencies.TransactionObservable;
-import info.juanmendez.realmtester.demo.models.Query;
-import info.juanmendez.realmtester.demo.models.TransactionEvent;
 import info.juanmendez.realmtester.utils.QueryTracker;
 import info.juanmendez.realmtester.utils.RealmModelUtil;
 import io.realm.Realm;
@@ -73,70 +72,59 @@ public class RealmDecorator {
             return null;
         });
 
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                return null;
-            }
-        }).when(Realm.class, "setDefaultConfiguration", any());
+        doAnswer((Answer<Void>) invocation -> null)
+                .when(Realm.class, "setDefaultConfiguration", any());
 
-        when(realm.createObject(Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmModel.class)))).thenAnswer(invocation -> {
-            Class clazz = (Class) invocation.getArguments()[0];
+        when(realm.createObject(Mockito.argThat(
+                new RealmMatchers.ClassMatcher<>(RealmModel.class))))
+                .thenAnswer(invocation -> {
+                        Class clazz = (Class) invocation.getArguments()[0];
 
-            if (!realmMap.containsKey(clazz)) {
-                realmMap.put(clazz, RealmListDecorator.create());
-            }
+                        if (!realmMap.containsKey(clazz)) {
+                            realmMap.put(clazz, RealmListDecorator.create());
+                        }
 
-            RealmModel realmModel = RealmModelDecorator.create(clazz, true);
-            RealmStorage.addModel(realmModel);
+                        RealmModel realmModel = RealmModelDecorator.create(clazz, true);
+                        RealmStorage.addModel(realmModel);
 
-            return realmModel;
-        });
+                        return realmModel;
+                });
 
         //realm.copyToRealm( realmModel )
-        when(realm.copyToRealm(Mockito.any(RealmModel.class))).thenAnswer(new Answer<RealmModel>() {
-
-            @Override
-            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
-
-                RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
-                return createOrUpdate(newRealmModel);
-            }
-        });
+        when(realm.copyToRealm(Mockito.any(RealmModel.class)))
+                .thenAnswer((Answer<RealmModel>) invocationOnMock -> {
+                    RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                    return createOrUpdate(newRealmModel);
+                });
 
         //realm.copyToRealmOrUpdate( realmModel ) same as realm.copyToRealm( realmModel )
-        when(realm.copyToRealmOrUpdate(Mockito.any(RealmModel.class))).thenAnswer(new Answer<RealmModel>() {
+        when(realm.copyToRealmOrUpdate(Mockito.any(RealmModel.class)))
+                .thenAnswer((Answer<RealmModel>) invocationOnMock -> {
+                    RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
+                    return createOrUpdate(newRealmModel);
+                });
 
-            @Override
-            public RealmModel answer(InvocationOnMock invocationOnMock) throws Throwable {
+        when(realm.where(Mockito.argThat(
+                new RealmMatchers.ClassMatcher<>(RealmModel.class))))
+                .then((Answer<RealmQuery>) invocationOnMock -> {
+                    //clear list being queried
+                    Class clazz = (Class) invocationOnMock.getArguments()[0];
+                    QueryTracker queryTracker = new QueryTracker(clazz);
 
-                RealmModel newRealmModel = (RealmModel) invocationOnMock.getArguments()[0];
-                return createOrUpdate(newRealmModel);
-            }
-        });
+                    RealmQuery realmQuery = RealmQueryDecorator.create(queryTracker);
 
-        when(realm.where(Mockito.argThat(new RealmMatchers.ClassMatcher<>(RealmModel.class)))).then(new Answer<RealmQuery>() {
+                    if (!realmMap.containsKey(clazz)) {
+                        realmMap.put(clazz, new RealmList<>());
+                    }
 
+                    queryTracker.appendQuery(
+                            Query.build()
+                                    .setCondition(Compare.startTopGroup)
+                                    .setArgs(new Object[]{realmMap.get(clazz)})
+                    );
 
-            @Override
-            public RealmQuery answer(InvocationOnMock invocationOnMock) throws Throwable {
-
-                //clear list being queried
-                Class clazz = (Class) invocationOnMock.getArguments()[0];
-                QueryTracker queryTracker = new QueryTracker(clazz);
-
-                RealmQuery realmQuery = RealmQueryDecorator.create(queryTracker);
-
-                if (!realmMap.containsKey(clazz)) {
-                    realmMap.put(clazz, new RealmList<>());
-                }
-
-                queryTracker.appendQuery(Query.build().setCondition(Compare.startTopGroup).setArgs(new Object[]{realmMap.get(clazz)}));
-
-
-                return realmQuery;
-            }
-        });
+                    return realmQuery;
+                });
     }
 
     private static RealmModel createOrUpdate(RealmModel newRealmModel) {
@@ -161,171 +149,136 @@ public class RealmDecorator {
     private static void handleAsyncTransactions(Realm realm) {
 
         //call execute() in Realm.Transaction object received.
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+        doAnswer((Answer<Void>) invocation -> {
 
-                if (invocation.getArguments().length > 0) {
-                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+            if (invocation.getArguments().length > 0) {
+                Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
 
-                    queueTransaction(() -> {
-                        transaction.execute(realm);
-                        return null;
-                    });
-                }
-                return null;
+                queueTransaction(() -> {
+                    transaction.execute(realm);
+                    return null;
+                });
             }
+            return null;
         }).when(realm).executeTransaction(any(Realm.Transaction.class));
 
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
+        doAnswer((Answer<Void>) invocation -> {
 
-                if (invocation.getArguments().length > 0) {
+            if (invocation.getArguments().length > 0) {
 
-                    queueTransaction(() -> {
-                        Observable.fromCallable(new Callable<Void>() {
-                            @Override
-                            public Void call() throws Exception {
-                                Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
-                                transaction.execute(realm);
-                                return null;
-                            }
-                        })
-                                .subscribeOn(getTransactionScheduler())
-                                .observeOn(getResponseScheduler()).subscribe(aVoid -> {
-                        });
-
+                queueTransaction(() -> {
+                    Observable.fromCallable((Callable<Void>) () -> {
+                        Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                        transaction.execute(realm);
                         return null;
+                    })
+                            .subscribeOn(getTransactionScheduler())
+                            .observeOn(getResponseScheduler()).subscribe(aVoid -> {
                     });
 
-                }
+                    return null;
+                });
 
-                return null;
             }
+
+            return null;
         }).when(realm).executeTransactionAsync(any(Realm.Transaction.class));
 
 
         when(realm.executeTransactionAsync(any(Realm.Transaction.class), any(Realm.Transaction.OnSuccess.class))).thenAnswer(
-                new Answer<RealmAsyncTask>() {
+                (Answer<RealmAsyncTask>) invocation -> {
 
-                    @Override
-                    public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
+                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
 
-                        Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                    return queueTransaction(() -> {
 
-                        return queueTransaction(() -> {
-
-                            Observable.fromCallable(new Callable<Boolean>() {
-                                @Override
-                                public Boolean call() throws Exception {
-                                    if (invocation.getArguments().length >= 1) {
-                                        transaction.execute(realm);
-                                        return true;
+                        Observable.fromCallable(() -> {
+                            if (invocation.getArguments().length >= 1) {
+                                transaction.execute(realm);
+                                return true;
+                            }
+                            return false;
+                        })
+                                .subscribeOn(getTransactionScheduler())
+                                .observeOn(getResponseScheduler())
+                                .subscribe(aBoolean -> {
+                                    if (aBoolean && invocation.getArguments().length >= 2) {
+                                        Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                                        onSuccess.onSuccess();
                                     }
-                                    return false;
-                                }
-                            })
-                                    .subscribeOn(getTransactionScheduler())
-                                    .observeOn(getResponseScheduler())
-                                    .subscribe(aBoolean -> {
-                                        if (aBoolean && invocation.getArguments().length >= 2) {
-                                            Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
-                                            onSuccess.onSuccess();
-                                        }
-                                    });
+                                });
 
-                            return null;
-                        });
-                    }
+                        return null;
+                    });
                 }
         );
 
 
         when(realm.executeTransactionAsync(any(Realm.Transaction.class), any(Realm.Transaction.OnSuccess.class), any(Realm.Transaction.OnError.class))).thenAnswer(
-                new Answer<RealmAsyncTask>() {
+                (Answer<RealmAsyncTask>) invocation -> queueTransaction(() -> {
+                    Observable.fromCallable(() -> {
+                        if (invocation.getArguments().length >= 1) {
+                            Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                            transaction.execute(realm);
+                            return true;
+                        }
 
-                    @Override
-                    public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
-
-                        return queueTransaction(() -> {
-                            Observable.fromCallable(new Callable<Boolean>() {
-                                @Override
-                                public Boolean call() throws Exception {
-                                    if (invocation.getArguments().length >= 1) {
-                                        Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
-                                        transaction.execute(realm);
-                                        return true;
-                                    }
-
-                                    return false;
+                        return false;
+                    })
+                            .subscribeOn(observerScheduler)
+                            .observeOn(subscriberScheduler)
+                            .subscribe(aBoolean -> {
+                                if (aBoolean && invocation.getArguments().length >= 2) {
+                                    Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                                    onSuccess.onSuccess();
                                 }
-                            })
-                                    .subscribeOn(observerScheduler)
-                                    .observeOn(subscriberScheduler)
-                                    .subscribe(aBoolean -> {
-                                        if (aBoolean && invocation.getArguments().length >= 2) {
-                                            Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
-                                            onSuccess.onSuccess();
-                                        }
 
-                                    }, throwable -> {
+                            }, throwable -> {
 
-                                        if (invocation.getArguments().length >= 3) {
-                                            Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
-                                            onError.onError(throwable);
-                                        }
+                                if (invocation.getArguments().length >= 3) {
+                                    Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
+                                    onError.onError(throwable);
+                                }
 
-                                    });
+                            });
 
-                            return null;
-                        });
-                    }
-                }
+                    return null;
+                })
         );
 
 
         when(realm.executeTransactionAsync(any(Realm.Transaction.class), any(Realm.Transaction.OnError.class))).thenAnswer(
-                new Answer<RealmAsyncTask>() {
+                (Answer<RealmAsyncTask>) invocation -> {
+                    Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
 
-                    @Override
-                    public RealmAsyncTask answer(InvocationOnMock invocation) throws Throwable {
-                        Realm.Transaction transaction = (Realm.Transaction) invocation.getArguments()[0];
+                    return queueTransaction(() -> {
 
-                        return queueTransaction(() -> {
+                        Observable.fromCallable(() -> {
+                            if (invocation.getArguments().length >= 1) {
+                                return true;
+                            }
 
-                            Observable.fromCallable(new Callable<Boolean>() {
-                                @Override
-                                public Boolean call() throws Exception {
-                                    if (invocation.getArguments().length >= 1) {
-
-
-                                        return true;
+                            return false;
+                        })
+                                .subscribeOn(observerScheduler)
+                                .observeOn(subscriberScheduler)
+                                .subscribe(aBoolean -> {
+                                    if (aBoolean && invocation.getArguments().length >= 2) {
+                                        Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
+                                        onSuccess.onSuccess();
                                     }
 
-                                    return false;
-                                }
-                            })
-                                    .subscribeOn(observerScheduler)
-                                    .observeOn(subscriberScheduler)
-                                    .subscribe(aBoolean -> {
-                                        if (aBoolean && invocation.getArguments().length >= 2) {
-                                            Realm.Transaction.OnSuccess onSuccess = (Realm.Transaction.OnSuccess) invocation.getArguments()[1];
-                                            onSuccess.onSuccess();
-                                        }
+                                }, throwable -> {
 
-                                    }, throwable -> {
+                                    if (invocation.getArguments().length >= 2) {
+                                        Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
+                                        onError.onError(throwable);
+                                    }
 
-                                        if (invocation.getArguments().length >= 2) {
-                                            Realm.Transaction.OnError onError = (Realm.Transaction.OnError) invocation.getArguments()[2];
-                                            onError.onError(throwable);
-                                        }
+                                });
 
-                                    });
-
-                            return null;
-                        });
-                    }
+                        return null;
+                    });
                 }
         );
     }
@@ -356,15 +309,14 @@ public class RealmDecorator {
 
         TransactionObservable.startRequest(funk,
                 TransactionObservable.asObservable()
-                        .filter(transactionEvent -> {
-                            return transactionEvent.getState() == TransactionEvent.START_TRANSACTION && transactionEvent.getTarget() == funk;
-                        })
+                        .filter(transactionEvent ->
+                                transactionEvent.getState() == TransactionEvent.START_TRANSACTION
+                                        && transactionEvent.getTarget() == funk)
                         .subscribe(o -> {
                             funk.call();
                             TransactionObservable.endRequest(funk);
                         })
         );
-
 
         return new RealmAsyncTask() {
             @Override

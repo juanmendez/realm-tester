@@ -104,7 +104,7 @@ public class RealmModelDecorator {
                 RealmObservable.add(realmModel,
 
                         RealmObservable.asObservable()
-                                .filter(realmEvent -> realmEvent.getState() == RealmEvent.MODEL_REMOVED)
+                                .filter(realmEvent -> realmEvent.getState().equals(RealmEvent.MODEL_REMOVED))
                                 .map(realmEvent -> realmEvent.getRealmModel())
                                 .ofType(fieldClass)
                                 .subscribe(o -> {

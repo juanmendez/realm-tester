@@ -28,8 +28,6 @@ public class RealmListDecorator<T extends RealmModel> {
     }
 
     public static RealmList<RealmModel> create() {
-
-        return new RealmListStubbed();
+        return new RealmListStubbed<>();
     }
-
 }
